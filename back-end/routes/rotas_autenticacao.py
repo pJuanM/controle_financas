@@ -2,18 +2,41 @@ from fastapi import APIRouter, Form, Depends, HTTPException, Request
 from models import Usuario
 from dependencies import pegar_sessao
 from sqlalchemy.orm import Session
-from main import templates
+from main import templates, ALGORITHM, ACCESS_TOKEN_EXPIRE_HOURS, SECRET_KEY
+from datetime import datetime, timedelta, timezone
+from jose import jwt, JWTError
+
 
 
 rota_autenticacao = APIRouter(prefix="/usuario", tags=["usuario"])
 
+def criar_token(usuario_id):
+    data_expiracao = datetime.now(timezone.utc) + timedelta(hours = ACCESS_TOKEN_EXPIRE_HOURS)
+    dic_info = {"sub": usuario_id, "exp": data_expiracao}
+    jwt_codificado = jwt.encode(dic_info, SECRET_KEY, ALGORITHM)
+
+    return jwt_codificado
+
+def autenticar_usuario(email, senha, session):
+    existe_usuario = session.query(Usuario).filter(Usuario.email == email).first()
+
+    if not existe_usuario:
+        raise HTTPException(status_code= 400, detail = "Não tem usuário cadastrado para este e-mail!")
+    
+    if senha != existe_usuario.senha:
+        raise HTTPException(status_code= 400, detail="Senha incorreta")
+    
+    return existe_usuario
+
+
+
 @rota_autenticacao.get("/")
-async def home(request: Request, session: Session = Depends(pegar_sessao)):
+async def home(request: Request):
     """
     Essa é a rota padrão de usuários do sistema.
     """
 
-    return templates.TemplateResponse(request= request, name="cadastro.html")
+    return templates.TemplateResponse(request = request, name="cadastro.html")
 
 @rota_autenticacao.post("/criarUsuario")
 async def criar_usuario(usuario: str = Form(...), nome: str = Form(...), email: str = Form(...), senha: str = Form(...), session: Session = Depends(pegar_sessao)):
@@ -33,13 +56,9 @@ async def criar_usuario(usuario: str = Form(...), nome: str = Form(...), email: 
 
 @rota_autenticacao.post("/login")
 async def login(email: str = Form(...), senha: str = Form(...), session: Session = Depends(pegar_sessao)):
-    existe_usuario = session.query(Usuario).filter(Usuario.email == email).first()
+    usuario = autenticar_usuario(email, senha, session)
+    access_token = criar_token(usuario.id)
 
-    if not existe_usuario:
-        raise HTTPException(status_code = 400, detail = "Não existe conta cadastrada para este e-mail.")
-    
-    if existe_usuario.senha != senha:
-        raise HTTPException(status_code = 400, detail = "Senha incorreta!")
-    
-    return {"mensagem" : "Login realizado com sucesso"}
-    
+    return {"access_token": access_token,
+            "token_type": "Bearer"
+    }
