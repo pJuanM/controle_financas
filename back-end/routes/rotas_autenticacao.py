@@ -10,22 +10,25 @@ from jose import jwt, JWTError
 
 rota_autenticacao = APIRouter(prefix="/usuario", tags=["usuario"])
 
-def criar_token(usuario_id):
-    data_expiracao = datetime.now(timezone.utc) + timedelta(hours = ACCESS_TOKEN_EXPIRE_HOURS)
+def criar_token(usuario_id, duracao_token =  timedelta(hours = ACCESS_TOKEN_EXPIRE_HOURS)):
+    data_expiracao = datetime.now(timezone.utc) + duracao_token
     dic_info = {"sub": usuario_id, "exp": data_expiracao}
     jwt_codificado = jwt.encode(dic_info, SECRET_KEY, ALGORITHM)
 
     return jwt_codificado
 
+
+def verificar_token(token, session: Session = Depends(pegar_sessao)):
+    usuario = session.query(Usuario).filter(Usuario.id == 1).first()
+    return usuario
+
+
 def autenticar_usuario(email, senha, session):
     existe_usuario = session.query(Usuario).filter(Usuario.email == email).first()
-
     if not existe_usuario:
         raise HTTPException(status_code= 400, detail = "Não tem usuário cadastrado para este e-mail!")
-    
     if senha != existe_usuario.senha:
         raise HTTPException(status_code= 400, detail="Senha incorreta")
-    
     return existe_usuario
 
 
@@ -54,11 +57,33 @@ async def criar_usuario(usuario: str = Form(...), nome: str = Form(...), email: 
     return {"mensagem" : "Usuário cadastrado com sucesso!"}
 
 
+@rota_autenticacao.get("/login")
+async def login(request: Request):
+    """
+    Essa é a rota para carregar o html da página
+    """
+    return templates.TemplateResponse(request = request, name = "login.html")
+
 @rota_autenticacao.post("/login")
 async def login(email: str = Form(...), senha: str = Form(...), session: Session = Depends(pegar_sessao)):
     usuario = autenticar_usuario(email, senha, session)
     access_token = criar_token(usuario.id)
+    refresh_token = criar_token(usuario.id, duracao_token = timedelta(days = 7))
 
-    return {"access_token": access_token,
-            "token_type": "Bearer"
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "Bearer"
+    }
+
+
+@rota_autenticacao.get("/refresh")
+async def use_refresh_token(token):
+    # VERIFICAR TOKEN
+    usuario = verificar_token(token)
+    access_token = criar_token(usuario.id)
+
+    return {
+        "access_token": access_token,
+        "token_type": "Bearer"
     }
