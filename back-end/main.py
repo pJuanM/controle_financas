@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
 import os
 
@@ -12,6 +13,8 @@ ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_HOURS = int(os.getenv("ACCESS_TOKEN_EXPIRE_HOURS"))
 
 app = FastAPI()
+
+oauth2_schema = OAuth2PasswordBearer(tokenUrl="usuario/login-form")
 
 templates = Jinja2Templates(directory = "../front-end/templates")
 app.mount("/static", StaticFiles(directory="../front-end"), name="static")
