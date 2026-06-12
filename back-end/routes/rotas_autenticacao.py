@@ -85,3 +85,4 @@ async def use_refresh_token(usuario: Usuario = Depends(verificar_token)):
         "access_token": access_token,
         "token_type": "Bearer"
     }
+        

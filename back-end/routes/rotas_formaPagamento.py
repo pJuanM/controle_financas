@@ -32,7 +32,7 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
     if not vencimento:
         data_vencimento = None
     if vencimento == True:
-        if data_vencimento != "":
+        if data_vencimento == "":
             raise HTTPException(status_code = 400, detail="Data de vencimento não informada.")
 
 

@@ -11,3 +11,16 @@ function mostrarQuantidadeParcelas() {
 
     }
 }
+
+function formatarMoeda(input) {
+    let value = input.value.replace(/\D/g, "");
+    let number = parseFloat(value) / 100;
+    if (isNaN(number)) {
+        input.value = "";
+        return;
+    }
+    input.value = number.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+}

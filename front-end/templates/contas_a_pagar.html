@@ -15,7 +15,7 @@
     <main class="container">
         <h1 class="titulo-pagina">Contas à Pagar</h1>
         <section class="formulario">
-            <form action="http://127.0.0.1:8000/contas/criarConta" method="POST" id="formulario">
+            <form action="http://127.0.0.1:8000/contasPagar/criarConta" method="POST" id="formulario">
                 <div class="grupo_campo">
                     <input type="date" id="data_compra" name="data_compra" placeholder="" onfocus="this.showPicker()" required>
                 </div>
@@ -47,7 +47,10 @@
                         {% endfor %}
                     </select>
                 </div>
-
+                
+                <div class="grupo_campo">
+                    <input type="text" name="valor_debito" id="valor_debito" placeholder="Valor R$" autocomplete="off" required oninput="formatarMoeda(this)">
+                </div>
                  <div class="grupo_campo">
                     <select name="parcelado" id="parcelado" onchange="mostrarQuantidadeParcelas()" required>
                         <option value="" selected disabled>Parcelar:</option>
@@ -125,7 +128,7 @@
             </svg>
         </a>
     </div>  
-  <script src="/static/js/script.js"></script>
-  <script src="/static/js/contasPagar.js"></script>
+    <script src="/static/js/script.js"></script>
+    <script src="/static/js/contasPagar.js"></script>
 </body>
 </html>

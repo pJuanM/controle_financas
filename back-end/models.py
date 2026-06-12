@@ -1,4 +1,4 @@
-from sqlalchemy import  create_engine, Column, Boolean, Integer, String, ForeignKey, Date
+from sqlalchemy import  create_engine, Column, Boolean, Integer, String, ForeignKey, Date, Float, Numeric
 from sqlalchemy.orm import declarative_base
 
 # ======= CRIAR CONEXÃO COM BANCO DE DADOS =======
@@ -16,8 +16,23 @@ class ContasPagar(Base):
     item_comprado = Column(String(150), nullable=False) 
     categoria_id = Column(Integer, ForeignKey("categoria.id"), nullable=False) 
     forma_pagamento = Column(Integer, ForeignKey("formaPagamento.id"), nullable=False) 
+    valor_debito = Column(Numeric(10, 2), nullable = False)
     parcelado = Column(Boolean, nullable=False) 
+    status_conta = Column(Boolean, nullable=False)
     qnt_parcelas = Column(Integer) 
+    
+
+# ======= PARCELAS =======
+class Parcelas(Base):
+    __tablename__ = "parcelas"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    item_comprado = Column(Integer, ForeignKey("contasPagar.id"), nullable=False)
+    categoria = Column(Integer, ForeignKey("categoria.id"), nullable=False)
+    valor_parcela = Column(Numeric(10, 2), nullable=False)
+    parcela = Column(String, nullable=False)
+    data_pagamento = Column(Date, ForeignKey("formaPagamento.data_vencimento"))
+    status_parcela = Column(String, nullable=False)
+    forma_pagamento = Column(Integer, ForeignKey("contasPagar.id"))
 
 # ======= FORMA DE PAGAMENTO ======= 
 class FormaPagamento(Base): 
@@ -60,9 +75,9 @@ def passar_categoria(categoria, descricao):
                      descricao = descricao)
 
 
-def passar_usuario(usuario, nome_completo, email, senha):
+def passar_usuario(usuario, nome, email, senha):
     return Usuario(usuario = usuario, 
-                   nome_completo = nome_completo, 
+                   nome = nome, 
                    email = email, 
                    senha = senha)
 

@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from dependencies import pegar_sessao
-from models import ContasPagar, Categoria, FormaPagamento
-from main import templates  
+from dependencies import pegar_sessao, verificar_token
+from models import ContasPagar, Categoria, FormaPagamento, Parcelas
+from main import templates
+from decimal import Decimal
 from datetime import date
 
 
@@ -31,21 +32,27 @@ async def criar_conta(data_compra: date = Form(...),
                       item_comprado: str = Form(...), 
                       categoria_id: int = Form(...),  
                       forma_pagamento: int = Form(...), 
+                      valor_debito: str = Form(...),
                       parcelado: bool = Form(...), 
                       qnt_parcelas: int | None = Form(None) , 
                       session: Session = Depends(pegar_sessao)):
+    valor_debito = (valor_debito.replace("R$", "").replace(".", "").replace(",", ".").strip())
+    valor_debito = Decimal(valor_debito)
     existeConta = session.query(ContasPagar).filter(ContasPagar.data_compra == data_compra, ContasPagar.item_comprado == item_comprado, ContasPagar.forma_pagamento == forma_pagamento).first()
-    if existeConta:
-        raise HTTPException(status_code = 400, detail = "Esta compra já foi incluída.")
 
     if parcelado == False:
         qnt_parcelas = None
     else:
         if qnt_parcelas == None or qnt_parcelas <= 0 :
             raise HTTPException(status_code = 400, detail = "A quantidade de parcelas precisa ser maior do que 0.")
+    if existeConta:
+        return {"mensagem": "Compra adicionada com sucesso. = Já existe uma compra idêntica em sistema, por gentileza analise."}
+    
+    novaConta = ContasPagar(data_compra = data_compra, item_comprado = item_comprado, categoria_id = categoria_id, forma_pagamento = forma_pagamento, valor_debito = valor_debito, parcelado = parcelado, qnt_parcelas = qnt_parcelas)
 
-    novaConta = ContasPagar(data_compra = data_compra, item_comprado = item_comprado, categoria_id = categoria_id, forma_pagamento = forma_pagamento, parcelado = parcelado, qnt_parcelas = qnt_parcelas)
     session.add(novaConta)
     session.commit()
+    session.refresh(novaConta)
+
 
     return {"mensagem": "Compra adicionada com sucesso!"}
