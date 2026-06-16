@@ -32,7 +32,7 @@ async def criar_conta(data_compra: date = Form(...),
                       item_comprado: str = Form(...), 
                       categoria_id: int = Form(...),  
                       forma_pagamento: int = Form(...), 
-                      status_conta = bool == False,
+                      status_conta: str = "Pendente",
                       valor_debito: str = Form(...),
                       parcelado: bool = Form(...), 
                       qnt_parcelas: int | None = Form(None), 
@@ -77,3 +77,11 @@ async def deletar_conta(id_conta: int, session: Session = Depends(pegar_sessao),
 
     return {"mensagem": f"Conta excluída com sucesso! - ID da conta {conta.id}",
             "conta": conta}
+
+
+@rota_conta.get("/listarContas")
+async def listar_contas(session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
+    pedidos = session.query(ContasPagar).filter(ContasPagar.id_usuario == usuario.id).all()
+    return {
+        "pedidos": pedidos
+    }

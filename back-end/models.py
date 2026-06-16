@@ -19,13 +19,14 @@ class ContasPagar(Base):
     forma_pagamento = Column(Integer, ForeignKey("formaPagamento.id"), nullable=False) 
     valor_debito = Column(Numeric(10, 2), nullable = False)
     parcelado = Column(Boolean, nullable=False) 
-    status_conta = Column(Boolean, nullable=False)
+    status_conta = Column(String, nullable=False)
     qnt_parcelas = Column(Integer) 
     
 # ======= FORMA DE PAGAMENTO ======= 
 class FormaPagamento(Base): 
     __tablename__ = "formaPagamento" 
     id = Column(Integer, primary_key=True, autoincrement=True)  
+    id_usuario = Column(Integer, ForeignKey("usuario.id"))
     forma_pagamento = Column(String(40), nullable=False) 
     responsavel = Column(String(150), nullable=False) 
     vencimento = Column(Boolean, nullable=False) 
@@ -36,6 +37,7 @@ class FormaPagamento(Base):
 class Categoria(Base):
     __tablename__ = "categoria" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
+    id_usuario = Column(Integer, ForeignKey("usuario.id"))
     categoria = Column(String(50), nullable=False) 
     descricao = Column(String(100), nullable=False) 
         
@@ -49,24 +51,5 @@ class Usuario(Base):
     email = Column(String(150), nullable=False) 
     senha = Column(String(16), nullable=False) 
 
-
-def passar_forma_pagamento(forma_pagamento, responsavel, vencimento, data_vencimento):
-    return FormaPagamento(forma_pagamento = forma_pagamento,
-                          responsavel = responsavel,
-                          vencimento = vencimento,
-                          data_vencimento = data_vencimento)
-
-
-
-def passar_categoria(categoria, descricao):
-    return Categoria(categoria = categoria, 
-                     descricao = descricao)
-
-
-def passar_usuario(usuario, nome, email, senha):
-    return Usuario(usuario = usuario, 
-                   nome = nome, 
-                   email = email, 
-                   senha = senha)
 
 Base.metadata.create_all(db)
