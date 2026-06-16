@@ -21,6 +21,8 @@ class ContasPagar(Base):
     parcelado = Column(Boolean, nullable=False) 
     status_conta = Column(String, nullable=False)
     qnt_parcelas = Column(Integer) 
+    ativo = Column(Boolean, nullable=False)
+
     
 # ======= FORMA DE PAGAMENTO ======= 
 class FormaPagamento(Base): 
@@ -31,6 +33,8 @@ class FormaPagamento(Base):
     responsavel = Column(String(150), nullable=False) 
     vencimento = Column(Boolean, nullable=False) 
     data_vencimento = Column(Integer) 
+    ativo = Column(Boolean, nullable=False)
+
 
     
 # ======= CATEGORIA ======= 
@@ -40,6 +44,7 @@ class Categoria(Base):
     id_usuario = Column(Integer, ForeignKey("usuario.id"))
     categoria = Column(String(50), nullable=False) 
     descricao = Column(String(100), nullable=False) 
+    ativo = Column(Boolean, nullable=False)
         
     
 # ======= USUÁRIO ======= 
@@ -50,6 +55,8 @@ class Usuario(Base):
     nome = Column(String(150), nullable=False) 
     email = Column(String(150), nullable=False) 
     senha = Column(String(16), nullable=False) 
+    ativo = Column(Boolean, nullable=False)
+
 
 
 Base.metadata.create_all(db)

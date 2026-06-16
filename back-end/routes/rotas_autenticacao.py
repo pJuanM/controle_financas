@@ -36,11 +36,16 @@ async def home(request: Request):
     return templates.TemplateResponse(request = request, name="cadastro.html")
 
 @rota_autenticacao.post("/criarUsuario")
-async def criar_usuario(usuario: str = Form(...), nome: str = Form(...), email: str = Form(...), senha: str = Form(...), session: Session = Depends(pegar_sessao)):
+async def criar_usuario(usuario: str = Form(...), 
+                        nome: str = Form(...), 
+                        email: str = Form(...), 
+                        senha: str = Form(...), 
+                        session: Session = Depends(pegar_sessao)):
+    
     existe_usuario = session.query(Usuario).filter(Usuario.email == email).first()
     if existe_usuario:
         raise HTTPException(status_code= 400, detail = "Este e-mail já foi cadastrado em sistema.")
-    novo_usuario = Usuario(usuario = usuario, nome = nome, email = email, senha = senha)
+    novo_usuario = Usuario(usuario = usuario, nome = nome, ativo = True, email = email, senha = senha)
     session.add(novo_usuario)
     session.commit()
 
@@ -56,7 +61,10 @@ async def login(request: Request):
     return templates.TemplateResponse(request = request, name = "login.html")
 
 @rota_autenticacao.post("/login")
-async def login(email: str = Form(...), senha: str = Form(...), session: Session = Depends(pegar_sessao)):
+async def login(email: str = Form(...), 
+                senha: str = Form(...), 
+                session: Session = Depends(pegar_sessao)):
+    
     usuario = autenticar_usuario(email, senha, session)
     access_token = criar_token(usuario.id)
     refresh_token = criar_token(usuario.id, duracao_token = timedelta(days = 7))
@@ -68,14 +76,15 @@ async def login(email: str = Form(...), senha: str = Form(...), session: Session
 
 # ======= LOGIN VIA FAST API =======
 @rota_autenticacao.post("/login-form")
-async def login_form(dados_formulario: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(pegar_sessao)):
+async def login_form(dados_formulario: OAuth2PasswordRequestForm = Depends(), 
+                     session: Session = Depends(pegar_sessao)):
+    
     usuario = autenticar_usuario(dados_formulario.username, dados_formulario.password, session)
     access_token = criar_token(usuario.id)
     return {
         "access_token": access_token,
         "token_type": "Bearer"
     }
-
 
 
 @rota_autenticacao.get("/refresh")

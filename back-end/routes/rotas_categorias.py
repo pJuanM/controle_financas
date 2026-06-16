@@ -24,16 +24,31 @@ async def criar_categoria(categoria: str = Form(...),descricao: str = Form(...),
         raise HTTPException(status_code = 400, detail="Categoria já cadastrada em sistema!")
 
     else:
-        nova_categoria = Categoria(id_usuario = usuario.id, categoria = categoria, descricao = descricao)
+        nova_categoria = Categoria(id_usuario = usuario.id, categoria = categoria, ativo = True, descricao = descricao)
         session.add(nova_categoria)
         session.commit()
 
         return {"mensagem": f"A Categoria {categoria} foi cadastrada com sucesso! "}
     
 
-@rota_categoria.post("/editarCategoria/{categoria_id}")
-async def editar_categoria(categoria_id: int, session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
-    existeCategoria = session.query(Categoria).filter(Categoria.id == categoria_id, Categoria.id_usuario == usuario.id).first()
-    if not existeCategoria:
-        raise HTTPException(status_code = 404, detail = "Não existe está categoria cadastrada." )
+@rota_categoria.patch("/editarCategoria/{categoria_id}")
+async def editar_categoria(categoria_id: int, categoria_titulo: str = Form(...), categoria_descricao: str = Form(...), session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
+    categoria = session.query(Categoria).filter(Categoria.id == categoria_id, Categoria.id_usuario == usuario.id).first()
+    if not categoria:
+        raise HTTPException(status_code = 404, detail = "Não existe essa categoria cadastrada em sistema." )
 
+    categoria.categoria = categoria_titulo
+    categoria.descricao = categoria_descricao
+    session.commit()
+    return {"mensagem": "A categoria foi alterada com sucesso"}
+
+
+@rota_categoria.post("/excluirCategoria/{categoria_id}")
+async def excluir_categoria(categoria_id: int, session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
+    categoria = session.query(Categoria).filter(Categoria.id == categoria_id, Categoria.id_usuario == usuario.id).first()
+
+    if not categoria:
+        raise HTTPException(status_code = 404, detail = "Não existe essa categoria cadastrada em sistema.")
+    
+    categoria.ativo = False
+    session.commit()
