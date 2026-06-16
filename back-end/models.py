@@ -12,6 +12,7 @@ Base = declarative_base()
 class ContasPagar(Base):
     __tablename__ = "contasPagar" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
+    id_usuario = Column(Integer, ForeignKey("usuario.id"))
     data_compra = Column(Date, nullable=False) 
     item_comprado = Column(String(150), nullable=False) 
     categoria_id = Column(Integer, ForeignKey("categoria.id"), nullable=False) 
@@ -21,19 +22,6 @@ class ContasPagar(Base):
     status_conta = Column(Boolean, nullable=False)
     qnt_parcelas = Column(Integer) 
     
-
-# ======= PARCELAS =======
-class Parcelas(Base):
-    __tablename__ = "parcelas"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    item_comprado = Column(Integer, ForeignKey("contasPagar.id"), nullable=False)
-    categoria = Column(Integer, ForeignKey("categoria.id"), nullable=False)
-    valor_parcela = Column(Numeric(10, 2), nullable=False)
-    parcela = Column(String, nullable=False)
-    data_pagamento = Column(Date, ForeignKey("formaPagamento.data_vencimento"))
-    status_parcela = Column(String, nullable=False)
-    forma_pagamento = Column(Integer, ForeignKey("contasPagar.id"))
-
 # ======= FORMA DE PAGAMENTO ======= 
 class FormaPagamento(Base): 
     __tablename__ = "formaPagamento" 
