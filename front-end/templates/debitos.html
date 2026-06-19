@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle Financeiro</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/contas_a_pagar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/debitos.css') }}">
 </head>
 <body>
     <header class="container">
@@ -15,7 +15,7 @@
     <main class="container">
         <h1 class="titulo-pagina">Contas à Pagar</h1>
         <section class="formulario">
-            <form action="http://127.0.0.1:8000/contasPagar/criarConta" method="POST" id="formulario">
+            <form action="http://127.0.0.1:8000/Debitos/debito/criar" method="POST" id="formulario">
                 <div class="grupo_campo">
                     <input type="date" id="data_compra" name="data_compra" placeholder="" onfocus="this.showPicker()" required>
                 </div>
@@ -129,6 +129,6 @@
         </a>
     </div>  
     <script src="/static/js/script.js"></script>
-    <script src="/static/js/contasPagar.js"></script>
+    <script src="/static/js/debitos.js"></script>
 </body>
 </html>

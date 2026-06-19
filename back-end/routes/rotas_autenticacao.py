@@ -35,7 +35,7 @@ async def home(request: Request):
     """
     return templates.TemplateResponse(request = request, name="cadastro.html")
 
-@rota_autenticacao.post("/criarUsuario")
+@rota_autenticacao.post("/criar")
 async def criar_usuario(usuario: str = Form(...), 
                         nome: str = Form(...), 
                         email: str = Form(...), 
@@ -45,7 +45,7 @@ async def criar_usuario(usuario: str = Form(...),
     existe_usuario = session.query(Usuario).filter(Usuario.email == email).first()
     if existe_usuario:
         raise HTTPException(status_code= 400, detail = "Este e-mail já foi cadastrado em sistema.")
-    novo_usuario = Usuario(usuario = usuario, nome = nome, ativo = True, email = email, senha = senha)
+    novo_usuario = Usuario(usuario = usuario, nome = nome, status_usuario = "ATIVO", email = email, senha = senha)
     session.add(novo_usuario)
     session.commit()
 

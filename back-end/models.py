@@ -9,8 +9,8 @@ Base = declarative_base()
 
 # ======= CRIAR COLUNAS/CLASSES BANCO DE DADOS =======
 # ======= CONTAS À PAGAR ======= 
-class ContasPagar(Base):
-    __tablename__ = "contasPagar" 
+class Debitos(Base):
+    __tablename__ = "debitos" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
     id_usuario = Column(Integer, ForeignKey("usuario.id"))
     data_compra = Column(Date, nullable=False) 
@@ -19,9 +19,8 @@ class ContasPagar(Base):
     forma_pagamento = Column(Integer, ForeignKey("formaPagamento.id"), nullable=False) 
     valor_debito = Column(Numeric(10, 2), nullable = False)
     parcelado = Column(Boolean, nullable=False) 
-    status_conta = Column(String, nullable=False)
     qnt_parcelas = Column(Integer) 
-    ativo = Column(Boolean, nullable=False)
+    status_debito = Column(String, nullable=False)
 
     
 # ======= FORMA DE PAGAMENTO ======= 
@@ -33,8 +32,7 @@ class FormaPagamento(Base):
     responsavel = Column(String(150), nullable=False) 
     vencimento = Column(Boolean, nullable=False) 
     data_vencimento = Column(Integer) 
-    ativo = Column(Boolean, nullable=False)
-
+    status_forma_pagamento = Column(String, nullable=False)
 
     
 # ======= CATEGORIA ======= 
@@ -43,8 +41,8 @@ class Categoria(Base):
     id = Column(Integer, primary_key=True, autoincrement=True) 
     id_usuario = Column(Integer, ForeignKey("usuario.id"))
     categoria = Column(String(50), nullable=False) 
-    descricao = Column(String(100), nullable=False) 
-    ativo = Column(Boolean, nullable=False)
+    descricao = Column(String(100), nullable=False)
+    status_categoria = Column(String, nullable=False) 
         
     
 # ======= USUÁRIO ======= 
@@ -55,7 +53,7 @@ class Usuario(Base):
     nome = Column(String(150), nullable=False) 
     email = Column(String(150), nullable=False) 
     senha = Column(String(16), nullable=False) 
-    ativo = Column(Boolean, nullable=False)
+    status_usuario = Column(String, nullable=False)
 
 
 

@@ -16,7 +16,7 @@ async def home(request: Request):
     return templates.TemplateResponse(request= request, name="forma_de_pagamento.html")
 
 
-@rota_formaPagamento.post("/criarFormaPagamento")
+@rota_formaPagamento.post("/criar")
 async def criar_formaPagamento(forma_pagamento: str = Form(...), 
                                responsavel: str = Form(...), 
                                vencimento: bool = Form(...), 
@@ -36,7 +36,7 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
             raise HTTPException(status_code = 400, detail="Data de vencimento não informada.")
 
 
-    nova_formaPagamento = FormaPagamento(forma_pagamento = forma_pagamento, responsavel = responsavel, vencimento = vencimento, data_vencimento = data_vencimento)
+    nova_formaPagamento = FormaPagamento(forma_pagamento = forma_pagamento, responsavel = responsavel, status_forma_pagamento = "ATIVO", vencimento = vencimento, data_vencimento = data_vencimento)
     session.add(nova_formaPagamento)
     session.commit()
 

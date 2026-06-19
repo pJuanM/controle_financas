@@ -22,9 +22,9 @@ app.mount("/static", StaticFiles(directory="../front-end"), name="static")
 from routes.rotas_categorias import rota_categoria
 from routes.rotas_formaPagamento import rota_formaPagamento
 from routes.rotas_autenticacao import rota_autenticacao
-from routes.rotas_contas import rota_conta
+from routes.rotas_debitos import rota_debito
 
 app.include_router(rota_categoria)
 app.include_router(rota_formaPagamento)
 app.include_router(rota_autenticacao)
-app.include_router(rota_conta)
+app.include_router(rota_debito)
