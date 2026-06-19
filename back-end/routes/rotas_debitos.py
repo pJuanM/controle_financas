@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from dependencies import pegar_sessao, verificar_token
-from models import Debitos, Categoria, FormaPagamento, Usuario
+from models import Debitos, Categoria, FormasPagamento, Usuario
 from main import templates
 from decimal import Decimal
 from datetime import date

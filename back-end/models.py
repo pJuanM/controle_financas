@@ -24,7 +24,7 @@ class Debitos(Base):
 
     
 # ======= FORMA DE PAGAMENTO ======= 
-class FormaPagamento(Base): 
+class FormasPagamento(Base): 
     __tablename__ = "formaPagamento" 
     id = Column(Integer, primary_key=True, autoincrement=True)  
     id_usuario = Column(Integer, ForeignKey("usuario.id"))

@@ -1,4 +1,4 @@
-from fastapi import Form, Depends, HTTPException, APIRouter, Request
+from fastapi import Form, Depends, HTTPException, APIRouter, Request, Query
 from sqlalchemy.orm import Session
 from dependencies import pegar_sessao, verificar_token
 from models import Categoria, Usuario
@@ -8,11 +8,12 @@ rota_categoria = APIRouter(prefix="/categorias", tags=["categorias"])
 
 
 @rota_categoria.get("/")
-async def home(request: Request, session: Session = Depends(pegar_sessao) ):
+async def home(request: Request):
     """
     Essa é a rota padrão das categorias
     """
-    return templates.TemplateResponse(request= request, 
+    
+    return templates.TemplateResponse(request = request, 
                                       name = "categoria.html")
 
 
@@ -32,13 +33,15 @@ async def criar_categoria(categoria: str = Form(...),descricao: str = Form(...),
     
 
 @rota_categoria.patch("/categoria/editar/{categoria_id}")
-async def editar_categoria(categoria_id: int, categoria_titulo: str = Form(...), categoria_descricao: str = Form(...), session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
+async def editar_categoria(categoria_id: int, categoria_titulo: str = Form(...), categoria_descricao: str = Form(...), categoria_status: str = Form(...), session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
     categoria = session.query(Categoria).filter(Categoria.id == categoria_id, Categoria.id_usuario == usuario.id).first()
     if not categoria:
         raise HTTPException(status_code = 404, detail = "Não existe essa categoria cadastrada em sistema." )
-
+    if categoria_status not in ["ATIVO", "INATIVO"]:
+        raise HTTPException(status_code = 401, detail = "A categoria só pode ser ATIVO ou INATIVO.")
     categoria.categoria = categoria_titulo
     categoria.descricao = categoria_descricao
+    categoria.status_categoria = categoria_status
     session.commit()
     return {"mensagem": "A categoria foi alterada com sucesso"}
 
@@ -52,3 +55,15 @@ async def excluir_categoria(categoria_id: int, session: Session = Depends(pegar_
     
     categoria.status_categoria = "CANCELADO"
     session.commit()
+
+
+@rota_categoria.get("/categoria/listar")
+async def listar_categoria(session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token),                        status_categoria: str = Query(...)):
+    categoria = session.query(Categoria).filter(Categoria.id_usuario == usuario.id, Categoria.status_categoria == status_categoria).all()
+
+    if not categoria:
+        raise HTTPException(status_code = 400, detail = "Não existe categoria cadastrada para este usuário")
+    
+    return {
+        "categoria": categoria
+    }

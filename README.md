@@ -16,23 +16,13 @@ Listar Débitos
    - Data do débito;
    - Forma de Pagamento do débito.
 
-Listar Categorias
- - Excluir
- - Editar
-   - Alterar título;
-   - Alterar descrição.
-
 Listar Forma de Pagamentos
  - Filtrar:
    - Responsável;
    - Possui / Não Vencimento;
    - Data de Vencimento.
  - Excluir;
- - Editar:
-   - Alterar responsável;
-   - Alterar data de vencimento;
-   - Alterar se possui vencimento;
-   - Alterar título.
+
 
 Listar Parcelas
 - Filtrar:
