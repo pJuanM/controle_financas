@@ -73,12 +73,49 @@ async def editar_formaPagamento(id_formaPagamento: int,
     return {"mensagem": f"A forma de pagamento foi alterada com sucesso!"}
 
 
+@rota_formaPagamento.post("/excluir/{formaPagamento_id}")
+async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
+    existeFormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == formaPagamento_id, FormasPagamento.id_usuario == usuario.id).first()
+
+    if not existeFormaPagamento:
+        raise HTTPException(status_code = 401, detail = "Não existe essa forma de pagamento cadastrada para este usuário")
+    
+    existeFormaPagamento.status_forma_pagamento == "INATIVO"
+    session.commit()
+
+    return {"mensagem": "Forma de pagamento excluida com sucesso."}
+
+
 @rota_formaPagamento.get("/listar")
-async def listar_formaPagamento(forma_pagamento: str = Query(...),
-                                responsavel: str = Query(...),
-                                vencimento: bool = Query(...),
-                                data_vencimento: int = Query(...),
-                                status_forma_pagamento: str = Query(...),
+async def listar_formaPagamento(forma_pagamento: str | None = Query(None),
+                                responsavel: str | None = Query(None),
+                                vencimento: bool | None = Query(None),
+                                data_vencimento: int | None = Query(None),
+                                status_forma_pagamento: str | None = Query(None),
                                 session: Session = Depends(pegar_sessao), 
                                 usuario: Usuario = Depends(verificar_token)):
     
+    
+    query = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
+
+    if forma_pagamento is not None:
+        query = query.filter(FormasPagamento.forma_pagamento == forma_pagamento)
+    
+    if responsavel is not None:
+        query = query.filter(FormasPagamento.responsavel == responsavel)
+
+    if vencimento is not None:
+        query = query.filter(FormasPagamento.vencimento == vencimento)
+
+    if data_vencimento is not None:
+        query = query.filter(FormasPagamento.data_vencimento == data_vencimento)
+
+    if status_forma_pagamento is not None:
+        query = query.filter(FormasPagamento.status_forma_pagamento == status_forma_pagamento)
+
+    resultado_forma_pagamento = query.all()
+
+    if not resultado_forma_pagamento:
+        return {"mensagem": "Não encontrado dados com os filtros aplicados."}
+
+    return {"Forma de Pagamento": resultado_forma_pagamento}

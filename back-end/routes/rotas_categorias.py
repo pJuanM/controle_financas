@@ -53,7 +53,7 @@ async def excluir_categoria(categoria_id: int, session: Session = Depends(pegar_
     if not categoria:
         raise HTTPException(status_code = 404, detail = "Não existe essa categoria cadastrada em sistema.")
     
-    categoria.status_categoria = "CANCELADO"
+    categoria.status_categoria = "INATIVO"
     session.commit()
 
 

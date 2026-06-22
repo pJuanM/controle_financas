@@ -7,22 +7,6 @@ Listar Débitos
    - Status;
    - Categoria;
    - Forma de Pagamento.
- - Excluir
- - Editar
-   - Marcar como Pago;
-   - Marcar como Cancelado;
-   - Título do débito;
-   - Valor do débito;
-   - Data do débito;
-   - Forma de Pagamento do débito.
-
-Listar Forma de Pagamentos
- - Filtrar:
-   - Responsável;
-   - Possui / Não Vencimento;
-   - Data de Vencimento.
- - Excluir;
-
 
 Listar Parcelas
 - Filtrar:
@@ -35,3 +19,12 @@ Listar Parcelas
   - Marcar como Pago;
   - Marcar como Cancelado.
 - Excluir
+
+Dashboard
+- Criar o dashboard todo
+  - Relatório de PIZZA
+  - Cards
+  - Relatório de linha
+  - Relatório de colunas
+  - Relatorio de barras
+  - Tabela com dados
