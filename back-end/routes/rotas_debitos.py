@@ -42,7 +42,7 @@ async def criar_debito(data_compra: date = Form(...),
     existeConta = session.query(Debitos).filter(Debitos.data_compra == data_compra, 
                                                     Debitos.id_usuario == usuario.id,
                                                     Debitos.item_comprado == item_comprado, 
-                                                    Debitos.forma_pagamento == forma_pagamento).first()
+                                                    Debitos.id_forma_pagamento == forma_pagamento).first()
 
     if parcelado == False:
         qnt_parcelas = None
@@ -53,7 +53,7 @@ async def criar_debito(data_compra: date = Form(...),
     if existeConta:
         return {"mensagem": "Compra adicionada com sucesso. - Já existe uma compra idêntica em sistema, por gentileza analise."}
     
-    novaConta = Debitos(data_compra = data_compra, id_usuario = usuario.id, status_debito = "PENDENTE" , item_comprado = item_comprado, categoria_id = categoria_id, forma_pagamento = forma_pagamento, valor_debito = valor_debito, parcelado = parcelado, qnt_parcelas = qnt_parcelas)
+    novaConta = Debitos(data_compra = data_compra, id_usuario = usuario.id, status_debito = "PENDENTE" , item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_debito = valor_debito, parcelado = parcelado, qnt_parcelas = qnt_parcelas)
     session.add(novaConta)
     session.commit()
 
@@ -81,10 +81,10 @@ async def editar_debito(id_debito: int,
         debito.item_comprado = item_comprado
     
     if categoria_id is not None:
-        debito.categoria_id = categoria_id
+        debito.id_categoria = categoria_id
 
     if forma_pagamento is not None:
-        debito.forma_pagamento = forma_pagamento
+        debito.id_forma_pagamento = forma_pagamento
     
     if valor_debito is not None:
         valor_debito = (valor_debito.replace("R$", "").replace(".", "").replace(",", ".").strip())
@@ -126,8 +126,25 @@ async def deletar_conta(id_debito: int, session: Session = Depends(pegar_sessao)
 
 
 @rota_debito.get("/listar")
-async def listar_contas(session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
-    debitos = session.query(Debitos).filter(Debitos.id_usuario == usuario.id).all()
-    return {
-        "debitos": debitos
-    }
+async def listar_debitos(status_debito: str | None = Query(None), 
+                        id_categoria: int | None = Query(None), 
+                        id_forma_pagamento: int | None = Query(None), 
+                        session: Session = Depends(pegar_sessao), 
+                        usuario: Usuario = Depends(verificar_token)):
+    query = session.query(Debitos).filter(Debitos.id_usuario == usuario.id)
+
+    if status_debito is not None:
+        query = query.filter(Debitos.status_debito == status_debito)
+
+    if id_categoria is not None:
+        query = query.filter(Debitos.id_categoria == id_categoria)
+
+    if id_forma_pagamento is not None:
+        query = query.filter(Debitos.id_forma_pagamento == id_forma_pagamento)
+
+    resultadoDebitos = query.all()
+
+    if not resultadoDebitos:
+        return {"mensagem": "Não existe dados com os filtros aplicados."}
+    
+    return {"Débitos": resultadoDebitos}

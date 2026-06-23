@@ -2,7 +2,7 @@ from sqlalchemy import  create_engine, Column, Boolean, Integer, String, Foreign
 from sqlalchemy.orm import declarative_base
 
 # ======= CRIAR CONEXÃO COM BANCO DE DADOS =======
-db = create_engine("sqlite:///database/banco2.db")
+db = create_engine("sqlite:///database/banco.db")
 
 # ======= CRIAR BASE DO BANCO DE DADOS =======
 Base = declarative_base()
@@ -12,11 +12,11 @@ Base = declarative_base()
 class Debitos(Base):
     __tablename__ = "debitos" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
-    id_usuario = Column(Integer, ForeignKey("usuario.id"))
+    id_usuario = Column(Integer, ForeignKey("usuarios.id"))
     data_compra = Column(Date, nullable=False) 
     item_comprado = Column(String(150), nullable=False) 
-    categoria_id = Column(Integer, ForeignKey("categoria.id"), nullable=False) 
-    forma_pagamento = Column(Integer, ForeignKey("formaPagamento.id"), nullable=False) 
+    id_categoria = Column(Integer, ForeignKey("categorias.id"), nullable=False) 
+    id_forma_pagamento = Column(Integer, ForeignKey("formasPagamento.id"), nullable=False) 
     valor_debito = Column(Numeric(10, 2), nullable = False)
     parcelado = Column(Boolean, nullable=False) 
     qnt_parcelas = Column(Integer) 
@@ -25,9 +25,9 @@ class Debitos(Base):
     
 # ======= FORMA DE PAGAMENTO ======= 
 class FormasPagamento(Base): 
-    __tablename__ = "formaPagamento" 
+    __tablename__ = "formasPagamento" 
     id = Column(Integer, primary_key=True, autoincrement=True)  
-    id_usuario = Column(Integer, ForeignKey("usuario.id"))
+    id_usuario = Column(Integer, ForeignKey("usuarios.id"))
     forma_pagamento = Column(String(40), nullable=False) 
     responsavel = Column(String(150), nullable=False) 
     vencimento = Column(Boolean, nullable=False) 
@@ -37,9 +37,9 @@ class FormasPagamento(Base):
     
 # ======= CATEGORIA ======= 
 class Categoria(Base):
-    __tablename__ = "categoria" 
+    __tablename__ = "categorias" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
-    id_usuario = Column(Integer, ForeignKey("usuario.id"))
+    id_usuario = Column(Integer, ForeignKey("usuarios.id"))
     categoria = Column(String(50), nullable=False) 
     descricao = Column(String(100), nullable=False)
     status_categoria = Column(String, nullable=False) 
@@ -47,7 +47,7 @@ class Categoria(Base):
     
 # ======= USUÁRIO ======= 
 class Usuario(Base): 
-    __tablename__ = "usuario" 
+    __tablename__ = "usuarios" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
     usuario = Column(String(100), nullable=False) 
     nome = Column(String(150), nullable=False) 

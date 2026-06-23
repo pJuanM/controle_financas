@@ -4,9 +4,6 @@ Controle de finanças
 Listar Débitos
  - Filtrar:
    - Data - Emissão / Vencimento;
-   - Status;
-   - Categoria;
-   - Forma de Pagamento.
 
 Listar Parcelas
 - Filtrar:
