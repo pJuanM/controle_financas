@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, Request, Query
 from sqlalchemy.orm import Session
 from dependencies import pegar_sessao, verificar_token
-from models import Debitos, Categoria, FormasPagamento, Usuario
+from models import Debitos, Categorias, FormasPagamento, Usuarios, Parcelas
 from main import templates
 from decimal import Decimal
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 
 rota_debito = APIRouter(prefix="/debitos", tags=["debitos"])
@@ -14,7 +15,7 @@ async def home(request: Request, session: Session = Depends(pegar_sessao)):
     """
     Essa é a rota padrão das contas.
     """
-    categorias = session.query(Categoria).all()
+    categorias = session.query(Categorias).all()
     formas_pagamento = session.query(FormasPagamento).all()
 
 
@@ -36,7 +37,7 @@ async def criar_debito(data_compra: date = Form(...),
                       parcelado: bool = Form(...), 
                       qnt_parcelas: int | None = Form(None), 
                       session: Session = Depends(pegar_sessao), 
-                      usuario: Usuario = Depends(verificar_token)):
+                      usuario: Usuarios = Depends(verificar_token)):
     valor_debito = (valor_debito.replace("R$", "").replace(".", "").replace(",", ".").strip())
     valor_debito = Decimal(valor_debito)
     existeConta = session.query(Debitos).filter(Debitos.data_compra == data_compra, 
@@ -45,7 +46,7 @@ async def criar_debito(data_compra: date = Form(...),
                                                     Debitos.id_forma_pagamento == forma_pagamento).first()
 
     if parcelado == False:
-        qnt_parcelas = None
+        qnt_parcelas = 1
     else:
         if qnt_parcelas == None or qnt_parcelas <= 0 :
             raise HTTPException(status_code = 400, detail = "A quantidade de parcelas precisa ser maior do que 0.")
@@ -53,8 +54,21 @@ async def criar_debito(data_compra: date = Form(...),
     if existeConta:
         return {"mensagem": "Compra adicionada com sucesso. - Já existe uma compra idêntica em sistema, por gentileza analise."}
     
-    novaConta = Debitos(data_compra = data_compra, id_usuario = usuario.id, status_debito = "PENDENTE" , item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_debito = valor_debito, parcelado = parcelado, qnt_parcelas = qnt_parcelas)
+    novaConta = Debitos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_debito = valor_debito, parcelado = parcelado, qnt_parcelas = qnt_parcelas)
     session.add(novaConta)
+    session.flush()
+
+    for parcela in range(1, novaConta.qnt_parcelas + 1):
+        if parcela < novaConta.qnt_parcelas:
+            valor_base = novaConta.valor_debito / novaConta.qnt_parcelas
+        else:
+            valor_base = novaConta.valor_debito - (valor_base * (novaConta.qnt_parcelas - 1))
+        dia_vencimento = novaConta.formaPagamento.data_vencimento
+        nova_parcela = Parcelas(numero_parcela = parcela,
+                                data_vencimento = relativedelta(days = dia_vencimento).replace(months = 1),
+                                valor_parcela = valor_base)
+
+        session.add(nova_parcela)
     session.commit()
 
 
@@ -71,7 +85,7 @@ async def editar_debito(id_debito: int,
                         qnt_parcelas: int | None = Query(None),
                         status_debito : str | None = Query(None),
                         session: Session = Depends(pegar_sessao), 
-                        usuario: Usuario = Depends(verificar_token)):
+                        usuario: Usuarios= Depends(verificar_token)):
     
     debito = session.query(Debitos).filter(Debitos.id == id_debito, Debitos.id_usuario == usuario.id).first()
     if not debito:
@@ -109,7 +123,7 @@ async def editar_debito(id_debito: int,
 
 
 @rota_debito.post("/cancelar/{id_debito}")
-async def deletar_conta(id_debito: int, session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
+async def deletar_conta(id_debito: int, session: Session = Depends(pegar_sessao), usuario: Usuarios = Depends(verificar_token)):
     conta = session.query(Debitos).filter(Debitos.id == id_debito).first()
 
     if not conta:
@@ -130,7 +144,7 @@ async def listar_debitos(status_debito: str | None = Query(None),
                         id_categoria: int | None = Query(None), 
                         id_forma_pagamento: int | None = Query(None), 
                         session: Session = Depends(pegar_sessao), 
-                        usuario: Usuario = Depends(verificar_token)):
+                        usuario: Usuarios = Depends(verificar_token)):
     query = session.query(Debitos).filter(Debitos.id_usuario == usuario.id)
 
     if status_debito is not None:
@@ -148,3 +162,5 @@ async def listar_debitos(status_debito: str | None = Query(None),
         return {"mensagem": "Não existe dados com os filtros aplicados."}
     
     return {"Débitos": resultadoDebitos}
+
+

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, Request
-from models import Usuario
+from models import Usuarios
 from dependencies import pegar_sessao, verificar_token
 from sqlalchemy.orm import Session
 from main import templates, ALGORITHM, ACCESS_TOKEN_EXPIRE_HOURS, SECRET_KEY
@@ -20,7 +20,7 @@ def criar_token(usuario_id, duracao_token =  timedelta(hours = ACCESS_TOKEN_EXPI
 
 
 def autenticar_usuario(email, senha, session):
-    existe_usuario = session.query(Usuario).filter(Usuario.email == email).first()
+    existe_usuario = session.query(Usuarios).filter(Usuarios.email == email).first()
     if not existe_usuario:
         raise HTTPException(status_code= 400, detail = "Não tem usuário cadastrado para este e-mail!")
     if senha != existe_usuario.senha:
@@ -42,10 +42,10 @@ async def criar_usuario(usuario: str = Form(...),
                         senha: str = Form(...), 
                         session: Session = Depends(pegar_sessao)):
     
-    existe_usuario = session.query(Usuario).filter(Usuario.email == email).first()
+    existe_usuario = session.query(Usuarios).filter(Usuarios.email == email).first()
     if existe_usuario:
         raise HTTPException(status_code= 400, detail = "Este e-mail já foi cadastrado em sistema.")
-    novo_usuario = Usuario(usuario = usuario, nome = nome, status_usuario = "ATIVO", email = email, senha = senha)
+    novo_usuario = Usuarios(usuario = usuario, nome = nome, status_usuario = "ATIVO", email = email, senha = senha)
     session.add(novo_usuario)
     session.commit()
 
@@ -88,7 +88,7 @@ async def login_form(dados_formulario: OAuth2PasswordRequestForm = Depends(),
 
 
 @rota_autenticacao.get("/refresh")
-async def use_refresh_token(usuario: Usuario = Depends(verificar_token)):
+async def use_refresh_token(usuario: Usuarios = Depends(verificar_token)):
     access_token = criar_token(usuario.id)
     return {
         "access_token": access_token,

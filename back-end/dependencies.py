@@ -1,7 +1,7 @@
 from models import db
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import sessionmaker, Session
-from models import Usuario
+from models import Usuarios
 from main import SECRET_KEY, ALGORITHM, oauth2_schema
 from jose import jwt, JWTError
 
@@ -20,7 +20,7 @@ def verificar_token(token: str = Depends(oauth2_schema), session: Session = Depe
         id_usuario = int(dict_info.get("sub"))
     except JWTError:
         raise HTTPException(status_code = 401, detail = "Acesso negado ou expirado.")
-    usuario = session.query(Usuario).filter(Usuario.id == id_usuario).first()
+    usuario = session.query(Usuarios).filter(Usuarios.id == id_usuario).first()
     if not usuario:
         raise HTTPException(status_code = 401, detail = "Acesso inválido")
     

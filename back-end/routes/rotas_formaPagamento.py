@@ -1,7 +1,7 @@
 from fastapi import Form, Depends, HTTPException, APIRouter, Request, Query
 from sqlalchemy.orm import Session
 from dependencies import pegar_sessao, verificar_token
-from models import FormasPagamento, Usuario
+from models import FormasPagamento, Usuarios
 from main import templates
 
 
@@ -22,7 +22,7 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
                                vencimento: bool = Form(...), 
                                data_vencimento: int | None = Form(None), 
                                session: Session = Depends(pegar_sessao),
-                               usuario: Usuario = Depends(verificar_token)):
+                               usuario: Usuarios = Depends(verificar_token)):
     
     existe_formaPagamento = session.query(FormasPagamento).filter(
         FormasPagamento.forma_pagamento == forma_pagamento, 
@@ -53,7 +53,7 @@ async def editar_formaPagamento(id_formaPagamento: int,
                                 data_vencimento: int | None = Form(None), 
                                 status_forma_pagamento: str = Form(...), 
                                 session: Session = Depends(pegar_sessao), 
-                                usuario: Usuario = Depends(verificar_token)):
+                                usuario: Usuarios = Depends(verificar_token)):
     
     FormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == id_formaPagamento, FormasPagamento.id_usuario == usuario.id).first()
     
@@ -74,7 +74,7 @@ async def editar_formaPagamento(id_formaPagamento: int,
 
 
 @rota_formaPagamento.post("/excluir/{formaPagamento_id}")
-async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depends(pegar_sessao), usuario: Usuario = Depends(verificar_token)):
+async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depends(pegar_sessao), usuario: Usuarios = Depends(verificar_token)):
     existeFormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == formaPagamento_id, FormasPagamento.id_usuario == usuario.id).first()
 
     if not existeFormaPagamento:
@@ -93,7 +93,7 @@ async def listar_formaPagamento(forma_pagamento: str | None = Query(None),
                                 data_vencimento: int | None = Query(None),
                                 status_forma_pagamento: str | None = Query(None),
                                 session: Session = Depends(pegar_sessao), 
-                                usuario: Usuario = Depends(verificar_token)):
+                                usuario: Usuarios = Depends(verificar_token)):
     
     
     query = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
