@@ -5,10 +5,10 @@ from models import FormasPagamento, Usuarios
 from main import templates
 
 
-rota_formaPagamento = APIRouter(prefix="/formaPagamento", tags=["formaPagamento"])
+rota_formasPagamento = APIRouter(prefix="/formaPagamento", tags=["formaPagamento"])
 
 
-@rota_formaPagamento.get("/")
+@rota_formasPagamento.get("/")
 async def home(request: Request):
     """
     Essa é a rota padrão das formas de pagamentos.
@@ -16,7 +16,7 @@ async def home(request: Request):
     return templates.TemplateResponse(request= request, name="forma_de_pagamento.html")
 
 
-@rota_formaPagamento.post("/criar")
+@rota_formasPagamento.post("/criar")
 async def criar_formaPagamento(forma_pagamento: str = Form(...), 
                                responsavel: str = Form(...), 
                                vencimento: bool = Form(...), 
@@ -35,7 +35,7 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
         data_vencimento = None
     if vencimento == True:
         if data_vencimento == "":
-            raise HTTPException(status_code = 400, detail="Data de vencimento não informada.")
+            raise HTTPException(status_code = 422, detail="Data de vencimento não informada.")
 
 
     nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, forma_pagamento = forma_pagamento, responsavel = responsavel, status_forma_pagamento = "ATIVO", vencimento = vencimento, data_vencimento = data_vencimento)
@@ -45,7 +45,7 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
     return {"mensagem": f"A Categoria {forma_pagamento} foi cadastrada com sucesso para o responsável {responsavel}! "}
 
 
-@rota_formaPagamento.post("/editar")
+@rota_formasPagamento.post("/editar")
 async def editar_formaPagamento(id_formaPagamento: int, 
                                 forma_pagamento: str = Form(...), 
                                 responsavel: str = Form(...), 
@@ -73,7 +73,7 @@ async def editar_formaPagamento(id_formaPagamento: int,
     return {"mensagem": f"A forma de pagamento foi alterada com sucesso!"}
 
 
-@rota_formaPagamento.post("/excluir/{formaPagamento_id}")
+@rota_formasPagamento.post("/excluir/{formaPagamento_id}")
 async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depends(pegar_sessao), usuario: Usuarios = Depends(verificar_token)):
     existeFormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == formaPagamento_id, FormasPagamento.id_usuario == usuario.id).first()
 
@@ -86,7 +86,7 @@ async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depe
     return {"mensagem": "Forma de pagamento excluida com sucesso."}
 
 
-@rota_formaPagamento.get("/listar")
+@rota_formasPagamento.get("/listar")
 async def listar_formaPagamento(forma_pagamento: str | None = Query(None),
                                 responsavel: str | None = Query(None),
                                 vencimento: bool | None = Query(None),

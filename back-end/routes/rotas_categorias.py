@@ -4,10 +4,10 @@ from dependencies import pegar_sessao, verificar_token
 from models import Categorias, Usuarios
 from main import templates
 
-rota_categoria = APIRouter(prefix="/categorias", tags=["categorias"])
+rota_categorias = APIRouter(prefix="/categorias", tags=["categorias"])
 
 
-@rota_categoria.get("/")
+@rota_categorias.get("/")
 async def home(request: Request):
     """
     Essa é a rota padrão das categorias
@@ -17,7 +17,7 @@ async def home(request: Request):
                                       name = "categoria.html")
 
 
-@rota_categoria.post("/categoria/criar")
+@rota_categorias.post("/categoria/criar")
 async def criar_categoria(categoria: str = Form(...),descricao: str = Form(...), session: Session = Depends(pegar_sessao), usuario: Usuarios = Depends(verificar_token)):
 
     existe_categoria = session.query(Categorias).filter(Categorias.categoria == categoria, Categorias.id_usuario == usuario.id).first()
@@ -31,7 +31,7 @@ async def criar_categoria(categoria: str = Form(...),descricao: str = Form(...),
     return {"mensagem": f"A Categoria {categoria} foi cadastrada com sucesso! "}
     
 
-@rota_categoria.patch("/categoria/editar/{categoria_id}")
+@rota_categorias.patch("/categoria/editar/{categoria_id}")
 async def editar_categoria(categoria_id: int, categoria_titulo: str = Form(...), categoria_descricao: str = Form(...), categoria_status: str = Form(...), session: Session = Depends(pegar_sessao), usuario: Usuarios = Depends(verificar_token)):
     categoria = session.query(Categorias).filter(Categorias.id == categoria_id, Categorias.id_usuario == usuario.id).first()
     if not categoria:
@@ -45,7 +45,7 @@ async def editar_categoria(categoria_id: int, categoria_titulo: str = Form(...),
     return {"mensagem": "A categoria foi alterada com sucesso"}
 
 
-@rota_categoria.post("/categoria/excluir/{categoria_id}")
+@rota_categorias.post("/categoria/excluir/{categoria_id}")
 async def excluir_categoria(categoria_id: int, session: Session = Depends(pegar_sessao), usuario: Usuarios = Depends(verificar_token)):
     categoria = session.query(Categorias).filter(Categorias.id == categoria_id, Categorias.id_usuario == usuario.id).first()
 
@@ -56,7 +56,7 @@ async def excluir_categoria(categoria_id: int, session: Session = Depends(pegar_
     session.commit()
 
 
-@rota_categoria.get("/categoria/listar")
+@rota_categorias.get("/categoria/listar")
 async def listar_categoria(session: Session = Depends(pegar_sessao), usuario: Usuarios = Depends(verificar_token),                        status_categoria: str = Query(...)):
     categoria = session.query(Categorias).filter(Categorias.id_usuario == usuario.id, Categorias.status_categoria == status_categoria).all()
 

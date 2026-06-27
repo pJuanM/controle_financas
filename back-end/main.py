@@ -19,12 +19,14 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl="usuario/login-form")
 templates = Jinja2Templates(directory = "../front-end/templates")
 app.mount("/static", StaticFiles(directory="../front-end"), name="static")
 
-from routes.rotas_categorias import rota_categoria
-from routes.rotas_formaPagamento import rota_formaPagamento
+from routes.rotas_categorias import rota_categorias
+from routes.rotas_formaPagamento import rota_formasPagamento
 from routes.rotas_autenticacao import rota_autenticacao
-from routes.rotas_debitos import rota_debito
+from routes.rotas_debitos import rota_debitos
+from routes.rotas_parcelas import rota_parcelas
 
-app.include_router(rota_categoria)
-app.include_router(rota_formaPagamento)
+app.include_router(rota_categorias)
+app.include_router(rota_formasPagamento)
 app.include_router(rota_autenticacao)
-app.include_router(rota_debito)
+app.include_router(rota_debitos)
+app.include_router(rota_parcelas)
