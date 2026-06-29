@@ -14,10 +14,10 @@ ACCESS_TOKEN_EXPIRE_HOURS = int(os.getenv("ACCESS_TOKEN_EXPIRE_HOURS"))
 
 app = FastAPI()
 
-oauth2_schema = OAuth2PasswordBearer(tokenUrl="usuario/login-form")
+oauth2_schema = OAuth2PasswordBearer(tokenUrl="usuario/login")
 
 templates = Jinja2Templates(directory = "../front-end/templates")
-app.mount("/static", StaticFiles(directory="../front-end"), name="static")
+app.mount("/static", StaticFiles(directory="../front-end/static"), name="static")
 
 from routes.rotas_categorias import rota_categorias
 from routes.rotas_formaPagamento import rota_formasPagamento

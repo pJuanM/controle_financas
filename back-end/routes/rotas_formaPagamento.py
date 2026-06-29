@@ -5,14 +5,16 @@ from models import FormasPagamento, Usuarios
 from main import templates
 
 
-rota_formasPagamento = APIRouter(prefix="/formaPagamento", tags=["formaPagamento"])
+rota_formasPagamento = APIRouter(prefix="/formaPagamento", tags=["formaPagamento"], dependencies=[Depends(verificar_token)])
 
 
 @rota_formasPagamento.get("/")
-async def home(request: Request):
+async def home(request: Request, usuario: Usuarios = Depends(verificar_token)):
     """
     Essa é a rota padrão das formas de pagamentos.
     """
+    if usuario is None:
+        return templates.TemplateResponse(request= request, name="sem_login.html")
     return templates.TemplateResponse(request= request, name="forma_de_pagamento.html")
 
 
@@ -87,7 +89,8 @@ async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depe
 
 
 @rota_formasPagamento.get("/listar")
-async def listar_formaPagamento(forma_pagamento: str | None = Query(None),
+async def listar_formaPagamento(request: Request,
+                                forma_pagamento: str | None = Query(None),
                                 responsavel: str | None = Query(None),
                                 vencimento: bool | None = Query(None),
                                 data_vencimento: int | None = Query(None),
@@ -95,6 +98,8 @@ async def listar_formaPagamento(forma_pagamento: str | None = Query(None),
                                 session: Session = Depends(pegar_sessao), 
                                 usuario: Usuarios = Depends(verificar_token)):
     
+    if usuario is None:
+        return templates.TemplateResponse(request= request, name="sem_login.html")
     
     query = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
 

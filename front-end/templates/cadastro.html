@@ -1,45 +1,38 @@
-<!DOCTYPE html>
-<html lang="pt-Br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle Financeiro</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/cadastro.css') }}">
-</head>
-<body>
-    <header class="container">
-        <nav>
-            <a href="#">Entrar</a>
-            <span>/</span>
-            <a href="#">Cadastrar-se</a>
-        </nav>
-    </header>
-    <main class="container">
-        <h1 class="titulo-pagina">Cadastro</h1>
-        <section class="formulario">
-            <form action="http://127.0.0.1:8000/usuario/criarUsuario" method="POST" id="formulario">
-                <div class="grupo_campo">
-                    <input type="text" id="usuario" name="usuario" placeholder="Usuário" autocomplete="off">
-                </div>
-                <div class="grupo_campo">
-                    <input type="text" id="nome" name="nome" placeholder="Nome completo" autocomplete="off">
-                </div>
-                <div class="grupo_campo">
-                    <input type="email" id="email" name="email" placeholder="E-mail" autocomplete="off">
-                </div>
-                <div class="grupo_campo">
-                    <input type="password" id="senha" name="senha" placeholder="Senha">
-                </div>
-                <div class="grupo_campo" onchange="senhaigual()">
-                    <input type="password" id="confirme_senha" name="confirme_senha" placeholder="Confirme sua senha">
-                </div>
-                <p id="erroSenha"></p>
-                <button type="submit" id="enviar_formulario">Enviar Cadastro</button>
-            </form>
-        </section>
-    </main>
+{% extends "base_publica.html" %}
 
-    <script src="/static/js/cadastro.js"></script>
-</body>
-</html>
+{% block titulo %}
+Cadastro
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', path='/css/cadastro.css') }}">
+{% endblock %}
+
+{% block conteudo %}
+<h1 class="titulo-pagina">Cadastro</h1>
+<section class="formulario">
+    <form action="/usuario/cadastro/criar" method="POST" id="formulario">
+        <div class="grupo_campo">
+            <input type="text" id="usuario" name="usuario" placeholder="Usuário" autocomplete="off">
+        </div>
+        <div class="grupo_campo">
+            <input type="text" id="nome" name="nome" placeholder="Nome completo" autocomplete="off">
+        </div>
+        <div class="grupo_campo">
+            <input type="email" id="email" name="email" placeholder="E-mail" autocomplete="off">
+        </div>
+        <div class="grupo_campo">
+            <input type="password" id="senha" name="senha" placeholder="Senha">
+        </div>
+        <div class="grupo_campo">
+            <input type="password" id="confirme_senha" name="confirme_senha" placeholder="Confirme sua senha">
+        </div>
+        <p id="erroSenha"></p>
+        <button type="submit" id="enviar_formulario">Enviar Cadastro</button>
+    </form>
+</section>
+{% endblock %}
+
+{% block script %}
+<script src="{{ url_for('static', path='/js/autenticar.js') }}"></script>
+{% endblock %}

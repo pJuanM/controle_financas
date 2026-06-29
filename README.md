@@ -9,3 +9,15 @@ Dashboard
   - Relatório de colunas
   - Relatorio de barras
   - Tabela com dados
+
+
+Front-end
+- Tela de listagem:
+ - Categorias
+ - Formas de Pagamento
+ - Parcelas
+ - Debitos
+- Rota de logout
+
+Token
+- Criar token para os acessos do front-end

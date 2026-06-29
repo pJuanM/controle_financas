@@ -4,15 +4,16 @@ from dependencies import pegar_sessao, verificar_token
 from models import Categorias, Usuarios
 from main import templates
 
-rota_categorias = APIRouter(prefix="/categorias", tags=["categorias"])
+rota_categorias = APIRouter(prefix="/categorias", tags=["categorias"], dependencies=[Depends(verificar_token)])
 
 
 @rota_categorias.get("/")
-async def home(request: Request):
+async def home(request: Request, usuario: Usuarios = Depends(verificar_token)):
     """
     Essa é a rota padrão das categorias
     """
-    
+    if usuario is None:
+        return templates.TemplateResponse(request= request, name="sem_login.html")
     return templates.TemplateResponse(request = request, 
                                       name = "categoria.html")
 
@@ -57,14 +58,28 @@ async def excluir_categoria(categoria_id: int, session: Session = Depends(pegar_
 
 
 @rota_categorias.get("/categoria/listar")
-async def listar_categoria(session: Session = Depends(pegar_sessao), usuario: Usuarios = Depends(verificar_token),                        status_categoria: str = Query(...)):
-    categoria = session.query(Categorias).filter(Categorias.id_usuario == usuario.id, Categorias.status_categoria == status_categoria).all()
+async def listar_categoria(request: Request,
+                           session: Session = Depends(pegar_sessao), 
+                           usuario: Usuarios = Depends(verificar_token),                        
+                           status_categoria: str | None = Form(None)):
 
-    if not categoria:
-        raise HTTPException(status_code = 400, detail = "Não existe categoria cadastrada para este usuário")
-    
-    return {
-        "categoria": categoria
-    }
+    if usuario is None:
+        return templates.TemplateResponse(request= request, name="sem_login.html")
+    if status_categoria:
+        categorias = session.query(Categorias).filter(Categorias.id_usuario == usuario.id, Categorias.status_categoria == status_categoria).all()
+        if not categorias:
+            raise HTTPException(status_code = 400, detail = "Não existe categoria cadastrada para este usuário")
+    if status_categoria is None:
+        categorias = []
+        
+    return templates.TemplateResponse(
+        name="lista_categorias.html", 
+        request=request, 
+        context={
+            "categorias": categorias,
+            "usuario": usuario
+        }
+    )
+
 
 

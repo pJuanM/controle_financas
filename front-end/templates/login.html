@@ -1,34 +1,23 @@
-<!DOCTYPE html>
-<html lang="pt-Br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle Financeiro</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
-</head>
-<body>
-    <header class="container">
-        <nav>
-            <a href="#">Entrar</a>
-            <span>/</span>
-            <a href="#">Cadastrar-se</a>
-        </nav>
-    </header>
-    <main class="container">
-        <h1 class="titulo-pagina">Login</h1>
-        <section class="formulario">
-            <form action="http://127.0.0.1:8000/usuario/login" method="POST" id="formulario">
-                <div class="grupo_campo">
-                    <input type="text" id="email" name="email" placeholder="E-mail">
-                </div>
+{% extends "base_publica.html" %}
+{% block titulo %}
+Login
+{% endblock %}
 
-                <div class="grupo_campo">
-                    <input type="password" id="senha" name="senha" placeholder="Senha">
-                </div>
+{% block conteudo %}
+<h1 class="titulo-pagina">Login</h1>
+<section class="formulario">
+    <form action="/usuario/login" method="POST" id="formulario">
+        <div class="grupo_campo">
+            <input type="text" id="email" name="email" placeholder="E-mail">
+        </div>
 
-                <button type="submit" id="enviar_formulario">Entrar</button>
-            </form>
-        </section>
-    </main>
-</body>
-</html>
+        <div class="grupo_campo">
+            <input type="password" id="senha" name="senha" placeholder="Senha">
+        </div>
+
+        <button type="submit" id="enviar_formulario">Entrar</button>
+    </form>
+</section>
+{% endblock %}
+
+

@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from main import templates, ALGORITHM, ACCESS_TOKEN_EXPIRE_HOURS, SECRET_KEY
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
+from fastapi.responses import RedirectResponse
+
 
 # ======= LOGIN VIA FAST API =======
 from fastapi.security import OAuth2PasswordRequestForm
@@ -28,14 +30,14 @@ def autenticar_usuario(email, senha, session):
     return existe_usuario
 
 
-@rota_autenticacao.get("/")
+@rota_autenticacao.get("/cadastro")
 async def home(request: Request):
     """
     Essa é a rota padrão de usuários do sistema.
     """
     return templates.TemplateResponse(request = request, name="cadastro.html")
 
-@rota_autenticacao.post("/criar")
+@rota_autenticacao.post("/cadastro/criar")
 async def criar_usuario(usuario: str = Form(...), 
                         nome: str = Form(...), 
                         email: str = Form(...), 
@@ -67,12 +69,26 @@ async def login(email: str = Form(...),
     
     usuario = autenticar_usuario(email, senha, session)
     access_token = criar_token(usuario.id)
-    refresh_token = criar_token(usuario.id, duracao_token = timedelta(days = 7))
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "token_type": "Bearer"
-    }
+    # refresh_token = criar_token(usuario.id, duracao_token = timedelta(days = 7))
+    # return {
+    #     "access_token": access_token,
+    #     "refresh_token": refresh_token,
+    #     "token_type": "Bearer",
+        
+    # }
+
+    response = RedirectResponse(
+        url="/debitos",
+        status_code = 303
+    )
+
+    response.set_cookie(
+        key = "access_token",
+        value = access_token,
+        httponly=True
+    )
+
+    return response
 
 # ======= LOGIN VIA FAST API =======
 @rota_autenticacao.post("/login-form")
@@ -95,3 +111,14 @@ async def use_refresh_token(usuario: Usuarios = Depends(verificar_token)):
         "token_type": "Bearer"
     }
         
+
+@rota_autenticacao.get("/logout")
+async def logout():
+    response = RedirectResponse(
+        url = "/usuario/login",
+        status_code= 303
+    )
+
+    response.delete_cookie("access_token")
+
+    return response

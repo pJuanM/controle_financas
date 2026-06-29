@@ -8,13 +8,17 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 
 
-rota_debitos = APIRouter(prefix="/debitos", tags=["debitos"])
+rota_debitos = APIRouter(prefix="/debitos", tags=["debitos"], dependencies=[Depends(verificar_token)])
 
 @rota_debitos.get("/")
-async def home(request: Request, session: Session = Depends(pegar_sessao)):
+async def home(request: Request, 
+               session: Session = Depends(pegar_sessao), 
+               usuario: Usuarios = Depends(verificar_token)):
     """
     Essa é a rota padrão das contas.
     """
+    if usuario is None:
+        return templates.TemplateResponse(request= request, name="sem_login.html")
     categorias = session.query(Categorias).all()
     formas_pagamento = session.query(FormasPagamento).all()
 
@@ -24,7 +28,8 @@ async def home(request: Request, session: Session = Depends(pegar_sessao)):
         request=request, 
         context={
             "categorias": categorias,
-            "formas_pagamento": formas_pagamento
+            "formas_pagamento": formas_pagamento,
+            "usuario": usuario
         }
     )
 
@@ -39,6 +44,7 @@ async def criar_debito(data_compra: date = Form(...),
                       qnt_parcelas: int | None = Form(None), 
                       session: Session = Depends(pegar_sessao), 
                       usuario: Usuarios = Depends(verificar_token)):
+
     valor_debito = (valor_debito.replace("R$", "").replace(".", "").replace(",", ".").strip())
     valor_debito = Decimal(valor_debito)
     existeDebito = session.query(Debitos).filter(Debitos.data_compra == data_compra, 
@@ -180,7 +186,8 @@ async def deletar_conta(id_debito: int, session: Session = Depends(pegar_sessao)
 
 
 @rota_debitos.get("/listar")
-async def listar_debitos(data_compra_inicio: date | None = Query(None),
+async def listar_debitos(request: Request,
+                         data_compra_inicio: date | None = Query(None),
                          data_compra_final: date | None = Query(None),
                          data_vencimento_inicio: date | None = Query(None),
                          data_vencimento_final: date | None = Query(None),
@@ -189,6 +196,9 @@ async def listar_debitos(data_compra_inicio: date | None = Query(None),
                          id_forma_pagamento: int | None = Query(None), 
                          session: Session = Depends(pegar_sessao), 
                          usuario: Usuarios = Depends(verificar_token)):
+    if usuario is None:
+        return templates.TemplateResponse(request= request, name="sem_login.html")
+
     query = session.query(Debitos).filter(Debitos.id_usuario == usuario.id)
 
     if data_compra_inicio is not None or data_compra_final is not None:
