@@ -38,7 +38,6 @@ class FormasPagamento(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)  
     forma_pagamento = Column(String(40), nullable=False) 
     responsavel = Column(String(150), nullable=False) 
-    vencimento = Column(Boolean, nullable=False) 
     data_vencimento = Column(Integer) 
     status_forma_pagamento = Column(String, nullable=False)
 

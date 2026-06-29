@@ -52,9 +52,6 @@ h1 {
     display: flex;
     flex-direction: column;
 }
-#formulario #data_vencimento {
-    display: none;
-}
 #formulario input, #enviar_formulario{
     background-color: #000E32;
     color: white;
@@ -88,6 +85,19 @@ h1 {
 #enviar_formulario {
     margin-top: auto;
     cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+th {
+    background-color: #f2f2f2;
 }
 
 

@@ -17,14 +17,6 @@ Forma de Pagamento
         </div>
     
         <div class="grupo_campo">
-            <select name="vencimento" id="vencimento" required onchange="mostrarCampoDataVencimento()">
-                <option selected disabled value="">Possui Vencimento:</option>
-                <option value="true">Sim</option>
-                <option  value="false">Não</option>
-            </select>
-        </div>
-
-        <div class="grupo_campo">
             <input type="number" id="data_vencimento" name="data_vencimento" placeholder="Data de Vencimento">
         </div>
 
@@ -32,7 +24,5 @@ Forma de Pagamento
     </form>
 </section>
 {% endblock %}
-{% block script %}
-<script src="/static/js/formaPagamento.js"></script>
-{% endblock %}
+
   

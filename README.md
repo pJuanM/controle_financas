@@ -13,11 +13,6 @@ Dashboard
 
 Front-end
 - Tela de listagem:
- - Categorias
  - Formas de Pagamento
  - Parcelas
  - Debitos
-- Rota de logout
-
-Token
-- Criar token para os acessos do front-end

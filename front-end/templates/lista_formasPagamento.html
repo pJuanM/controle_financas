@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block titulo %}
+Forma de Pagamento
+{% endblock %}
+{% block conteudo %}
+<section class="formulario">
+    <form action="/formaPagamento/listar" method="get" id="formulario">
+        <div class="grupo_campo">
+            <select name="status_forma_pagamento" id="status_forma_pagamento" required>
+                <option value="" selected disabled>Status Forma de Pagamento</option>
+                <option value="ATIVO">ATIVO</option>
+                <option value="INATIVO">INATIVO</option>
+            </select>
+        </div>
+        <div class="grupo_campo">
+            <input type="text" id="forma_pagamento" name="forma_pagamento" placeholder="Forma de Pagamento" autocomplete="off">
+        </div>
+        <div class="grupo_campo">
+            <input type="number" id="data_vencimento" name="data_vencimento" placeholder="Data de Vencimento" autocomplete="off">
+        </div>
+        <div class="grupo_campo">
+            <input type="text" id="responsavel" name="responsavel" placeholder="Responsavel" autocomplete="off">
+        </div>
+        <button type="submit" id="enviar_formulario">Filtrar Forma de Pagamento</button>
+    </form>
+</section>
+<h1 class="titulo-pagina">Lista de Formas de Pagamento</h1>
+<section class="tabela">
+    <table>
+        <thead>
+            <tr>
+                <th>FORMA DE PAGAMENTO</th>
+                <th>RESPONSÁVEL</th>
+                <th>DATA DE VENCIMENTO</th>
+                <th>STATUS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if formasDePagamento %}
+                {% for formaDePagamento in formasDePagamento %}
+
+                <tr>
+                    <td>{{ formaDePagamento.forma_pagamento }}</td>
+                    <td>{{ formaDePagamento.responsavel }}</td>
+                    <td>{{ formaDePagamento.data_vencimento }}</td>
+                    <td>{{ formaDePagamento.status_forma_pagamento }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4">Nenhuma forma de pagamento encontrada.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

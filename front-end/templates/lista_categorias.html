@@ -3,22 +3,8 @@
 Categoria
 {% endblock %}
 {% block conteudo %}
-<style>
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-th {
-    background-color: #f2f2f2;
-}
-</style>
 <section class="formulario">
-    <form action="/categoria/listar" method="GET" id="formulario">
+    <form action="/categorias/categoria/listar" method="get" id="formulario">
         <div class="grupo_campo">
             <select name="status_categoria" id="status_categoria" required>
                 <option value="" selected disabled>Status Categoria</option>
@@ -34,26 +20,25 @@ th {
     <table>
         <thead>
             <tr>
-                <th>Categoria</th>
-                <th>Descrição</th>
-                <th>Status Categoria</th>
+                <th>CATEGORIA</th>
+                <th>DESCRIÇÃO</th>
+                <th>STATUS</th>
             </tr>
         </thead>
         <tbody>
-            {% for categoria in categorias %}
-                {% if categoria %}
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                {% endif %}
-            <tr>
-                <td>{{ categoria.categoria }}</td>
-                <td>{{ categoria.descricao }}</td>
-                <td>{{ categoria.status_categoria }}</td>
-            </tr>
-            {% endfor %}
+            {% if categorias %}
+                {% for categoria in categorias %}
+                <tr>
+                    <td>{{ categoria.categoria }}</td>
+                    <td>{{ categoria.descricao }}</td>
+                    <td>{{ categoria.status_categoria }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="3">Nenhuma categoria encontrada.</td>
+                </tr>
+            {% endif %}
         </tbody>
     </table>
 </section>

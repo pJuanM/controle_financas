@@ -21,7 +21,6 @@ async def home(request: Request, usuario: Usuarios = Depends(verificar_token)):
 @rota_formasPagamento.post("/criar")
 async def criar_formaPagamento(forma_pagamento: str = Form(...), 
                                responsavel: str = Form(...), 
-                               vencimento: bool = Form(...), 
                                data_vencimento: int | None = Form(None), 
                                session: Session = Depends(pegar_sessao),
                                usuario: Usuarios = Depends(verificar_token)):
@@ -33,14 +32,11 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
     if existe_formaPagamento:
         raise HTTPException(status_code = 400, detail="Forma de pagamento já cadastrada para este responsável em sistema!")
 
-    if not vencimento:
-        data_vencimento = None
-    if vencimento == True:
-        if data_vencimento == "":
-            raise HTTPException(status_code = 422, detail="Data de vencimento não informada.")
+    if data_vencimento == "":
+        raise HTTPException(status_code = 422, detail="Data de vencimento não informada.")
 
 
-    nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, forma_pagamento = forma_pagamento, responsavel = responsavel, status_forma_pagamento = "ATIVO", vencimento = vencimento, data_vencimento = data_vencimento)
+    nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, forma_pagamento = forma_pagamento, responsavel = responsavel, status_forma_pagamento = "ATIVO", data_vencimento = data_vencimento)
     session.add(nova_formaPagamento)
     session.commit()
 
@@ -51,7 +47,6 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
 async def editar_formaPagamento(id_formaPagamento: int, 
                                 forma_pagamento: str = Form(...), 
                                 responsavel: str = Form(...), 
-                                vencimento: bool = Form(...), 
                                 data_vencimento: int | None = Form(None), 
                                 status_forma_pagamento: str = Form(...), 
                                 session: Session = Depends(pegar_sessao), 
@@ -67,7 +62,6 @@ async def editar_formaPagamento(id_formaPagamento: int,
     
     FormaPagamento.forma_pagamento = forma_pagamento
     FormaPagamento.responsavel = responsavel
-    FormaPagamento.vencimento = vencimento
     FormaPagamento.data_vencimento = data_vencimento
     FormaPagamento.status_forma_pagamento = status_forma_pagamento
     session.commit()
@@ -82,7 +76,7 @@ async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depe
     if not existeFormaPagamento:
         raise HTTPException(status_code = 401, detail = "Não existe essa forma de pagamento cadastrada para este usuário")
     
-    existeFormaPagamento.status_forma_pagamento == "INATIVO"
+    existeFormaPagamento.status_forma_pagamento = "INATIVO"
     session.commit()
 
     return {"mensagem": "Forma de pagamento excluida com sucesso."}
@@ -92,8 +86,7 @@ async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depe
 async def listar_formaPagamento(request: Request,
                                 forma_pagamento: str | None = Query(None),
                                 responsavel: str | None = Query(None),
-                                vencimento: bool | None = Query(None),
-                                data_vencimento: int | None = Query(None),
+                                data_vencimento: str     | None = Query(None),
                                 status_forma_pagamento: str | None = Query(None),
                                 session: Session = Depends(pegar_sessao), 
                                 usuario: Usuarios = Depends(verificar_token)):
@@ -102,25 +95,30 @@ async def listar_formaPagamento(request: Request,
         return templates.TemplateResponse(request= request, name="sem_login.html")
     
     query = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
-
-    if forma_pagamento is not None:
+    if forma_pagamento:
         query = query.filter(FormasPagamento.forma_pagamento == forma_pagamento)
     
-    if responsavel is not None:
+    if responsavel:
         query = query.filter(FormasPagamento.responsavel == responsavel)
 
-    if vencimento is not None:
-        query = query.filter(FormasPagamento.vencimento == vencimento)
+    if data_vencimento:
+        query = query.filter(FormasPagamento.data_vencimento == int(data_vencimento))
 
-    if data_vencimento is not None:
-        query = query.filter(FormasPagamento.data_vencimento == data_vencimento)
-
-    if status_forma_pagamento is not None:
+    if status_forma_pagamento:
         query = query.filter(FormasPagamento.status_forma_pagamento == status_forma_pagamento)
 
-    resultado_forma_pagamento = query.all()
+    formasDePagamento = query.all()
 
-    if not resultado_forma_pagamento:
-        return {"mensagem": "Não encontrado dados com os filtros aplicados."}
+    if not formasDePagamento:
+        formasDePagamento = []
+    
 
-    return {"Forma de Pagamento": resultado_forma_pagamento}
+    return templates.TemplateResponse(
+        name="lista_formasPagamento.html", 
+        request=request, 
+        context={
+            "formasDePagamento": formasDePagamento,
+            "usuario": usuario
+        }
+    )
+

@@ -61,7 +61,7 @@ async def excluir_categoria(categoria_id: int, session: Session = Depends(pegar_
 async def listar_categoria(request: Request,
                            session: Session = Depends(pegar_sessao), 
                            usuario: Usuarios = Depends(verificar_token),                        
-                           status_categoria: str | None = Form(None)):
+                           status_categoria: str | None = Query(None)):
 
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
@@ -80,6 +80,7 @@ async def listar_categoria(request: Request,
             "usuario": usuario
         }
     )
+
 
 
 
