@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block titulo %}
+Débitos
+{% endblock %}
+{% block conteudo %}
+<section class="formulario">
+    <form action="/debitos/listar" method="get" id="formulario">
+        <div class="grupo_campo">
+            <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off">
+        </div>
+        <div class="grupo_campo">
+            <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off">
+        </div>
+
+        <div class="grupo_campo">
+            <input type="date" id="data_vencimento_inicio" name="data_vencimento_inicio" placeholder="Data vencimento início" autocomplete="off">
+        </div>
+        <div class="grupo_campo">
+            <input type="date" id="data_vencimento_final" name="data_vencimento_final" placeholder="Data vencimento final" autocomplete="off">
+        </div>
+
+
+        <div class="grupo_campo">
+            <select name="categoria_id" id="categoria_id" required>
+                <option value="" selected disabled>Categoria: </option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}">
+                        {{ categoria.categoria }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="grupo_campo">
+            <select name="forma_pagamento" id="forma_pagamento" required>
+                <option value="" selected disabled>Forma de Pagamento:</option>
+                {% for formaPagamento in formas_pagamento %}
+                    <option value="{{ formaPagamento.id }}">
+                        {{ formaPagamento.forma_pagamento}} - {{ formaPagamento.responsavel }}
+                    </option>
+                {% endfor %}
+            </select>        
+        </div>
+        <button type="submit" id="enviar_formulario">Filtrar Débitos</button>
+
+    </form>
+</section>
+<h1 class="titulo-pagina">Lista de Formas de Pagamento</h1>
+<section class="tabela">
+    <table>
+        <thead>
+            <tr>
+                <th>FORMA DE PAGAMENTO</th>
+                <th>RESPONSÁVEL</th>
+                <th>DATA DE VENCIMENTO</th>
+                <th>STATUS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if formasDePagamento %}
+                {% for formaDePagamento in formasDePagamento %}
+
+                <tr>
+                    <td>{{ formaDePagamento.forma_pagamento }}</td>
+                    <td>{{ formaDePagamento.responsavel }}</td>
+                    <td>{{ formaDePagamento.data_vencimento }}</td>
+                    <td>{{ formaDePagamento.status_forma_pagamento }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4">Nenhuma forma de pagamento encontrada.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -13,6 +13,5 @@ Dashboard
 
 Front-end
 - Tela de listagem:
- - Formas de Pagamento
  - Parcelas
  - Debitos

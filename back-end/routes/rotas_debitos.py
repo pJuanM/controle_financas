@@ -191,7 +191,6 @@ async def listar_debitos(request: Request,
                          data_compra_final: date | None = Query(None),
                          data_vencimento_inicio: date | None = Query(None),
                          data_vencimento_final: date | None = Query(None),
-                         status_debito: str | None = Query(None), 
                          id_categoria: int | None = Query(None), 
                          id_forma_pagamento: int | None = Query(None), 
                          session: Session = Depends(pegar_sessao), 
@@ -209,10 +208,7 @@ async def listar_debitos(request: Request,
     if data_vencimento_inicio is not None or data_vencimento_final is not None:
         if data_vencimento_inicio is None or data_vencimento_final is None:
             raise HTTPException(status_code= 400, detail="Precisa informar ambas datas.")
-        query = query.join(Debitos.parcela).filter(Parcelas.data_vencimento >= data_vencimento_inicio, Parcelas.data_vencimento <= data_vencimento_final)
-
-    if status_debito is not None:
-        query = query.filter(Debitos.status_debito == status_debito)
+        query = query.join(Debitos.parcela).filter(Parcelas.data_vencimento >= data_vencimento_inicio, Parcelas.data_vencimento <= data_vencimento_final).distinct()
 
     if id_categoria is not None:
         query = query.filter(Debitos.id_categoria == id_categoria)
