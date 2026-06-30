@@ -99,7 +99,9 @@ th, td {
 th {
     background-color: #f2f2f2;
 }
-
+table .tabela_cabecalho {
+    cursor: pointer;
+}
 
 /* MENU */
 .menu {

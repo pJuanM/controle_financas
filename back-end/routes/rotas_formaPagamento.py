@@ -86,7 +86,7 @@ async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depe
 async def listar_formaPagamento(request: Request,
                                 forma_pagamento: str | None = Query(None),
                                 responsavel: str | None = Query(None),
-                                data_vencimento: str     | None = Query(None),
+                                data_vencimento: str | None = Query(None),
                                 status_forma_pagamento: str | None = Query(None),
                                 session: Session = Depends(pegar_sessao), 
                                 usuario: Usuarios = Depends(verificar_token)):

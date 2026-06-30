@@ -6,22 +6,18 @@ Débitos
 <section class="formulario">
     <form action="/debitos/listar" method="get" id="formulario">
         <div class="grupo_campo">
+            <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
             <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off">
         </div>
         <div class="grupo_campo">
+            <label for="data_compra_inicio">Intervalo de Compra Final</label>
             <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off">
         </div>
 
-        <div class="grupo_campo">
-            <input type="date" id="data_vencimento_inicio" name="data_vencimento_inicio" placeholder="Data vencimento início" autocomplete="off">
-        </div>
-        <div class="grupo_campo">
-            <input type="date" id="data_vencimento_final" name="data_vencimento_final" placeholder="Data vencimento final" autocomplete="off">
-        </div>
 
 
         <div class="grupo_campo">
-            <select name="categoria_id" id="categoria_id" required>
+            <select name="id_categoria" id="id_categoria">
                 <option value="" selected disabled>Categoria: </option>
                 {% for categoria in categorias %}
                     <option value="{{ categoria.id }}">
@@ -32,7 +28,7 @@ Débitos
         </div>
 
         <div class="grupo_campo">
-            <select name="forma_pagamento" id="forma_pagamento" required>
+            <select name="id_forma_pagamento" id="id_forma_pagamento">
                 <option value="" selected disabled>Forma de Pagamento:</option>
                 {% for formaPagamento in formas_pagamento %}
                     <option value="{{ formaPagamento.id }}">
@@ -45,34 +41,41 @@ Débitos
 
     </form>
 </section>
-<h1 class="titulo-pagina">Lista de Formas de Pagamento</h1>
+<h1 class="titulo-pagina">Lista de Débitos</h1>
 <section class="tabela">
     <table>
         <thead>
             <tr>
-                <th>FORMA DE PAGAMENTO</th>
-                <th>RESPONSÁVEL</th>
-                <th>DATA DE VENCIMENTO</th>
-                <th>STATUS</th>
+                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 0, 'data')">DATA DE COMPRA</th>
+                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 1, 'texto')">ITEM COMPRADO</th>
+                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 2, 'texto')">CATEGORIA</th>
+                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 3, 'numero')">VALOR DEBITO</th>
+                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 4, 'texto')">FORMA DE PAGAMENTO</th>
+                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 5, 'numero')">QNT. PARCELAS</th>
             </tr>
         </thead>
         <tbody>
-            {% if formasDePagamento %}
-                {% for formaDePagamento in formasDePagamento %}
-
+            {% if debitos %}
+                {% for debito in debitos | sort(attribute='data_compra', reverse=True) %}
                 <tr>
-                    <td>{{ formaDePagamento.forma_pagamento }}</td>
-                    <td>{{ formaDePagamento.responsavel }}</td>
-                    <td>{{ formaDePagamento.data_vencimento }}</td>
-                    <td>{{ formaDePagamento.status_forma_pagamento }}</td>
+                    <td>{{ debito.data_compra.strftime("%d/%m/%Y") }}</td>
+                    <td>{{ debito.item_comprado }}</td>
+                    <td>{{ debito.categoria.categoria }}</td>
+                    <td>R$ {{ "{:,.2f}".format(debito.valor_debito).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
+                    <td>{{ debito.formaPagamento.forma_pagamento }}</td>
+                    <td>{{ debito.qnt_parcelas }}</td>
                 </tr>
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td colspan="4">Nenhuma forma de pagamento encontrada.</td>
+                    <td colspan="6">Nenhuma forma de pagamento encontrada.</td>
                 </tr>
             {% endif %}
         </tbody>
     </table>
 </section>
+{% endblock %}
+{% block script %}
+<script src="/static/js/lista_debitos.js"></script>
+
 {% endblock %}
