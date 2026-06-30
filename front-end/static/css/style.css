@@ -23,11 +23,16 @@ a {
     color: white;
     font-weight: bold;
 }
-header .navegar_rotas {
+
+.menu_navegacao {
+    display: flex;
+    justify-content: space-between;
+}
+.menu_navegacao .navegar_rotas {
     display: flex;
     gap: 2em;
 }
-header .navegar_rotas a:hover {
+nav a:hover {
     text-decoration: underline;
     color: #000E32;
     cursor: pointer;
@@ -40,8 +45,6 @@ header{
     color: white;
     text-align: end;
     background-image: linear-gradient(to right, #18E474,#19AEA2 , #2F85E8);
-    display: flex;
-    justify-content: space-between;
 }
 
 h1 {

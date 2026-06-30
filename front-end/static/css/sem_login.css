@@ -9,4 +9,13 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-image: linear-gradient(#18E474,#19AEA2 , #2F85E8);
+    text-align: center;
+}
+
+#falha_acesso a {
+    text-decoration: underline;
+}
+
+#falha_acesso a:hover {
+    color: #000E32;
 }
