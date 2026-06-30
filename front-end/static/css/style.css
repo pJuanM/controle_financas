@@ -23,6 +23,16 @@ a {
     color: white;
     font-weight: bold;
 }
+header .navegar_rotas {
+    display: flex;
+    gap: 2em;
+}
+header .navegar_rotas a:hover {
+    text-decoration: underline;
+    color: #000E32;
+    cursor: pointer;
+}
+
 .container {
     padding: 1em;
 }
@@ -30,6 +40,8 @@ header{
     color: white;
     text-align: end;
     background-image: linear-gradient(to right, #18E474,#19AEA2 , #2F85E8);
+    display: flex;
+    justify-content: space-between;
 }
 
 h1 {
@@ -52,6 +64,7 @@ h1 {
     display: flex;
     flex-direction: column;
 }
+
 #formulario input, #enviar_formulario{
     background-color: #000E32;
     color: white;
@@ -74,6 +87,43 @@ h1 {
     border: none;
     font-weight: bold;
 }
+
+#formulario .campo_data {
+    position: relative;
+}
+
+#formulario .campo_data input {
+    width: 100%;
+    background: #000e32b0;
+    color: #000e32b0;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+}
+
+#formulario .campo_data input:focus,
+#formulario .campo_data input.tem_valor {
+    color: white;
+}
+
+#formulario .campo_data label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    pointer-events: none;
+    transition: .2s;
+}
+#formulario .campo_data:focus-within label,
+#formulario .campo_data label.escondida {
+    opacity: 0;
+}
+
 #formulario input:valid, select:valid {
     background-color: #000e32;
 }

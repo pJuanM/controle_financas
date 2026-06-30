@@ -10,13 +10,87 @@ from dateutil.relativedelta import relativedelta
 
 rota_debitos = APIRouter(prefix="/debitos", tags=["debitos"], dependencies=[Depends(verificar_token)])
 
+
 @rota_debitos.get("/")
-async def home(request: Request, 
-               session: Session = Depends(pegar_sessao), 
-               usuario: Usuarios = Depends(verificar_token)):
+async def listar_debitos(request: Request,
+                         data_compra_inicio: str | None = Query(None),
+                         data_compra_final: str | None = Query(None),
+                         data_vencimento_inicio: str | None = Query(None),
+                         data_vencimento_final: str | None = Query(None),
+                         id_categoria: str | None = Query(None), 
+                         id_forma_pagamento: str | None = Query(None), 
+                         session: Session = Depends(pegar_sessao), 
+                         usuario: Usuarios = Depends(verificar_token)):
     """
     Essa é a rota padrão das contas.
     """
+    
+    if usuario is None:
+        return templates.TemplateResponse(request= request, name="sem_login.html")
+    
+    categorias = session.query(Categorias).all()
+    formas_pagamento = session.query(FormasPagamento).all()
+    
+    filtros_aplicados = any([
+        data_compra_inicio,
+        data_compra_final,
+        data_vencimento_inicio,
+        data_vencimento_final,
+        id_categoria,
+        id_forma_pagamento
+    ])
+    resultadoDebitos = []
+
+    if filtros_aplicados:
+        data_compra_inicio = data_compra_inicio or None 
+        data_compra_final = data_compra_final or None 
+        data_vencimento_inicio = data_vencimento_inicio or None 
+        data_vencimento_final = data_vencimento_final or None 
+
+        query = session.query(Debitos).filter(Debitos.id_usuario == usuario.id)
+
+        if data_compra_inicio or data_compra_final:
+            if not data_compra_inicio or not data_compra_final:
+                raise HTTPException(status_code= 400, detail="Precisa informar ambas datas compra.")
+            query = query.filter(
+                Debitos.data_compra >= datetime.strptime(data_compra_inicio, "%Y-%m-%d").date(), 
+                Debitos.data_compra <= datetime.strptime(data_compra_final, "%Y-%m-%d")
+            .date())
+
+        if data_vencimento_inicio or data_vencimento_final:
+            if not data_vencimento_inicio or not data_vencimento_final:
+                raise HTTPException(status_code= 400, detail="Precisa informar ambas datas vencimento.")
+            query = query.join(Debitos.parcela).filter(
+                Parcelas.data_vencimento >= datetime.strptime(data_vencimento_inicio, "%Y-%m-%d").date(), 
+                Parcelas.data_vencimento <= datetime.strptime(data_vencimento_final, "%Y-%m-%d").date()
+            ).distinct()
+
+        if id_categoria is not None:
+            query = query.filter(Debitos.id_categoria == int(id_categoria))
+
+        if id_forma_pagamento is not None:
+            query = query.filter(Debitos.id_forma_pagamento == int(id_forma_pagamento))
+
+        resultadoDebitos = query.all()
+
+    return templates.TemplateResponse(
+        name="lista_debitos.html", 
+        request=request, 
+        context={
+            "debitos": resultadoDebitos,
+            "usuario": usuario,
+            "filtros_aplicados": filtros_aplicados,
+            "categorias": categorias,
+            "formas_pagamento": formas_pagamento
+
+        }
+    )
+
+
+@rota_debitos.get("/criar")
+async def home(request: Request, 
+               session: Session = Depends(pegar_sessao), 
+               usuario: Usuarios = Depends(verificar_token)):
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
     categorias = session.query(Categorias).all()
@@ -184,77 +258,5 @@ async def deletar_conta(id_debito: int, session: Session = Depends(pegar_sessao)
     return {"mensagem": f"Conta excluída com sucesso! - ID da conta {conta.id}",
             "conta": conta}
 
-
-@rota_debitos.get("/listar")
-async def listar_debitos(request: Request,
-                         data_compra_inicio: str | None = Query(None),
-                         data_compra_final: str | None = Query(None),
-                         data_vencimento_inicio: str | None = Query(None),
-                         data_vencimento_final: str | None = Query(None),
-                         id_categoria: str | None = Query(None), 
-                         id_forma_pagamento: str | None = Query(None), 
-                         session: Session = Depends(pegar_sessao), 
-                         usuario: Usuarios = Depends(verificar_token)):
-    
-    if usuario is None:
-        return templates.TemplateResponse(request= request, name="sem_login.html")
-    
-    categorias = session.query(Categorias).all()
-    formas_pagamento = session.query(FormasPagamento).all()
-    
-    filtros_aplicados = any([
-        data_compra_inicio,
-        data_compra_final,
-        data_vencimento_inicio,
-        data_vencimento_final,
-        id_categoria,
-        id_forma_pagamento
-    ])
-    resultadoDebitos = []
-
-    if filtros_aplicados:
-        data_compra_inicio = data_compra_inicio or None 
-        data_compra_final = data_compra_final or None 
-        data_vencimento_inicio = data_vencimento_inicio or None 
-        data_vencimento_final = data_vencimento_final or None 
-
-        query = session.query(Debitos).filter(Debitos.id_usuario == usuario.id)
-
-        if data_compra_inicio or data_compra_final:
-            if not data_compra_inicio or not data_compra_final:
-                raise HTTPException(status_code= 400, detail="Precisa informar ambas datas compra.")
-            query = query.filter(
-                Debitos.data_compra >= datetime.strptime(data_compra_inicio, "%Y-%m-%d").date(), 
-                Debitos.data_compra <= datetime.strptime(data_compra_final, "%Y-%m-%d")
-            .date())
-
-        if data_vencimento_inicio or data_vencimento_final:
-            if not data_vencimento_inicio or not data_vencimento_final:
-                raise HTTPException(status_code= 400, detail="Precisa informar ambas datas vencimento.")
-            query = query.join(Debitos.parcela).filter(
-                Parcelas.data_vencimento >= datetime.strptime(data_vencimento_inicio, "%Y-%m-%d").date(), 
-                Parcelas.data_vencimento <= datetime.strptime(data_vencimento_final, "%Y-%m-%d").date()
-            ).distinct()
-
-        if id_categoria is not None:
-            query = query.filter(Debitos.id_categoria == int(id_categoria))
-
-        if id_forma_pagamento is not None:
-            query = query.filter(Debitos.id_forma_pagamento == int(id_forma_pagamento))
-
-        resultadoDebitos = query.all()
-
-    return templates.TemplateResponse(
-        name="lista_debitos.html", 
-        request=request, 
-        context={
-            "debitos": resultadoDebitos,
-            "usuario": usuario,
-            "filtros_aplicados": filtros_aplicados,
-            "categorias": categorias,
-            "formas_pagamento": formas_pagamento
-
-        }
-    )
 
 

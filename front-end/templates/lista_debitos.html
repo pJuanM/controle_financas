@@ -2,19 +2,27 @@
 {% block titulo %}
 Débitos
 {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/debitos.css') }}">
+{% endblock %}
+{% block header %}
+<nav class="navegar_rotas">
+    <a href="/debitos/criar">Criar</a>
+    <a href="/debitos/editar">Editar</a>
+    <a href="/debitos">Listar</a>
+</nav>
+{% endblock %}
 {% block conteudo %}
 <section class="formulario">
     <form action="/debitos/listar" method="get" id="formulario">
-        <div class="grupo_campo">
+        <div class="grupo_campo campo_data">
+            <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
             <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
-            <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off">
         </div>
-        <div class="grupo_campo">
-            <label for="data_compra_inicio">Intervalo de Compra Final</label>
-            <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off">
+        <div class="grupo_campo campo_data" >
+            <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()">
+            <label for="data_compra_final">Intervalo de Compra Final</label>
         </div>
-
-
 
         <div class="grupo_campo">
             <select name="id_categoria" id="id_categoria">
@@ -46,12 +54,12 @@ Débitos
     <table>
         <thead>
             <tr>
-                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 0, 'data')">DATA DE COMPRA</th>
-                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 1, 'texto')">ITEM COMPRADO</th>
-                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 2, 'texto')">CATEGORIA</th>
-                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 3, 'numero')">VALOR DEBITO</th>
-                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 4, 'texto')">FORMA DE PAGAMENTO</th>
-                <th class="tabela-cabecalho" onclick="ordenarTabela(this, 5, 'numero')">QNT. PARCELAS</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'data')">DATA DE COMPRA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">ITEM COMPRADO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'texto')">CATEGORIA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 3, 'numero')">VALOR DEBITO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 4, 'texto')">FORMA DE PAGAMENTO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 5, 'numero')">QNT. PARCELAS</th>
             </tr>
         </thead>
         <tbody>

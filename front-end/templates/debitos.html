@@ -3,6 +3,13 @@
 {% block titulo %}
 Débitos
 {% endblock %}
+{% block header %}
+<nav class="navegar_rotas">
+    <a href="/debitos/criar">Criar</a>
+    <a href="/debitos/editar">Editar</a>
+    <a href="/debitos">Listar</a>
+</nav>
+{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{{ url_for('static', path='/css/debitos.css') }}">

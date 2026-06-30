@@ -2,11 +2,18 @@
 {% block titulo %}
 Forma de Pagamento
 {% endblock %}
+{% block header %}
+<nav class="navegar_rotas">
+    <a href="/formaPagamento/criar">Criar</a>
+    <a href="/formaPagamento/editar">Editar</a>
+    <a href="/formaPagamento">Listar</a>
+</nav>
+{% endblock %}
 {% block conteudo %}
 <section class="formulario">
-    <form action="/formaPagamento/listar" method="get" id="formulario">
+    <form action="/formaPagamento" method="get" id="formulario">
         <div class="grupo_campo">
-            <select name="status_forma_pagamento" id="status_forma_pagamento" required>
+            <select name="status_forma_pagamento" id="status_forma_pagamento">
                 <option value="" selected disabled>Status Forma de Pagamento</option>
                 <option value="ATIVO">ATIVO</option>
                 <option value="INATIVO">INATIVO</option>
@@ -30,10 +37,10 @@ Forma de Pagamento
     <table>
         <thead>
             <tr>
-                <th>FORMA DE PAGAMENTO</th>
-                <th>RESPONSÁVEL</th>
-                <th>DATA DE VENCIMENTO</th>
-                <th>STATUS</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'texto')">FORMA DE PAGAMENTO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">RESPONSÁVEL</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'numero')">DATA DE VENCIMENTO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 3, 'texto')">STATUS</th>
             </tr>
         </thead>
         <tbody>

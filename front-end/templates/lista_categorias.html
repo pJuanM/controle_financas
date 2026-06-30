@@ -2,11 +2,18 @@
 {% block titulo %}
 Categoria
 {% endblock %}
+{% block header %}
+<nav class="navegar_rotas">
+    <a href="/categorias/criar">Criar</a>
+    <a href="/categorias/editar">Editar</a>
+    <a href="/categorias">Listar</a>
+</nav>
+{% endblock %}
 {% block conteudo %}
 <section class="formulario">
-    <form action="/categorias/categoria/listar" method="get" id="formulario">
+    <form action="/categorias/listar" method="get" id="formulario">
         <div class="grupo_campo">
-            <select name="status_categoria" id="status_categoria" required>
+            <select name="status_categoria" id="status_categoria">
                 <option value="" selected disabled>Status Categoria</option>
                 <option value="ATIVO">ATIVO</option>
                 <option value="INATIVO">INATIVO</option>
@@ -20,9 +27,9 @@ Categoria
     <table>
         <thead>
             <tr>
-                <th>CATEGORIA</th>
-                <th>DESCRIÇÃO</th>
-                <th>STATUS</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'texto')">CATEGORIA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">DESCRIÇÃO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'texto')">STATUS</th>
             </tr>
         </thead>
         <tbody>

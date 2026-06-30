@@ -9,10 +9,55 @@ rota_formasPagamento = APIRouter(prefix="/formaPagamento", tags=["formaPagamento
 
 
 @rota_formasPagamento.get("/")
-async def home(request: Request, usuario: Usuarios = Depends(verificar_token)):
+async def listar_formaPagamento(request: Request,
+                                forma_pagamento: str | None = Query(None),
+                                responsavel: str | None = Query(None),
+                                data_vencimento: str | None = Query(None),
+                                status_forma_pagamento: str | None = Query(None),
+                                session: Session = Depends(pegar_sessao), 
+                                usuario: Usuarios = Depends(verificar_token)):
     """
     Essa é a rota padrão das formas de pagamentos.
     """
+    
+    if usuario is None:
+        return templates.TemplateResponse(request= request, name="sem_login.html")
+    
+    filtros_aplicados = any([
+        forma_pagamento,
+        responsavel,
+        data_vencimento,
+        status_forma_pagamento
+    ])
+    formasDePagamento = []
+    if filtros_aplicados:
+        query = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
+        if forma_pagamento:
+            query = query.filter(FormasPagamento.forma_pagamento == forma_pagamento)
+        
+        if responsavel:
+            query = query.filter(FormasPagamento.responsavel == responsavel)
+
+        if data_vencimento:
+            query = query.filter(FormasPagamento.data_vencimento == int(data_vencimento))
+
+        if status_forma_pagamento:
+            query = query.filter(FormasPagamento.status_forma_pagamento == status_forma_pagamento)
+
+        formasDePagamento = query.all()
+
+    return templates.TemplateResponse(
+        name="lista_formasPagamento.html", 
+        request=request, 
+        context={
+            "formasDePagamento": formasDePagamento,
+            "usuario": usuario
+        }
+    )
+
+
+@rota_formasPagamento.get("/criar")
+async def home(request: Request, usuario: Usuarios = Depends(verificar_token)):
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
     return templates.TemplateResponse(request= request, name="forma_de_pagamento.html")
@@ -81,44 +126,4 @@ async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depe
 
     return {"mensagem": "Forma de pagamento excluida com sucesso."}
 
-
-@rota_formasPagamento.get("/listar")
-async def listar_formaPagamento(request: Request,
-                                forma_pagamento: str | None = Query(None),
-                                responsavel: str | None = Query(None),
-                                data_vencimento: str | None = Query(None),
-                                status_forma_pagamento: str | None = Query(None),
-                                session: Session = Depends(pegar_sessao), 
-                                usuario: Usuarios = Depends(verificar_token)):
-    
-    if usuario is None:
-        return templates.TemplateResponse(request= request, name="sem_login.html")
-    
-    query = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
-    if forma_pagamento:
-        query = query.filter(FormasPagamento.forma_pagamento == forma_pagamento)
-    
-    if responsavel:
-        query = query.filter(FormasPagamento.responsavel == responsavel)
-
-    if data_vencimento:
-        query = query.filter(FormasPagamento.data_vencimento == int(data_vencimento))
-
-    if status_forma_pagamento:
-        query = query.filter(FormasPagamento.status_forma_pagamento == status_forma_pagamento)
-
-    formasDePagamento = query.all()
-
-    if not formasDePagamento:
-        formasDePagamento = []
-    
-
-    return templates.TemplateResponse(
-        name="lista_formasPagamento.html", 
-        request=request, 
-        context={
-            "formasDePagamento": formasDePagamento,
-            "usuario": usuario
-        }
-    )
 
