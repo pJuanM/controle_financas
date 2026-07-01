@@ -13,7 +13,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 rota_autenticacao = APIRouter(prefix="/usuario", tags=["usuario"])
 
-def criar_token(usuario_id, duracao_token =  timedelta(hours = ACCESS_TOKEN_EXPIRE_HOURS)):
+def criar_token(usuario_id, 
+                duracao_token =  timedelta(hours = ACCESS_TOKEN_EXPIRE_HOURS)):
+    
+
     data_expiracao = datetime.now(timezone.utc) + duracao_token
     dict_info = {"sub": str(usuario_id), "exp": data_expiracao}
     jwt_codificado = jwt.encode(dict_info, SECRET_KEY, ALGORITHM)
@@ -21,7 +24,11 @@ def criar_token(usuario_id, duracao_token =  timedelta(hours = ACCESS_TOKEN_EXPI
     return jwt_codificado
 
 
-def autenticar_usuario(email, senha, session):
+def autenticar_usuario(email, 
+                       senha, 
+                       session):
+    
+
     existe_usuario = session.query(Usuarios).filter(Usuarios.email == email).first()
     if not existe_usuario:
         raise HTTPException(status_code= 400, detail = "Não tem usuário cadastrado para este e-mail!")
@@ -44,6 +51,7 @@ async def criar_usuario(usuario: str = Form(...),
                         senha: str = Form(...), 
                         session: Session = Depends(pegar_sessao)):
     
+
     existe_usuario = session.query(Usuarios).filter(Usuarios.email == email).first()
     if existe_usuario:
         raise HTTPException(status_code= 400, detail = "Este e-mail já foi cadastrado em sistema.")
@@ -62,21 +70,15 @@ async def login(request: Request):
     """
     return templates.TemplateResponse(request = request, name = "login.html")
 
+
 @rota_autenticacao.post("/login")
 async def login(email: str = Form(...), 
                 senha: str = Form(...), 
                 session: Session = Depends(pegar_sessao)):
     
+
     usuario = autenticar_usuario(email, senha, session)
     access_token = criar_token(usuario.id)
-    # refresh_token = criar_token(usuario.id, duracao_token = timedelta(days = 7))
-    # return {
-    #     "access_token": access_token,
-    #     "refresh_token": refresh_token,
-    #     "token_type": "Bearer",
-        
-    # }
-
     response = RedirectResponse(
         url="/debitos",
         status_code = 303
@@ -105,6 +107,8 @@ async def login_form(dados_formulario: OAuth2PasswordRequestForm = Depends(),
 
 @rota_autenticacao.get("/refresh")
 async def use_refresh_token(usuario: Usuarios = Depends(verificar_token)):
+
+
     access_token = criar_token(usuario.id)
     return {
         "access_token": access_token,
@@ -118,7 +122,6 @@ async def logout():
         url = "/usuario/login",
         status_code= 303
     )
-
     response.delete_cookie("access_token")
 
     return response

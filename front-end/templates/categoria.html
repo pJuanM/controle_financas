@@ -27,5 +27,10 @@ Categorias
         <button type="submit" id="enviar_formulario">Salvar Categoria</button>
     </form>
 </section>
+{% if mensagem %}
+<div class="mensagem_sucesso">
+    <p>{{ mensagem }}</p>
+</div>
+{% endif %}
 
 {% endblock %}

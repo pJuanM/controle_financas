@@ -1,4 +1,7 @@
 from fastapi import Form, Depends, HTTPException, APIRouter, Request, Query
+from fastapi.responses import RedirectResponse
+from urllib.parse import quote
+from typing import Optional
 from sqlalchemy.orm import Session
 from dependencies import pegar_sessao, verificar_token
 from models import FormasPagamento, Usuarios
@@ -57,10 +60,22 @@ async def listar_formaPagamento(request: Request,
 
 
 @rota_formasPagamento.get("/criar")
-async def home(request: Request, usuario: Usuarios = Depends(verificar_token)):
+async def home(request: Request, 
+               mensagem: Optional[str] = None,
+               usuario: Usuarios = Depends(verificar_token)):
+    
+
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
-    return templates.TemplateResponse(request= request, name="forma_de_pagamento.html")
+
+    return templates.TemplateResponse(
+        name="forma_de_pagamento.html", 
+        request=request, 
+        context={
+            "usuario": usuario,
+            "mensagem":mensagem
+        }
+    )
 
 
 @rota_formasPagamento.post("/criar")
@@ -70,26 +85,37 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
                                session: Session = Depends(pegar_sessao),
                                usuario: Usuarios = Depends(verificar_token)):
     
+
     existe_formaPagamento = session.query(FormasPagamento).filter(
         FormasPagamento.forma_pagamento == forma_pagamento, 
         FormasPagamento.responsavel == responsavel).first()
     
     if existe_formaPagamento:
-        raise HTTPException(status_code = 400, detail="Forma de pagamento já cadastrada para este responsável em sistema!")
+        mensagem = quote("Já existe uma forma de pagamento idêntica.")
+        return RedirectResponse(
+            url = f"/formaPagamento/criar?mensagem={mensagem}",
+            status_code = 303
+        )
 
     if data_vencimento == "":
-        raise HTTPException(status_code = 422, detail="Data de vencimento não informada.")
+        return RedirectResponse(
+            url = f"/formaPagamento/criar?mensagem=Data de vencimento não informada.",
+            status_code = 303
+        )
 
 
     nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, forma_pagamento = forma_pagamento, responsavel = responsavel, status_forma_pagamento = "ATIVO", data_vencimento = data_vencimento)
     session.add(nova_formaPagamento)
     session.commit()
-
-    return {"mensagem": f"A Categoria {forma_pagamento} foi cadastrada com sucesso para o responsável {responsavel}! "}
+    mensagem = quote("Forma de pagamento cadastrada com sucesso.")
+    return RedirectResponse(
+        url = f"/formaPagamento/criar?mensagem={mensagem}",
+        status_code = 303,
+    )
 
 
 @rota_formasPagamento.post("/editar")
-async def editar_formaPagamento(id_formaPagamento: int, 
+async def editar_formaPagamento(id_formaPagamento: int = Form(...), 
                                 forma_pagamento: str = Form(...), 
                                 responsavel: str = Form(...), 
                                 data_vencimento: int | None = Form(None), 
@@ -97,8 +123,8 @@ async def editar_formaPagamento(id_formaPagamento: int,
                                 session: Session = Depends(pegar_sessao), 
                                 usuario: Usuarios = Depends(verificar_token)):
     
-    FormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == id_formaPagamento, FormasPagamento.id_usuario == usuario.id).first()
     
+    FormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == id_formaPagamento, FormasPagamento.id_usuario == usuario.id).first()
     if not FormaPagamento:
         raise HTTPException(status_code = 400, detail = "Forma de pagamento não cadastrada.")
     
@@ -111,12 +137,19 @@ async def editar_formaPagamento(id_formaPagamento: int,
     FormaPagamento.status_forma_pagamento = status_forma_pagamento
     session.commit()
 
-    return {"mensagem": f"A forma de pagamento foi alterada com sucesso!"}
+    return RedirectResponse(
+        "/formaPagamento",
+        status_code=303
+    )
 
 
-@rota_formasPagamento.post("/excluir/{formaPagamento_id}")
-async def excluir_formaPagamento(formaPagamento_id: int, session: Session = Depends(pegar_sessao), usuario: Usuarios = Depends(verificar_token)):
-    existeFormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == formaPagamento_id, FormasPagamento.id_usuario == usuario.id).first()
+@rota_formasPagamento.post("/excluir")
+async def excluir_formaPagamento(id_formaPagamento: int = Form(...), 
+                                 session: Session = Depends(pegar_sessao), 
+                                 usuario: Usuarios = Depends(verificar_token)):
+    
+    
+    existeFormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == id_formaPagamento, FormasPagamento.id_usuario == usuario.id).first()
 
     if not existeFormaPagamento:
         raise HTTPException(status_code = 401, detail = "Não existe essa forma de pagamento cadastrada para este usuário")

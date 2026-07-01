@@ -2,14 +2,15 @@ from fastapi import APIRouter, Form, Depends, HTTPException, Request, Query
 from models import Usuarios, Parcelas, Debitos, FormasPagamento
 from dependencies import pegar_sessao, verificar_token
 from sqlalchemy.orm import Session
-from datetime import date, datetime, timedelta, timezone
+from datetime import date
 from main import templates
 
 rota_parcelas = APIRouter(prefix="/parcelas", tags=["parcela"], dependencies=[Depends(verificar_token)])
 
 
 @rota_parcelas.get("/")
-async def home(request: Request, usuario: Usuarios = Depends(verificar_token)):
+async def home(request: Request, 
+               usuario: Usuarios = Depends(verificar_token)):
     """
     Essa é a rota padrão das parcelas
     """
@@ -26,6 +27,7 @@ async def listar_parcelas(request: Request,
                           id_categoria: int | None = Query(None),
                           id_forma_pagamento: int | None = Query(None),
                           responsavel: str | None = Query(None)):
+    
     
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
@@ -73,7 +75,8 @@ async def editar_parcela(id_parcela: int,
                          session : Session = Depends(pegar_sessao),
                          usuario: Usuarios = Depends(verificar_token),
                          status_parcela: str | None = Form(...)):
-    """"""
+    
+
     parcela = session.query(Parcelas).join(Parcelas.debito).filter(Parcelas.id == id_parcela, Debitos.id_usuario == usuario.id).first()
 
     if not parcela:

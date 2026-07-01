@@ -11,7 +11,7 @@ Categoria
 {% endblock %}
 {% block conteudo %}
 <section class="formulario">
-    <form action="/categorias/listar" method="get" id="formulario">
+    <form action="/categorias" method="get" id="formulario">
         <div class="grupo_campo">
             <select name="status_categoria" id="status_categoria">
                 <option value="" selected disabled>Status Categoria</option>
@@ -35,7 +35,10 @@ Categoria
         <tbody>
             {% if categorias %}
                 {% for categoria in categorias %}
-                <tr>
+                <tr onclick="editarItem(this)"
+                data-categoria="{{ categoria.categoria }}"
+                data-descricao="{{ categoria.descricao }}"
+                data-status="{{ categoria.status_categoria }}">
                     <td>{{ categoria.categoria }}</td>
                     <td>{{ categoria.descricao }}</td>
                     <td>{{ categoria.status_categoria }}</td>
@@ -49,4 +52,30 @@ Categoria
         </tbody>
     </table>
 </section>
+<div class="overlay" id="overlay"></div>
+<aside class="menu_editar">
+    <form action="" method="get" id="formulario">
+        <div class="grupo_campo">
+            <select name="status_categoria" id="editar_status_categoria">
+                <option value="" selected disabled>Status Categoria</option>
+                <option value="ATIVO">ATIVO</option>
+                <option value="INATIVO">INATIVO</option>
+            </select>
+        </div>
+
+        <div class="grupo_campo">
+            <input type="text" id="editar_categoria" name="categoria" placeholder="Categoria" autocomplete="off" required>
+        </div>
+        <div class="grupo_campo">
+            <input type="text" id="editar_descricao" name="descricao" placeholder="Descrição" autocomplete="off" required>
+        </div>
+        <div class="grupo_campo">
+            <button type="submit" id="enviar_formulario" formaction="/excluir">Excluir Categoria</button>
+            <button type="submit" id="enviar_formulario" formaction="/editar">Editar Categoria</button>
+        </div>
+
+    </form>
+</aside>
+{% endblock %}
+{% block script %}
 {% endblock %}

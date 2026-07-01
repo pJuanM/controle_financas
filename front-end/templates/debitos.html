@@ -53,7 +53,7 @@ Débitos
         <div class="grupo_campo">
             <input type="text" name="valor_debito" id="valor_debito" placeholder="Valor R$" autocomplete="off" required oninput="formatarMoeda(this)">
         </div>
-            <div class="grupo_campo">
+        <div class="grupo_campo">
             <select name="parcelado" id="parcelado" onchange="mostrarQuantidadeParcelas()" required>
                 <option value="" selected disabled>Parcelar:</option>
                 <option value="true">SIM</option>
@@ -69,7 +69,13 @@ Débitos
 
     </form>
 </section>
+{% if mensagem %}
+    <div class="mensagem_sucesso">
+        <p> {{ mensagem }} </p>
+    </div>
+{% endif %}
 {% endblock %}
+
 
 {% block script %}
 <script src="/static/js/debitos.js"></script>

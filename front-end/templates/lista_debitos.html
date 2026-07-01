@@ -14,7 +14,7 @@ Débitos
 {% endblock %}
 {% block conteudo %}
 <section class="formulario">
-    <form action="/debitos/listar" method="get" id="formulario">
+    <form action="/debitos" method="get" id="formulario">
         <div class="grupo_campo campo_data">
             <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
             <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
@@ -46,7 +46,6 @@ Débitos
             </select>        
         </div>
         <button type="submit" id="enviar_formulario">Filtrar Débitos</button>
-
     </form>
 </section>
 <h1 class="titulo-pagina">Lista de Débitos</h1>
@@ -65,7 +64,13 @@ Débitos
         <tbody>
             {% if debitos %}
                 {% for debito in debitos | sort(attribute='data_compra', reverse=True) %}
-                <tr>
+                <tr onclick="editarItem(this)"
+                    data-data_compra="{{ debito.data_compra }}"
+                    data-item_comprado="{{ debito.item_comprado }}"
+                    data-categoria="{{ debito.categoria.id }}"
+                    data-valor-debito="{{ debito.valor_debito }}"
+                    data-forma_pagamento="{{ debito.formaPagamento.id }}"
+                    data-qnt-parcelas="{{ debito.qnt_parcelas }}">
                     <td>{{ debito.data_compra.strftime("%d/%m/%Y") }}</td>
                     <td>{{ debito.item_comprado }}</td>
                     <td>{{ debito.categoria.categoria }}</td>
@@ -82,8 +87,61 @@ Débitos
         </tbody>
     </table>
 </section>
+
+
+<div class="overlay" id="overlay"></div>
+<aside class="menu_editar">
+    <form action="/debitos" method="get" id="formulario">
+        <div class="grupo_campo">
+            <input type="text" id="editar_item_comprado" name="item_comprado" placeholder="Item Comprado" autocomplete="off">
+        </div>
+        <div class="grupo_campo">
+            <input type="text" name="valor_debito" id="editar_valor_debito" placeholder="Valor R$" autocomplete="off" oninput="formatarMoeda(this)">
+        </div>
+
+        <div class="grupo_campo">
+            <select name="id_categoria" id="editar_id_categoria">
+                <option value="" disabled>Categoria: </option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}">
+                        {{ categoria.categoria }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="grupo_campo">
+            <select name="id_forma_pagamento" id="editar_id_forma_pagamento">
+                <option value="" disabled>Forma de Pagamento:</option>
+                {% for formaPagamento in formas_pagamento %}
+                    <option value="{{ formaPagamento.id }}">
+                        {{ formaPagamento.forma_pagamento}} - {{ formaPagamento.responsavel }}
+                    </option>
+                {% endfor %}
+            </select>        
+        </div>
+
+        <div class="grupo_campo">
+            <select name="parcelado" id="editar_parcelado" onchange="mostrarQuantidadeParcelas()">
+                <option value="" disabled>Parcelar:</option>
+                <option value="true">SIM</option>
+                <option value="false">NÃO</option>
+            </select>
+        </div>
+
+        <div class="grupo_campo">
+            <input type="number" id="editar_qnt_parcelas" name="qnt_parcelas" placeholder="Quantidade Parcelas">
+        </div>
+
+        <div class="grupo_campo">
+            <button type="submit" id="enviar_formulario">Excluir Débito</button>
+            <button type="submit" id="enviar_formulario">Editar Débito</button>
+        </div>
+    </form>
+</aside>
 {% endblock %}
 {% block script %}
 <script src="/static/js/lista_debitos.js"></script>
+<script src="/static/js/debitos.js"></script>
 
 {% endblock %}

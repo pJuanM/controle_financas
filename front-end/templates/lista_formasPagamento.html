@@ -47,7 +47,12 @@ Forma de Pagamento
             {% if formasDePagamento %}
                 {% for formaDePagamento in formasDePagamento %}
 
-                <tr>
+                <tr onclick="editarItem(this)"
+                    data-id="{{ formaDePagamento.id }}"
+                    data-forma_pagamento="{{ formaDePagamento.forma_pagamento }}"
+                    data-responsavel="{{ formaDePagamento.responsavel }}"
+                    data-data_vencimento="{{ formaDePagamento.data_vencimento }}"
+                    data-status="{{ formaDePagamento.status_forma_pagamento }}">
                     <td>{{ formaDePagamento.forma_pagamento }}</td>
                     <td>{{ formaDePagamento.responsavel }}</td>
                     <td>{{ formaDePagamento.data_vencimento }}</td>
@@ -62,4 +67,38 @@ Forma de Pagamento
         </tbody>
     </table>
 </section>
+
+
+<div class="overlay" id="overlay"></div>
+<aside class="menu_editar">
+    <form action="/formaPagamento" method="post" id="formulario">
+        <input type="hidden" id="id_formaPagamento" name="id_formaPagamento">
+        <div class="grupo_campo">
+            <input type="text" id="editar_forma_pagamento" name="forma_pagamento" placeholder="Forma de Pagamento" autocomplete="off" required>
+        </div>
+
+        <div class="grupo_campo">
+            <input type="text" id="editar_responsavel" name="responsavel" placeholder="Responsável" autocomplete="off" required>
+        </div>
+    
+        <div class="grupo_campo">
+            <input type="number" id="editar_data_vencimento" name="data_vencimento" placeholder="Data de Vencimento">
+        </div>
+
+        <div class="grupo_campo">
+            <select name="status_forma_pagamento" id="editar_status_forma_pagamento">
+                <option value="" disabled>Status Forma de Pagamento</option>
+                <option value="ATIVO">ATIVO</option>
+                <option value="INATIVO">INATIVO</option>
+            </select>
+        </div>
+
+        <div class="grupo_campo">
+            <button type="submit" id="enviar_formulario" formaction="/formaPagamento/excluir/">Excluir Forma de Pagamento</button>
+            <button type="submit" id="enviar_formulario" formaction="/formaPagamento/editar">Editar Forma de Pagamento</button>
+        </div>
+
+        
+    </form>
+</aside>
 {% endblock %}

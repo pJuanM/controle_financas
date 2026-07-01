@@ -156,6 +156,53 @@ table .tabela_cabecalho {
     cursor: pointer;
 }
 
+
+
+.menu_editar {
+    min-height: 20vh;
+    width: 60vw;
+    border: 1px solid;
+    padding: 1.5em;
+    border-radius: 15px;
+    position: fixed;
+    top: 20vh;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffffd6;
+    z-index: 999;
+    visibility: hidden;
+}
+.menu_editar.ativo {
+    visibility: visible;
+}
+
+.menu_editar.ativo button{
+    position: absolute;
+    bottom: 0;
+    width: 45% !important;
+}
+.menu_editar.ativo button:first-child{
+    left: 2%;
+}
+.menu_editar.ativo button:last-child {
+    right: 2%;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.75); /* Preto com 75% de opacidade */
+    z-index: 998;
+    display: none;
+}
+.overlay.ativo {
+    display: block;
+}
+
+
 /* MENU */
 .menu {
     position: fixed;

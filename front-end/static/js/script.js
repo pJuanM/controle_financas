@@ -60,3 +60,36 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
     // Atualiza o indicador visual de seta (▲ ou ▼) sem apagar o texto original do cabeçalho
     colunaElemento.textContent = colunaElemento.textContent.replace(/ ▲| ▼/g, '') + (direcaoAtual === 'asc' ? ' ▲' : ' ▼');
 }
+
+
+const menu_editar = document.querySelector('.menu_editar');
+const overlay = document.querySelector('.overlay');
+overlay.addEventListener("click", function() {
+    menu_editar.classList.remove("ativo");
+    overlay.classList.remove("ativo");
+});
+function editarItem(linha) {
+
+    menu_editar.classList.add("ativo");
+    overlay.classList.add("ativo");
+    
+
+    for (const campo in linha.dataset) {
+
+        const id = "editar_" + campo.replace(/[A-Z]/g, letra => "_" + letra.toLowerCase());
+
+        const input = document.getElementById(id);
+
+        if (input) {
+            input.value = linha.dataset[campo];
+        }
+    }
+    document.getElementById("id_formaPagamento").value = linha.dataset.id;
+    const inputValor = document.getElementById("editar_valor_debito");
+
+
+    if (inputValor) {
+        inputValor.value = linha.dataset.valorDebito;
+        formatarMoeda(inputValor);
+    }
+}
