@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, Request, Query
+from fastapi.responses import RedirectResponse
 from models import Usuarios, Parcelas, Debitos, FormasPagamento
 from dependencies import pegar_sessao, verificar_token
 from sqlalchemy.orm import Session
@@ -16,7 +17,7 @@ async def home(request: Request,
     """
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
-    return {"mensagem": "Você está na rota de parcelas."}
+    return templates.TemplateResponse(request= request, name="parcelas.html")
 
 @rota_parcelas.get("/listar")
 async def listar_parcelas(request: Request,

@@ -182,14 +182,14 @@ async def criar_debito(data_compra: date = Form(...),
     )
     
 
-@rota_debitos.patch("/editar")
-async def editar_debito(id_debito: int,
-                        item_comprado: str | None = Query(None),
-                        categoria_id: int | None = Query(None),
-                        forma_pagamento: int | None = Query(None),
-                        valor_debito: str | None = Query(None),
-                        parcelado: bool | None = Query(None),
-                        qnt_parcelas: int | None = Query(None),
+@rota_debitos.post("/editar")
+async def editar_debito(id_debito: int = Form(...),
+                        item_comprado: str | None = Form(None),
+                        id_categoria: int | None = Form(None),
+                        id_forma_pagamento: int | None = Form(None),
+                        valor_debito: str | None = Form(None),
+                        parcelado: bool | None = Form(None),
+                        qnt_parcelas: int | None = Form(None),
                         session: Session = Depends(pegar_sessao), 
                         usuario: Usuarios= Depends(verificar_token)):
     
@@ -202,11 +202,11 @@ async def editar_debito(id_debito: int,
     if item_comprado is not None:
         debito.item_comprado = item_comprado
 
-    if categoria_id is not None:
-        debito.id_categoria = categoria_id
+    if id_categoria is not None:
+        debito.id_categoria = id_categoria
 
-    if forma_pagamento is not None:
-        debito.id_forma_pagamento = forma_pagamento
+    if id_forma_pagamento is not None:
+        debito.id_forma_pagamento = id_forma_pagamento
 
     if valor_debito is not None and qnt_parcelas is None:
         valor_debito = (valor_debito.replace("R$", "").replace(".", "").replace(",", ".").strip())
@@ -261,11 +261,15 @@ async def editar_debito(id_debito: int,
     
     session.commit()
 
-    return {"mensagem": "Débito alterado com sucesso!"}
+    return RedirectResponse(
+        url = "/debitos",
+        status_code = 303
+
+    )
      
 
-@rota_debitos.post("/cancelar/{id_debito}")
-async def deletar_conta(id_debito: int, 
+@rota_debitos.post("/excluir")
+async def deletar_conta(id_debito: int = Form(...), 
                         session: Session = Depends(pegar_sessao), 
                         usuario: Usuarios = Depends(verificar_token)):
     

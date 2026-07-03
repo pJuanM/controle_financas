@@ -5,7 +5,6 @@ Forma de Pagamento
 {% block header %}
 <nav class="navegar_rotas">
     <a href="/formaPagamento/criar">Criar</a>
-    <a href="/formaPagamento/editar">Editar</a>
     <a href="/formaPagamento">Listar</a>
 </nav>
 {% endblock %}
@@ -72,7 +71,7 @@ Forma de Pagamento
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
     <form action="/formaPagamento" method="post" id="formulario">
-        <input type="hidden" id="id_formaPagamento" name="id_formaPagamento">
+        <input type="hidden" id="id_formaPagamento" name="id_formaPagamento" data-id-principal>
         <div class="grupo_campo">
             <input type="text" id="editar_forma_pagamento" name="forma_pagamento" placeholder="Forma de Pagamento" autocomplete="off" required>
         </div>
@@ -86,7 +85,7 @@ Forma de Pagamento
         </div>
 
         <div class="grupo_campo">
-            <select name="status_forma_pagamento" id="editar_status_forma_pagamento">
+            <select name="" id="editar_status_forma_pagamento">
                 <option value="" disabled>Status Forma de Pagamento</option>
                 <option value="ATIVO">ATIVO</option>
                 <option value="INATIVO">INATIVO</option>
@@ -97,8 +96,6 @@ Forma de Pagamento
             <button type="submit" id="enviar_formulario" formaction="/formaPagamento/excluir/">Excluir Forma de Pagamento</button>
             <button type="submit" id="enviar_formulario" formaction="/formaPagamento/editar">Editar Forma de Pagamento</button>
         </div>
-
-        
     </form>
 </aside>
 {% endblock %}

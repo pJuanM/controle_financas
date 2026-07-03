@@ -84,7 +84,7 @@ function editarItem(linha) {
             input.value = linha.dataset[campo];
         }
     }
-    document.getElementById("id_formaPagamento").value = linha.dataset.id;
+    document.querySelector("[data-id-principal]").value = linha.dataset.id;
     const inputValor = document.getElementById("editar_valor_debito");
 
 

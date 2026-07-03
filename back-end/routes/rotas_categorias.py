@@ -78,11 +78,11 @@ async def criar_categoria(categoria: str = Form(...),
     )
     
 
-@rota_categorias.patch("/editar/{categoria_id}")
-async def editar_categoria(categoria_id: int, 
-                           categoria_titulo: str = Form(...), 
-                           categoria_descricao: str = Form(...), 
-                           categoria_status: str = Form(...), 
+@rota_categorias.post("/editar")
+async def editar_categoria(categoria_id: int = Form(...), 
+                           categoria_titulo: str | None = Form(None), 
+                           categoria_descricao: str | None = Form(None), 
+                           categoria_status: str | None = Form(None), 
                            session: Session = Depends(pegar_sessao), 
                            usuario: Usuarios = Depends(verificar_token)):
     
@@ -99,7 +99,10 @@ async def editar_categoria(categoria_id: int,
     categoria.status_categoria = categoria_status
     session.commit()
 
-    return {"mensagem": "A categoria foi alterada com sucesso"}
+    return RedirectResponse(
+        url = "/categorias",
+        status_code = 303
+    )
 
 
 @rota_categorias.post("/excluir/{categoria_id}")

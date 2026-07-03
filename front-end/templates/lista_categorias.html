@@ -5,7 +5,6 @@ Categoria
 {% block header %}
 <nav class="navegar_rotas">
     <a href="/categorias/criar">Criar</a>
-    <a href="/categorias/editar">Editar</a>
     <a href="/categorias">Listar</a>
 </nav>
 {% endblock %}
@@ -36,6 +35,7 @@ Categoria
             {% if categorias %}
                 {% for categoria in categorias %}
                 <tr onclick="editarItem(this)"
+                data-id="{{ categoria.id }}"
                 data-categoria="{{ categoria.categoria }}"
                 data-descricao="{{ categoria.descricao }}"
                 data-status="{{ categoria.status_categoria }}">
@@ -54,28 +54,27 @@ Categoria
 </section>
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="" method="get" id="formulario">
+    <form action="" method="post" id="formulario">
+        <input type="hidden" id="categoria_id" name="categoria_id" data-id-principal>
         <div class="grupo_campo">
-            <select name="status_categoria" id="editar_status_categoria">
-                <option value="" selected disabled>Status Categoria</option>
+            <select name="categoria_status" id="editar_status_categoria">
+                <option value="" disabled>Status Categoria</option>
                 <option value="ATIVO">ATIVO</option>
                 <option value="INATIVO">INATIVO</option>
             </select>
         </div>
 
         <div class="grupo_campo">
-            <input type="text" id="editar_categoria" name="categoria" placeholder="Categoria" autocomplete="off" required>
+            <input type="text" id="editar_categoria" name="categoria_titulo" placeholder="Categoria" autocomplete="off" required>
         </div>
         <div class="grupo_campo">
-            <input type="text" id="editar_descricao" name="descricao" placeholder="Descrição" autocomplete="off" required>
+            <input type="text" id="editar_descricao" name="categoria_descricao" placeholder="Descrição" autocomplete="off" required>
         </div>
         <div class="grupo_campo">
-            <button type="submit" id="enviar_formulario" formaction="/excluir">Excluir Categoria</button>
-            <button type="submit" id="enviar_formulario" formaction="/editar">Editar Categoria</button>
+            <button type="submit" id="enviar_formulario" formaction="/categorias/excluir">Excluir Categoria</button>
+            <button type="submit" id="enviar_formulario" formaction="/categorias/editar">Editar Categoria</button>
         </div>
 
     </form>
 </aside>
-{% endblock %}
-{% block script %}
 {% endblock %}
