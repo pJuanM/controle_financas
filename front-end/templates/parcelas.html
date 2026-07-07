@@ -3,7 +3,7 @@
 Parcelas
 {% endblock %}
 {% block css %}
-<link rel="stylesheet" href="{{ url_for('static', path='css/debitos.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='css/parcelas.css') }}">
 {% endblock %}
 {% block header %}
 <nav class="navegar_rotas">
@@ -13,15 +13,37 @@ Parcelas
 {% block conteudo %}
 <section class="formulario">
     <form action="/parcelas" method="get" id="formulario">
-        <div class="grupo_campo campo_data">
-            <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
-            <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
+        <div class="grupo_campo_data">
+            <div class="grupo_campo campo_data">
+                <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
+                <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
+            </div>
+            <div class="grupo_campo campo_data" >
+                <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()">
+                <label for="data_compra_final">Intervalo de Compra Final</label>
+            </div>
         </div>
-        <div class="grupo_campo campo_data" >
-            <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()">
-            <label for="data_compra_final">Intervalo de Compra Final</label>
+        <div class="grupo_campo_data">
+            <div class="grupo_campo campo_data">
+                <input type="date" id="data_vencimento_inicio" name="data_vencimento_inicio" placeholder="Data Vencimento início" autocomplete="off" onclick="this.showPicker()">
+                <label for="data_vencimento_inicio">Intervalo de Vencimento Ínicio</label>
+            </div>
+            <div class="grupo_campo campo_data" >
+                <input type="date" id="data_vencimento_final" name="data_vencimento_final" placeholder="Data Vencimento final" autocomplete="off" onclick="this.showPicker()">
+                <label for="data_vencimento_final">Intervalo de Vencimento Final</label>
+            </div>
         </div>
 
+        <div class="grupo_campo">
+            <select name="status_parcela" id="status_parcela">
+                <option value="" selected disabled>Status Parcela</option>
+                <option value="CANCELADO">CANCELADO</option>
+                <option value="PAGO">PAGO</option>
+                <option value="PENDENTE">PENDENTE</option>
+            </select>
+        </div>
+
+        
         <div class="grupo_campo">
             <select name="id_categoria" id="id_categoria">
                 <option value="" selected disabled>Categoria: </option>
@@ -48,7 +70,10 @@ Parcelas
             </select>        
         </div>
 
-        <button type="submit" id="enviar_formulario">Filtrar Débitos</button>
+        <div class="grupo_campo">
+            <input type="text" id="responsavel" name="responsavel" placeholder="Responsavel" autocomplete="off">
+        </div>
+        <button type="submit" id="enviar_formulario">Filtrar Parcelas</button>
     </form>
 </section>
 <h1 class="titulo-pagina">Lista de Parcelas</h1>
@@ -56,43 +81,38 @@ Parcelas
     <table>
         <thead>
             <tr>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'texto')">Nº PARCELA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'data')">DATA DE VENCIMENTO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'texto')">STATUS PARCELA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 3, 'numero')">VALOR PARCELA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 4, 'data')">DATA DE COMPRA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 5, 'texto')">ITEM COMPRADO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 6, 'texto')">FORMA DE PAGAMENTO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 7, 'texto')">RESPONSAVEL</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 0, 'data')">DATA DE VENCIMENTO</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 1, 'data')">DATA DE COMPRA</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'texto')">ITEM COMPRADO</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'texto')">CATEGORIA</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 4, 'numero')">VALOR PARCELA</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 5, 'parcela')">PARCELA</th>
             </tr>
         </thead>
         <tbody>
             {% if parcelas %}
-                {% for parcela in parcelas | sort(attribute='data_compra', reverse=True) %}
+                {% for parcela in parcelas | sort(attribute='data_vencimento', reverse=True) %}
                 <tr onclick="editarItem(this)"
                     data-id="{{ parcela.id }}"
-                    data-numero-parcela="{{ parcela.numero_parcela }}"
-                    data-data-vencimento="{{ parcela.data_vencimento }}"
-                    data-status-parcela="{{ parcela.status_parcela }}"
+                    data-data_compra="{{ parcela.debito.data_compra }}"
+                    data-item_comprado="{{ parcela.debito.item_comprado }}"
+                    data-categoria="{{ parcela.debito.categoria.id }}"
                     data-valor-parcela="{{ parcela.valor_parcela }}"
-                    data-data-compra="{{ parcela.debito.data_compra }}"
-                    data-item-comprado="{{ parcela.debito.item_comprado }}"
-                    data-forma-pagamento="{{ parcela.formaPagamento.forma_pagamento }}"
-                    data-responsavel="{{ parcela.formaPagamento.responsavel }}">
-
-                    <td>{{ parcela.numero_parcela }}</td>
+                    data-parcela="{{ parcela.numero_parcela}}"
+                    data-data-vencimento="{{ parcela.data_vencimento }}"
+                    data-parcela-responsavel="{{ parcela.debito.formaPagamento.responsavel}}"
+                    data-status-parcela="{{ parcela.status_parcela }}">
                     <td>{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
-                    <td>{{ parcela.status_parcela.strftime("%d/%m/%Y") }}</td>
-                    <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                     <td>{{ parcela.debito.data_compra.strftime("%d/%m/%Y") }}</td>
                     <td>{{ parcela.debito.item_comprado }}</td>
-                    <td>{{ parcela.formaPagamento.forma_pagamento }}</td>
-                    <td>{{ parcela.formaPagamento.responsavel }}</td>
+                    <td>{{ parcela.debito.categoria.categoria }}</td>
+                    <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
+                    <td>{{ parcela.numero_parcela }}/{{ parcela.debito.qnt_parcelas }}</td>
                 </tr>
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td colspan="8">Nenhuma forma de pagamento encontrada.</td>
+                    <td colspan="6">Nenhuma forma de pagamento encontrada.</td>
                 </tr>
             {% endif %}
         </tbody>
@@ -102,17 +122,14 @@ Parcelas
 
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="/debitos" method="post" id="formulario">
-        <input type="hidden" id="id_debito" name="id_debito" data-id-principal>
+    <form action="/parcelas" method="post" id="formulario">
+        <input type="hidden" id="id_parcela" name="id_parcela" data-id-principal>
         <div class="grupo_campo">
-            <input type="text" id="editar_item_comprado" name="item_comprado" placeholder="Item Comprado" autocomplete="off">
-        </div>
-        <div class="grupo_campo">
-            <input type="text" name="valor_debito" id="editar_valor_debito" placeholder="Valor R$" autocomplete="off" oninput="formatarMoeda(this)">
+            <input type="text" id="editar_item_comprado" name="item_comprado" placeholder="Item Comprado" disabled >
         </div>
 
         <div class="grupo_campo">
-            <select name="id_categoria" id="editar_id_categoria">
+            <select disabled name="id_categoria" id="editar_id_categoria">
                 <option value="" disabled>Categoria: </option>
                 {% for categoria in categorias %}
                     <option value="{{ categoria.id }}">
@@ -123,7 +140,7 @@ Parcelas
         </div>
 
         <div class="grupo_campo">
-            <select name="id_forma_pagamento" id="editar_id_forma_pagamento">
+            <select disabled name="id_forma_pagamento" id="editar_id_forma_pagamento">
                 <option value="" disabled>Forma de Pagamento:</option>
                 {% for grupo in formas_pagamento|groupby('responsavel') %}  
                     <optgroup label="{{ grupo.grouper }}">
@@ -138,20 +155,28 @@ Parcelas
         </div>
 
         <div class="grupo_campo">
-            <select name="parcelado" id="editar_parcelado" onchange="mostrarQuantidadeParcelas()">
-                <option value="" disabled>Parcelar:</option>
-                <option value="true">SIM</option>
-                <option value="false">NÃO</option>
-            </select>
+            <input disabled type="number" id="editar_parcela" name="editar_parcela" placeholder="Quantidade Parcelas">
+        </div>
+
+        <div class="grupo_campo" >
+            <input type="date" id="editar_data_vencimento" name="editar_data_vencimento" disabled>
+        </div>
+
+        <div class="grupo_campo" >
+            <input type="text" id="editar_parcela_responsavel" name="editar_parcela_responsavel" disabled>
         </div>
 
         <div class="grupo_campo">
-            <input type="number" id="editar_qnt_parcelas" name="qnt_parcelas" placeholder="Quantidade Parcelas">
+            <input disabled type="text" name="valor_parcela" id="editar_valor_parcela" placeholder="Valor R$" autocomplete="off" oninput="formatarMoeda(this)">
         </div>
 
         <div class="grupo_campo">
-            <button type="submit" id="enviar_formulario" formaction="/debitos/excluir">Excluir Débito</button>
-            <button type="submit" id="enviar_formulario" formaction="/debitos/editar">Editar Débito</button>
+            <input type="text" name="status_parcela" id="editar_status_parcela" placeholder="Valor R$" autocomplete="off">
+        </div>
+
+        <div class="grupo_campo">
+            <button type="submit" id="enviar_formulario" formaction="/parcelas/excluir">Excluir Parcela</button>
+            <button type="submit" id="enviar_formulario" formaction="/parcelas/editar">Editar Parcela</button>
         </div>
     </form>
 </aside>

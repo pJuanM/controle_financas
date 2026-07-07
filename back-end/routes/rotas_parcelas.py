@@ -1,81 +1,109 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, Request, Query
 from fastapi.responses import RedirectResponse
-from models import Usuarios, Parcelas, Debitos, FormasPagamento
+from models import Usuarios, Parcelas, Debitos, FormasPagamento, Categorias
 from dependencies import pegar_sessao, verificar_token
 from sqlalchemy.orm import Session
-from datetime import date
+from datetime import date, datetime
 from main import templates
 
 rota_parcelas = APIRouter(prefix="/parcelas", tags=["parcela"], dependencies=[Depends(verificar_token)])
 
-
 @rota_parcelas.get("/")
-async def home(request: Request, 
-               usuario: Usuarios = Depends(verificar_token)):
-    """
-    Essa é a rota padrão das parcelas
-    """
-    if usuario is None:
-        return templates.TemplateResponse(request= request, name="sem_login.html")
-    return templates.TemplateResponse(request= request, name="parcelas.html")
-
-@rota_parcelas.get("/listar")
 async def listar_parcelas(request: Request,
                           session: Session = Depends(pegar_sessao),
                           usuario: Usuarios = Depends(verificar_token),
-                          data_vencimento: date | None = Query(None),
-                          data_compra: date | None = Query(None),
-                          id_categoria: int | None = Query(None),
+                          data_compra_inicio: str | None = Query(None),
+                          data_compra_final: str | None = Query(None),
+                          data_vencimento_inicio: str | None = Query(None),
+                          data_vencimento_final: str | None = Query(None),
+                          status_parcela: str | None = Query(None),
                           id_forma_pagamento: int | None = Query(None),
+                          id_categoria: int | None = Query(None),
                           responsavel: str | None = Query(None)):
     
     
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
+    
+    categorias = session.query(Categorias).all()
+    formas_pagamento = session.query(FormasPagamento).all()
+    filtros_aplicados = any([
+        data_compra_inicio,
+        data_compra_final,
+        data_vencimento_inicio,
+        data_vencimento_final,
+        status_parcela,
+        id_forma_pagamento,
+        id_categoria,
+        responsavel,
+    ])
+    resultado_parcelas = []
 
-    query = session.query(Parcelas).join(Parcelas.debito).filter(Debitos.id_usuario == usuario.id)
+    if filtros_aplicados:
+        query = session.query(Parcelas).join(Parcelas.debito).filter(Debitos.id_usuario == usuario.id)
 
-    if data_vencimento is not None:
-        query = query.filter(Parcelas.data_vencimento == data_vencimento)
+        if data_compra_inicio or data_compra_final:
+            if not data_compra_inicio or not data_compra_final  :
+                raise HTTPException(status_code= 400, detail="Precisa informar ambas datas compra.")
+            query = query.filter(
+                Debitos.data_compra >= datetime.strptime(data_compra_inicio, "%Y-%m-%d").date(), 
+                Debitos.data_compra <= datetime.strptime(data_compra_final, "%Y-%m-%d").date()
+            )
 
-    if data_compra is not None:
-        query = query.filter(Debitos.data_compra == data_compra)
+        if data_vencimento_inicio or data_vencimento_final:
+            if not data_vencimento_inicio or not data_vencimento_final:
+                    raise HTTPException(status_code= 400, detail="Precisa informar ambas datas vencimento.")
+            query = query.filter(
+                    Parcelas.data_vencimento >= datetime.strptime(data_vencimento_inicio, "%Y-%m-%d").date(), 
+                    Parcelas.data_vencimento <= datetime.strptime(data_vencimento_final, "%Y-%m-%d").date()
+                )
 
-    if id_categoria is not None:
-        query = query.filter(Debitos.id_categoria == id_categoria)
+        if status_parcela:
+            if status_parcela not in ["CANCELADO", "PAGO", "PENDENTE"]:
+                raise HTTPException(status_code = 400, detail="Status da parcela precisa estar entre CANCELADO PAGO ou PENDENTE")
+            query = query.filter(Parcelas.status_parcela == status_parcela)
 
-    if id_forma_pagamento is not None:
-        query = query.filter(Debitos.id_forma_pagamento == id_forma_pagamento)
+        if id_forma_pagamento:
+            query = query.filter(Debitos.id_forma_pagamento == id_forma_pagamento)
 
-    if responsavel is not None:
-        query = query.join(Debitos.formaPagamento).filter(FormasPagamento.responsavel == responsavel)
+        if id_categoria:
+            query = query.filter(Debitos.id_categoria == id_categoria)
 
-    resultado_parcelas = query.all()
+        if responsavel:
+            query = query.join(Debitos.formaPagamento).filter(FormasPagamento.responsavel == responsavel)
 
-    if not resultado_parcelas:
-        return {
-            "mensagem": "Nenhuma parcela encontrada com os filtros aplicados."
+        resultado_parcelas = query.all()
+        print(resultado_parcelas)
+
+        # resultado = []
+        # for parcela in resultado_parcelas:
+        #     resultado.append({
+        #         "Item Comprado": parcela.debito.item_comprado,
+        #         "Parcelas": f"{parcela.numero_parcela}/{parcela.debito.qnt_parcelas}",
+        #         "Valor Parcela": parcela.valor_parcela,
+        #         "Forma de Pagamento": parcela.debito.formaPagamento.forma_pagamento,
+        #         "Responsável": parcela.debito.formaPagamento.responsavel,
+        #     })
+
+    return templates.TemplateResponse(
+        name="parcelas.html", 
+        request=request, 
+        context={
+            "usuario": usuario,
+            "parcelas": resultado_parcelas,
+            "filtros_aplicados": filtros_aplicados,
+            "categorias": categorias,
+            "formas_pagamento": formas_pagamento
         }
-    resultado = []
-    for parcela in resultado_parcelas:
-        resultado.append({
-            "Item Comprado": parcela.debito.item_comprado,
-            "Parcelas": f"{parcela.numero_parcela}/{parcela.debito.qnt_parcelas}",
-            "Valor Parcela": parcela.valor_parcela,
-            "Forma de Pagamento": parcela.debito.formaPagamento.forma_pagamento,
-            "Responsável": parcela.debito.formaPagamento.responsavel,
-        })
+    )
 
-    return {
-        "Parcelas": resultado    
-    }
 
 
 @rota_parcelas.post("/editar")                        
-async def editar_parcela(id_parcela: int,
+async def editar_parcela(id_parcela: int = Form(...),
                          session : Session = Depends(pegar_sessao),
                          usuario: Usuarios = Depends(verificar_token),
-                         status_parcela: str | None = Form(...)):
+                         status_parcela: str | None = Form(None)):
     
 
     parcela = session.query(Parcelas).join(Parcelas.debito).filter(Parcelas.id == id_parcela, Debitos.id_usuario == usuario.id).first()
@@ -83,8 +111,8 @@ async def editar_parcela(id_parcela: int,
     if not parcela:
         raise HTTPException(status_code = 400, detail = "Parcela inexistente.")
     
-    if status_parcela is not None:
-        if status_parcela not in ["PAGO", "PENDENTE"]:
+    if status_parcela:
+        if status_parcela not in ["PAGO", "PENDENTE",]:
             raise HTTPException(status_code= 400, detail = "O status da parcela só pode ser PAGO ou PENDENTE.")
         parcela.status_parcela = status_parcela
 

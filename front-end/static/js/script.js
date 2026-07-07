@@ -17,7 +17,7 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
     const direcaoAtual = colunaElemento.dataset.ordem === 'asc' ? 'desc' : 'asc';
     
     // Remove setas visuais de todos os outros cabeçalhos antes de ordenar o atual
-    document.querySelectorAll(".tabela-cabecalho").forEach(th => {
+    document.querySelectorAll(".tabela_cabecalho").forEach(th => {
         if (th !== colunaElemento) {
             th.textContent = th.textContent.replace(/▲|▼/g, '');
             delete th.dataset.ordem;
@@ -31,10 +31,32 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
 
         if (tipoDado === 'numero') {
             // Remove "R$", pontos de milhar e troca vírgula por ponto para virar número real
-            valorA = parseFloat(valorA.replace(/[^0-8,-]/g, '').replace('.', '').replace(',', '.')) || 0;
-            valorB = parseFloat(valorB.replace(/[^0-8,-]/g, '').replace('.', '').replace(',', '.')) || 0;
+            valorA = parseFloat(valorA.replace(/[^0-9,-]/g, '').replace('.', '').replace(',', '.')) || 0;
+            valorB = parseFloat(valorB.replace(/[^0-9,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0
+
             return direcaoAtual === 'asc' ? valorA - valorB : valorB - valorA;
         } 
+        if (tipoDado === 'parcela') {
+            const itemA = a.cells[2].textContent.trim();
+            const itemB = b.cells[2].textContent.trim();
+
+            // Primeiro compara o nome do débito
+            const comparacaoItem = itemA.localeCompare(itemB);
+
+            if (comparacaoItem !== 0) {
+                return direcaoAtual === 'asc'
+                    ? comparacaoItem
+                    : -comparacaoItem;
+            }
+
+            // Se for o mesmo débito, compara o número da parcela
+            const numeroA = parseInt(valorA.split('/')[0], 10);
+            const numeroB = parseInt(valorB.split('/')[0], 10);
+
+            return direcaoAtual === 'asc'
+                ? numeroA - numeroB
+                : numeroB - numeroA;
+        }
         
         if (tipoDado === 'data') {
             // Transforma o formato DD/MM/AAAA em um objeto Date comparável
@@ -68,6 +90,7 @@ overlay.addEventListener("click", function() {
     menu_editar.classList.remove("ativo");
     overlay.classList.remove("ativo");
 });
+
 function editarItem(linha) {
 
     menu_editar.classList.add("ativo");
