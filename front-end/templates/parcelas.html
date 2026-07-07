@@ -12,7 +12,7 @@ Parcelas
 {% endblock %}
 {% block conteudo %}
 <section class="formulario">
-    <form action="/debitos" method="get" id="formulario">
+    <form action="/parcelas" method="get" id="formulario">
         <div class="grupo_campo campo_data">
             <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
             <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
@@ -56,36 +56,43 @@ Parcelas
     <table>
         <thead>
             <tr>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'data')">DATA DE COMPRA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">ITEM COMPRADO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'texto')">CATEGORIA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 3, 'numero')">VALOR DEBITO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 4, 'texto')">FORMA DE PAGAMENTO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 5, 'numero')">QNT. PARCELAS</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'texto')">Nº PARCELA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'data')">DATA DE VENCIMENTO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'texto')">STATUS PARCELA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 3, 'numero')">VALOR PARCELA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 4, 'data')">DATA DE COMPRA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 5, 'texto')">ITEM COMPRADO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 6, 'texto')">FORMA DE PAGAMENTO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 7, 'texto')">RESPONSAVEL</th>
             </tr>
         </thead>
         <tbody>
-            {% if debitos %}
-                {% for debito in debitos | sort(attribute='data_compra', reverse=True) %}
+            {% if parcelas %}
+                {% for parcela in parcelas | sort(attribute='data_compra', reverse=True) %}
                 <tr onclick="editarItem(this)"
-                    data-id="{{ debito.id }}"
-                    data-data_compra="{{ debito.data_compra }}"
-                    data-item_comprado="{{ debito.item_comprado }}"
-                    data-categoria="{{ debito.categoria.id }}"
-                    data-valor-debito="{{ debito.valor_debito }}"
-                    data-forma_pagamento="{{ debito.formaPagamento.id }}"
-                    data-qnt-parcelas="{{ debito.qnt_parcelas }}">
-                    <td>{{ debito.data_compra.strftime("%d/%m/%Y") }}</td>
-                    <td>{{ debito.item_comprado }}</td>
-                    <td>{{ debito.categoria.categoria }}</td>
-                    <td>R$ {{ "{:,.2f}".format(debito.valor_debito).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
-                    <td>{{ debito.formaPagamento.forma_pagamento }}</td>
-                    <td>{{ debito.qnt_parcelas }}</td>
+                    data-id="{{ parcela.id }}"
+                    data-numero-parcela="{{ parcela.numero_parcela }}"
+                    data-data-vencimento="{{ parcela.data_vencimento }}"
+                    data-status-parcela="{{ parcela.status_parcela }}"
+                    data-valor-parcela="{{ parcela.valor_parcela }}"
+                    data-data-compra="{{ parcela.debito.data_compra }}"
+                    data-item-comprado="{{ parcela.debito.item_comprado }}"
+                    data-forma-pagamento="{{ parcela.formaPagamento.forma_pagamento }}"
+                    data-responsavel="{{ parcela.formaPagamento.responsavel }}">
+
+                    <td>{{ parcela.numero_parcela }}</td>
+                    <td>{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
+                    <td>{{ parcela.status_parcela.strftime("%d/%m/%Y") }}</td>
+                    <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
+                    <td>{{ parcela.debito.data_compra.strftime("%d/%m/%Y") }}</td>
+                    <td>{{ parcela.debito.item_comprado }}</td>
+                    <td>{{ parcela.formaPagamento.forma_pagamento }}</td>
+                    <td>{{ parcela.formaPagamento.responsavel }}</td>
                 </tr>
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td colspan="6">Nenhuma forma de pagamento encontrada.</td>
+                    <td colspan="8">Nenhuma forma de pagamento encontrada.</td>
                 </tr>
             {% endif %}
         </tbody>

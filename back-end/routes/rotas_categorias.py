@@ -105,8 +105,8 @@ async def editar_categoria(categoria_id: int = Form(...),
     )
 
 
-@rota_categorias.post("/excluir/{categoria_id}")
-async def excluir_categoria(categoria_id: int, 
+@rota_categorias.post("/excluir")
+async def excluir_categoria(categoria_id: int = Form(...), 
                             session: Session = Depends(pegar_sessao), 
                             usuario: Usuarios = Depends(verificar_token)):
     
