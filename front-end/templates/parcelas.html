@@ -81,12 +81,10 @@ Parcelas
     <table>
         <thead>
             <tr>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 0, 'data')">DATA DE VENCIMENTO</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 1, 'data')">DATA DE COMPRA</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'texto')">ITEM COMPRADO</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'texto')">CATEGORIA</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 4, 'numero')">VALOR PARCELA</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 5, 'parcela')">PARCELA</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 0, 'data')">VENC.</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 1, 'texto')">COMPRA</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'numero')">VLR. PARCELA</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'parcela')">PARCELA</th>
             </tr>
         </thead>
         <tbody>
@@ -102,17 +100,15 @@ Parcelas
                     data-data-vencimento="{{ parcela.data_vencimento }}"
                     data-parcela-responsavel="{{ parcela.debito.formaPagamento.responsavel}}"
                     data-status-parcela="{{ parcela.status_parcela }}">
-                    <td>{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
-                    <td>{{ parcela.debito.data_compra.strftime("%d/%m/%Y") }}</td>
+                    <td>{{ parcela.data_vencimento.strftime("%d/%m") }}</td>
                     <td>{{ parcela.debito.item_comprado }}</td>
-                    <td>{{ parcela.debito.categoria.categoria }}</td>
                     <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                     <td>{{ parcela.numero_parcela }}/{{ parcela.debito.qnt_parcelas }}</td>
                 </tr>
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td colspan="6">Nenhuma forma de pagamento encontrada.</td>
+                    <td colspan="4">Nenhuma forma de pagamento encontrada.</td>
                 </tr>
             {% endif %}
         </tbody>
@@ -124,57 +120,72 @@ Parcelas
 <aside class="menu_editar">
     <form action="/parcelas" method="post" id="formulario">
         <input type="hidden" id="id_parcela" name="id_parcela" data-id-principal>
-        <div class="grupo_campo">
-            <input type="text" id="editar_item_comprado" name="item_comprado" placeholder="Item Comprado" disabled >
-        </div>
 
         <div class="grupo_campo">
-            <select disabled name="id_categoria" id="editar_id_categoria">
-                <option value="" disabled>Categoria: </option>
-                {% for categoria in categorias %}
-                    <option value="{{ categoria.id }}">
-                        {{ categoria.categoria }}
-                    </option>
-                {% endfor %}
-            </select>
+            <label for="item_comprado">Item Comprado</label>
+            <input type="text" id="editar_item_comprado" name="item_comprado" placeholder="Item Comprado" disabled>
         </div>
-
-        <div class="grupo_campo">
-            <select disabled name="id_forma_pagamento" id="editar_id_forma_pagamento">
-                <option value="" disabled>Forma de Pagamento:</option>
-                {% for grupo in formas_pagamento|groupby('responsavel') %}  
-                    <optgroup label="{{ grupo.grouper }}">
-                        {% for formaPagamento in grupo.list %}
-                            <option value="{{ formaPagamento.id }}">
-                                {{ formaPagamento.forma_pagamento }}
-                            </option>
-                        {% endfor %}
-                    </optgroup>
-                {% endfor %}
-            </select>        
-        </div>
-
-        <div class="grupo_campo">
-            <input disabled type="number" id="editar_parcela" name="editar_parcela" placeholder="Quantidade Parcelas">
-        </div>
-
+        
         <div class="grupo_campo" >
-            <input type="date" id="editar_data_vencimento" name="editar_data_vencimento" disabled>
+            <label for="parcela_responsavel">Parcela Responsável</label>
+            <input type="text" id="editar_parcela_responsavel" name="parcela_responsavel" placeholder="Responsável" disabled>
+        </div>
+        
+        <div class="grupo_campo_editar">
+            <div class="grupo_campo">
+                <label for="id_categoria">Categoria:</label>
+                <select disabled name="id_categoria" id="editar_id_categoria">
+                    <option value="" disabled>Categoria: </option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}">
+                            {{ categoria.categoria }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="grupo_campo">
+                <label for="id_forma_pagamento">Pagamento:</label>
+                <select disabled name="id_forma_pagamento" id="editar_id_forma_pagamento">
+                    <option value="" disabled>Forma de Pagamento:</option>
+                    {% for grupo in formas_pagamento|groupby('responsavel') %}  
+                        <optgroup label="{{ grupo.grouper }}">
+                            {% for formaPagamento in grupo.list %}
+                                <option value="{{ formaPagamento.id }}">
+                                    {{ formaPagamento.forma_pagamento }}
+                                </option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endfor %}
+                </select>        
+            </div>
         </div>
 
-        <div class="grupo_campo" >
-            <input type="text" id="editar_parcela_responsavel" name="editar_parcela_responsavel" disabled>
+        <div class="grupo_campo_editar">
+            <div class="grupo_campo">
+                <label for="editar_parcela">Nº Parcela:</label>
+                <input disabled type="number" id="editar_parcela" name="editar_parcela" placeholder="Nº Parcela">
+            </div>
+
+            <div class="grupo_campo" >
+                <label for="data_vencimento">Vencimento:</label>
+                <input type="date" id="editar_data_vencimento" name="data_vencimento" disabled>
+            </div>
         </div>
 
-        <div class="grupo_campo">
-            <input disabled type="text" name="valor_parcela" id="editar_valor_parcela" placeholder="Valor R$" autocomplete="off" oninput="formatarMoeda(this)">
+        <div class="grupo_campo_editar">
+            <div class="grupo_campo">
+                <label for="valor_parcela">Valor Parcela:</label>
+                <input disabled type="text" name="valor_parcela" id="editar_valor_parcela" placeholder="Valor R$" autocomplete="off" oninput="formatarMoeda(this)">
+            </div>
+
+            <div class="grupo_campo">
+                <label for="status_parcela">Status:</label>
+                <input type="text" name="status_parcela" id="editar_status_parcela" placeholder="Status Parcela" autocomplete="off">
+            </div>
         </div>
 
-        <div class="grupo_campo">
-            <input type="text" name="status_parcela" id="editar_status_parcela" placeholder="Valor R$" autocomplete="off">
-        </div>
-
-        <div class="grupo_campo">
+        <div class="grupo_campo botoes_formulario">
             <button type="submit" id="enviar_formulario" formaction="/parcelas/excluir">Excluir Parcela</button>
             <button type="submit" id="enviar_formulario" formaction="/parcelas/editar">Editar Parcela</button>
         </div>

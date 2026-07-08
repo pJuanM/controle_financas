@@ -116,3 +116,15 @@ function editarItem(linha) {
         formatarMoeda(inputValor);
     }
 }
+
+
+const input = document.getElementById('editar_status_parcela');
+const botoes = document.querySelector('.botoes_formulario');
+
+input.addEventListener('focus', () => {
+    botoes.style.display = 'none';
+});
+
+input.addEventListener('blur', () => {
+    botoes.style.display = '';
+});

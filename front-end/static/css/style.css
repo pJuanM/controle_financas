@@ -121,6 +121,8 @@ h1 {
     font-weight: bold;
     pointer-events: none;
     transition: .2s;
+    width: 100%;
+    font-size: .9em;
 }
 #formulario .campo_data:focus-within label,
 #formulario .campo_data label.escondida {
@@ -159,8 +161,8 @@ table .tabela_cabecalho {
 
 
 .menu_editar {
-    min-height: 20vh;
-    width: 60vw;
+    min-height: 70vh;
+    width: 90vw;
     border: 1px solid;
     padding: 1.5em;
     border-radius: 15px;
@@ -186,6 +188,27 @@ table .tabela_cabecalho {
 }
 .menu_editar.ativo button:last-child {
     right: 2%;
+}
+.menu_editar .grupo_campo_editar {
+    display: flex;
+    gap: 1em;
+}
+.menu_editar .botoes_formulario {
+    flex-direction: row !important;
+    gap: 1em;
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    transform: translate(50%, 0);
+    width: 80vw;
+}
+
+label {
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: .2em;
 }
 
 .overlay {
