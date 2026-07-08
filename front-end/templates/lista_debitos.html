@@ -13,6 +13,7 @@ Débitos
 </nav>
 {% endblock %}
 {% block conteudo %}
+<h2>Filtrar Débitos</h2>
 <section class="formulario">
     <form action="/debitos" method="get" id="formulario">
         <div class="grupo_campo campo_data">
@@ -58,12 +59,9 @@ Débitos
     <table>
         <thead>
             <tr>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'data')">DATA DE COMPRA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">ITEM COMPRADO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'texto')">CATEGORIA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 3, 'numero')">VALOR DEBITO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 4, 'texto')">FORMA DE PAGAMENTO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 5, 'numero')">QNT. PARCELAS</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'data')">DT. COMPRA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">COMPRA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'numero')">VLR. DEBITO</th>
             </tr>
         </thead>
         <tbody>
@@ -71,18 +69,15 @@ Débitos
                 {% for debito in debitos | sort(attribute='data_compra', reverse=True) %}
                 <tr onclick="editarItem(this)"
                     data-id="{{ debito.id }}"
-                    data-data_compra="{{ debito.data_compra }}"
-                    data-item_comprado="{{ debito.item_comprado }}"
+                    data-data-compra="{{ debito.data_compra }}"
+                    data-item-comprado="{{ debito.item_comprado }}"
                     data-categoria="{{ debito.categoria.id }}"
                     data-valor-debito="{{ debito.valor_debito }}"
                     data-forma_pagamento="{{ debito.formaPagamento.id }}"
                     data-qnt-parcelas="{{ debito.qnt_parcelas }}">
                     <td>{{ debito.data_compra.strftime("%d/%m/%Y") }}</td>
                     <td>{{ debito.item_comprado }}</td>
-                    <td>{{ debito.categoria.categoria }}</td>
                     <td>R$ {{ "{:,.2f}".format(debito.valor_debito).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
-                    <td>{{ debito.formaPagamento.forma_pagamento }}</td>
-                    <td>{{ debito.qnt_parcelas }}</td>
                 </tr>
                 {% endfor %}
             {% else %}
@@ -99,54 +94,71 @@ Débitos
 <aside class="menu_editar">
     <form action="/debitos" method="post" id="formulario">
         <input type="hidden" id="id_debito" name="id_debito" data-id-principal>
-        <div class="grupo_campo">
-            <input type="text" id="editar_item_comprado" name="item_comprado" placeholder="Item Comprado" autocomplete="off">
-        </div>
-        <div class="grupo_campo">
-            <input type="text" name="valor_debito" id="editar_valor_debito" placeholder="Valor R$" autocomplete="off" oninput="formatarMoeda(this)">
-        </div>
-
-        <div class="grupo_campo">
-            <select name="id_categoria" id="editar_id_categoria">
-                <option value="" disabled>Categoria: </option>
-                {% for categoria in categorias %}
-                    <option value="{{ categoria.id }}">
-                        {{ categoria.categoria }}
-                    </option>
-                {% endfor %}
-            </select>
+        <div class="grupo_campo_editar">
+            <div class="grupo_campo">
+                <label for="item_comprado">Compra:</label>
+                <input type="text" id="editar_item_comprado" name="item_comprado" placeholder="Item Comprado" autocomplete="off">
+            </div>
+            <div class="grupo_campo">
+                <label for="data_compra">Dt. Compra:</label>
+                <input type="date" id="editar_data_compra" name="data_compra" placeholder="" onfocus="this.showPicker()" required>
+            </div>
         </div>
 
-        <div class="grupo_campo">
-            <select name="id_forma_pagamento" id="editar_id_forma_pagamento">
-                <option value="" disabled>Forma de Pagamento:</option>
-                {% for grupo in formas_pagamento|groupby('responsavel') %}  
-                    <optgroup label="{{ grupo.grouper }}">
-                        {% for formaPagamento in grupo.list %}
-                            <option value="{{ formaPagamento.id }}">
-                                {{ formaPagamento.forma_pagamento }}
-                            </option>
-                        {% endfor %}
-                    </optgroup>
-                {% endfor %}
-            </select>        
+        <div class="grupo_campo_editar">
+            <div class="grupo_campo">
+                <label for="valor_debito">Valor:</label>
+                <input type="text" name="valor_debito" id="editar_valor_debito" placeholder="Valor R$" autocomplete="off" oninput="formatarMoeda(this)">
+            </div>
+
+
+            <div class="grupo_campo">
+                <label for="id_forma_pagamento">Pagamento:</label>
+                <select name="id_forma_pagamento" id="editar_id_forma_pagamento">
+                    <option value="" disabled>Forma de Pagamento:</option>
+                    {% for grupo in formas_pagamento|groupby('responsavel') %}  
+                        <optgroup label="{{ grupo.grouper }}">
+                            {% for formaPagamento in grupo.list %}
+                                <option value="{{ formaPagamento.id }}">
+                                    {{ formaPagamento.forma_pagamento }}
+                                </option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endfor %}
+                </select>        
+            </div>
+        </div>
+        <div class="grupo_campo_editar">
+            <div class="grupo_campo">
+                <label for="id_categoria">Categoria:</label>
+                <select name="id_categoria" id="editar_id_categoria">
+                    <option value="" disabled>Categoria: </option>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}">
+                            {{ categoria.categoria }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="grupo_campo">
+                <label for="parcelado">Parcelado:</label>
+                <select name="parcelado" id="editar_parcelado" onchange="mostrarQuantidadeParcelas()">
+                    <option value="" disabled>Parcelar:</option>
+                    <option value="true">SIM</option>
+                    <option value="false">NÃO</option>
+                </select>
+            </div>
+
+            <div class="grupo_campo">
+                <label for="qnt_parcelas">Parcelas:</label>
+                <input type="number" id="editar_qnt_parcelas" name="qnt_parcelas" placeholder="Quantidade Parcelas">
+            </div>
         </div>
 
-        <div class="grupo_campo">
-            <select name="parcelado" id="editar_parcelado" onchange="mostrarQuantidadeParcelas()">
-                <option value="" disabled>Parcelar:</option>
-                <option value="true">SIM</option>
-                <option value="false">NÃO</option>
-            </select>
-        </div>
-
-        <div class="grupo_campo">
-            <input type="number" id="editar_qnt_parcelas" name="qnt_parcelas" placeholder="Quantidade Parcelas">
-        </div>
-
-        <div class="grupo_campo">
-            <button type="submit" id="enviar_formulario" formaction="/debitos/excluir">Excluir Débito</button>
-            <button type="submit" id="enviar_formulario" formaction="/debitos/editar">Editar Débito</button>
+        <div class="grupo_campo botoes_formulario">
+            <button type="submit" id="btn_excluir" formaction="/debitos/excluir">Excluir Débito</button>
+            <button type="submit" id="btn_editar" formaction="/debitos/editar">Editar Débito</button>
         </div>
     </form>
 </aside>

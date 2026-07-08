@@ -1,3 +1,4 @@
+// MENU
 const menu = document.getElementById('menu');
 const toggle = document.querySelector('.toggle');
 
@@ -5,21 +6,21 @@ toggle.onclick = () => {
     menu.classList.toggle('active');
 }
 
-
+// ORDENAR TABELA
 function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
     const tbody = document.querySelector(".tabela table tbody");
     const linhas = Array.from(tbody.querySelectorAll('tr'));
 
-    // Verifica se a tabela está vazia (mensagem de "Nenhuma forma encontrada")
+    // Verificar se a tabela está vazia (aparece a mensagem de "Nenhuma forma encontrada")
     if (linhas.length === 0 || (linhas.length === 1 && linhas[0].cells.length === 1)) return;
 
-    // Descobre a direção atual guardada na própria tag HTML (padrão: crescente)
-    const direcaoAtual = colunaElemento.dataset.ordem === 'asc' ? 'desc' : 'asc';
+    // Descobre a direção atual guardada na própria tag HTML
+    const direcaoAtual = colunaElemento.dataset.ordem === 'asc' ? 'desc' : 'asc';   
     
     // Remove setas visuais de todos os outros cabeçalhos antes de ordenar o atual
     document.querySelectorAll(".tabela_cabecalho").forEach(th => {
         if (th !== colunaElemento) {
-            th.textContent = th.textContent.replace(/▲|▼/g, '');
+            th.classList.remove("ordem-asc", "ordem-desc");
             delete th.dataset.ordem;
         }
     });
@@ -80,10 +81,15 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
     colunaElemento.dataset.ordem = direcaoAtual;
 
     // Atualiza o indicador visual de seta (▲ ou ▼) sem apagar o texto original do cabeçalho
-    colunaElemento.textContent = colunaElemento.textContent.replace(/ ▲| ▼/g, '') + (direcaoAtual === 'asc' ? ' ▲' : ' ▼');
+    colunaElemento.classList.remove("ordem-asc", "ordem-desc");
+    colunaElemento.classList.add(
+        direcaoAtual === "asc" ? "ordem-asc" : "ordem-desc"
+    );
 }
 
 
+
+// ABRIR OVERLAY
 const menu_editar = document.querySelector('.menu_editar');
 const overlay = document.querySelector('.overlay');
 overlay.addEventListener("click", function() {
@@ -91,6 +97,7 @@ overlay.addEventListener("click", function() {
     overlay.classList.remove("ativo");
 });
 
+// EDITAR ITEM
 function editarItem(linha) {
 
     menu_editar.classList.add("ativo");
@@ -116,15 +123,22 @@ function editarItem(linha) {
         formatarMoeda(inputValor);
     }
 }
+// ESCONDER BOTOES QUANDO SELECIONAR INPUT OU SELECT
+const campos = document.querySelectorAll('.menu_editar input, .menu_editar select');
+const botoes = document.querySelector(".botoes_formulario");
 
 
-const input = document.getElementById('editar_status_parcela');
-const botoes = document.querySelector('.botoes_formulario');
+campos.forEach(campo => {
+    if (campo.type === 'hidden') return;
 
-input.addEventListener('focus', () => {
-    botoes.style.display = 'none';
-});
+    campo.addEventListener('focus', () => {
+        botoes.style.display = 'none';
+    });
 
-input.addEventListener('blur', () => {
-    botoes.style.display = '';
+    campo.addEventListener('blur', () => {
+        setTimeout(() => {
+            const campoComFoco = [...campos].some(c => c === document.activeElement);
+            botoes.style.display = campoComFoco ? 'none' : '';
+        }, 0);
+    });
 });

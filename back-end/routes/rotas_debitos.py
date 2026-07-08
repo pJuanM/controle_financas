@@ -76,6 +76,7 @@ async def listar_debitos(request: Request,
 
         resultadoDebitos = query.all()
 
+
     return templates.TemplateResponse(
         name="lista_debitos.html", 
         request=request, 
@@ -85,7 +86,6 @@ async def listar_debitos(request: Request,
             "filtros_aplicados": filtros_aplicados,
             "categorias": categorias,
             "formas_pagamento": formas_pagamento
-
         }
     )
 
@@ -288,6 +288,4 @@ async def deletar_conta(id_debito: int = Form(...),
 
     return {"mensagem": f"Conta excluída com sucesso! - ID da conta {conta.id}",
             "conta": conta}
-
-
 

@@ -52,6 +52,11 @@ h1 {
     font-size: 1.8em;
     margin: .4em 0 1.2em 0;
 }
+h2 {
+    text-align: center;
+    font-size: 1.8em;
+    margin: .4em 0 .7em 0;
+}
 
 .formulario{
     background-color: #D9F0EE;
@@ -66,9 +71,10 @@ h1 {
 #formulario .grupo_campo {
     display: flex;
     flex-direction: column;
+    width: 100%;
 }
 
-#formulario input, #enviar_formulario{
+#formulario input, .botoes_formulario button{
     background-color: #000E32;
     color: white;
     text-align: center;
@@ -78,6 +84,10 @@ h1 {
     border-radius: 12px;
     border: none;
     font-weight: bold;
+}
+optgroup{
+    text-align: left;
+    font-size: 1.1em;
 }
 #formulario input, #enviar_formulario, select{
     background-color: #000e32b0;
@@ -89,10 +99,20 @@ h1 {
     border-radius: 12px;
     border: none;
     font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
+optgroup option{
+    text-align: center;
+    font-size: 1em;
+}
+
+
 
 #formulario .campo_data {
     position: relative;
+    width: 100%;
 }
 
 #formulario .campo_data input {
@@ -157,7 +177,13 @@ th {
 table .tabela_cabecalho {
     cursor: pointer;
 }
+.tabela_cabecalho.ordem-asc {
+    color: green;
+}
 
+.tabela_cabecalho.ordem-desc {
+    color: red;
+}
 
 
 .menu_editar {
@@ -189,10 +215,11 @@ table .tabela_cabecalho {
 .menu_editar.ativo button:last-child {
     right: 2%;
 }
-.menu_editar .grupo_campo_editar {
+.menu_editar .grupo_campo_editar, .formulario .grupo_campo_editar{
     display: flex;
-    gap: 1em;
+    gap: .5em;
 }
+
 .menu_editar .botoes_formulario {
     flex-direction: row !important;
     gap: 1em;
