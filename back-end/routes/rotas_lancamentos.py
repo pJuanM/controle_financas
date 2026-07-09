@@ -8,6 +8,7 @@ from models import Lancamentos, Categorias, FormasPagamento, Usuarios, Parcelas
 from main import templates
 from decimal import Decimal
 from datetime import date, datetime
+import calendar
 from dateutil.relativedelta import relativedelta
 
 
@@ -135,9 +136,12 @@ async def criar_lancamento(data_compra: date = Form(...),
 
     valor_lancamento = (valor_lancamento.replace("R$", "").replace(".", "").replace(",", ".").strip())
     valor_lancamento = Decimal(valor_lancamento)
-    existelancamento = session.query(Lancamentos).filter(Lancamentos.data_compra == data_compra, 
+    existelancamento = session.query(Lancamentos).join(Lancamentos.parcela).filter(Lancamentos.data_compra == data_compra, 
                                                     Lancamentos.id_usuario == usuario.id,
-                                                    Lancamentos.item_comprado == item_comprado, 
+                                                    Lancamentos.item_comprado == item_comprado,
+                                                    Parcelas.status_parcela != "CANCELADO",
+                                                    Parcelas.tipo_lancamento == tipo_lancamento,
+                                                    Lancamentos.valor_lancamento == valor_lancamento,
                                                     Lancamentos.id_forma_pagamento == forma_pagamento).first()
     if parcelado == False:
         qnt_parcelas = 1
@@ -158,21 +162,46 @@ async def criar_lancamento(data_compra: date = Form(...),
     valor_total = Decimal(str(novolancamento.valor_lancamento))
     qtd = novolancamento.qnt_parcelas
     valor_base = (valor_total / qtd).quantize(Decimal("0.01"))
+
+    # ======= DT. VENC. PARCELAS COM BASE NO FECHAMENTO + COMPRA + VENCIMENTO =======
+    dia_fechamento = novolancamento.formaPagamento.data_fechamento
+    dia_vencimento = novolancamento.formaPagamento.data_vencimento
+
+    if dia_fechamento is None or dia_vencimento is None:
+        primeiro_vencimento = data_compra
+    else:
+        ultimo_dia = calendar.monthrange(data_compra.year, data_compra.month)[1]
+        fechamento = date(
+                data_compra.year,
+                data_compra.month,
+                min(dia_fechamento, ultimo_dia)
+            )
+        if data_compra < fechamento:
+                ultimo_dia = calendar.monthrange(data_compra.year, data_compra.month)[1]
+                primeiro_vencimento = date(
+                    data_compra.year,
+                    data_compra.month,
+                    min(dia_vencimento, ultimo_dia)
+                )
+        else:
+            proximo_mes = data_compra + relativedelta(months = 1)
+
+            ultimo_dia = calendar.monthrange(proximo_mes.year, proximo_mes.month)[1]
+            
+            primeiro_vencimento = date(
+                proximo_mes.year,
+                proximo_mes.month,
+                min(dia_vencimento, ultimo_dia)
+                )
+
+    
     for numero in range(1, qtd + 1):
         if numero < qtd:
             valor = valor_base
         else:
             valor = valor_total - (valor_base * (qtd - 1))
-        dia_vencimento = novolancamento.formaPagamento.data_vencimento
-        vencimento = None
-        if dia_vencimento is None:
-            if numero <= 1: 
-                vencimento = novolancamento.data_compra
-        else:
-            if numero <= 1: 
-                if data_compra.day < dia_vencimento:
-                    vencimento = (data_compra.replace(day = dia_vencimento) + relativedelta(months = 0))
-            vencimento = (data_compra.replace(day = dia_vencimento) + relativedelta(months = numero))
+        
+        vencimento = primeiro_vencimento + relativedelta(months = numero - 1)
             
         parcela = Parcelas(numero_parcela = numero,
                            valor_parcela = valor,
@@ -215,44 +244,63 @@ async def editar_lancamento(id_lancamento: int = Form(...),
     if id_forma_pagamento is not None:
         lancamento.id_forma_pagamento = id_forma_pagamento
 
-    if valor_lancamento is not None and qnt_parcelas is None:
-        valor_lancamento = (valor_lancamento.replace("R$", "").replace(".", "").replace(",", ".").strip())
-        novo_valor = Decimal(str(valor_lancamento))
+    if valor_lancamento is not None:
+        valor_lancamento = (
+            valor_lancamento.replace("R$", "")
+            .replace(".", "")
+            .replace(",", ".")
+            .strip()
+        )
+        novo_valor = Decimal(valor_lancamento)
         lancamento.valor_lancamento = novo_valor
+
         if lancamento.parcelado:
             qtd = lancamento.qnt_parcelas
             valor_base = (novo_valor / qtd).quantize(Decimal("0.01"))
+
             for indice, parcela in enumerate(lancamento.parcela, start=1):
                 if indice < qtd:
                     parcela.valor_parcela = valor_base
                 else:
                     parcela.valor_parcela = novo_valor - (valor_base * (qtd - 1))
-            session.commit()
 
-    if valor_lancamento is None and qnt_parcelas is not None:
-        valor_lancamento = Decimal(str(lancamento.valor_lancamento))
+
+    if qnt_parcelas is not None and qnt_parcelas != lancamento.qnt_parcelas:
         if qnt_parcelas <= 0:
-            raise HTTPException(status_code = 400, detail = "Quantidade de parcelas precisa ser maior do que 0")
-        qtd = qnt_parcelas
-        lancamento.qnt_parcelas = qtd
-        dia_vencimento = lancamento.formaPagamento.data_vencimento
-        lancamento.parcela.clear()
-        valor_base = (valor_lancamento / qtd).quantize(Decimal("0.01"))
+            raise HTTPException(
+                status_code=400,
+                detail="Quantidade de parcelas precisa ser maior do que 0"
+            )
 
-        for numero in range(1, qtd + 1):
-            if numero < qtd:
+        valor_total = Decimal(str(lancamento.valor_lancamento))
+        lancamento.qnt_parcelas = qnt_parcelas
+
+        dia_vencimento = lancamento.formaPagamento.data_vencimento
+
+        lancamento.parcela.clear()
+
+        valor_base = (valor_total / qnt_parcelas).quantize(Decimal("0.01"))
+
+        for numero in range(1, qnt_parcelas + 1):
+            if numero < qnt_parcelas:
                 valor = valor_base
             else:
-                valor = valor_lancamento - (valor_base * (qtd - 1))
-            vencimento = (lancamento.data_compra.replace(day = dia_vencimento) + relativedelta(months = numero))
-            parcela = Parcelas(numero_parcela = numero,
-                            valor_parcela = valor,
-                            id_lancamento = lancamento.id,
-                            data_vencimento = vencimento
-                            )
+                valor = valor_total - (valor_base * (qnt_parcelas - 1))
+
+            vencimento = (
+                lancamento.data_compra.replace(day=dia_vencimento)
+                + relativedelta(months=numero)
+            )
+
+            parcela = Parcelas(
+                numero_parcela=numero,
+                valor_parcela=valor,
+                id_lancamento=lancamento.id,
+                data_vencimento=vencimento
+            )
+
             session.add(parcela)
     
-
     if parcelado is not None:
         lancamento.parcelado = parcelado
         if parcelado is False:

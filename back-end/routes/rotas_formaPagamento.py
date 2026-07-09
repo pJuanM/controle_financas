@@ -81,7 +81,8 @@ async def home(request: Request,
 @rota_formasPagamento.post("/criar")
 async def criar_formaPagamento(forma_pagamento: str = Form(...), 
                                responsavel: str = Form(...), 
-                               data_vencimento: int | None = Form(None), 
+                               data_vencimento: int | None = Form(None),
+                               data_fechamento: int | None = Form(None), 
                                session: Session = Depends(pegar_sessao),
                                usuario: Usuarios = Depends(verificar_token)):
     
@@ -104,7 +105,7 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
         )
 
 
-    nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, forma_pagamento = forma_pagamento, responsavel = responsavel, status_forma_pagamento = "ATIVO", data_vencimento = data_vencimento)
+    nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, forma_pagamento = forma_pagamento, responsavel = responsavel, status_forma_pagamento = "ATIVO", data_vencimento = data_vencimento, data_fechamento = data_fechamento)
     session.add(nova_formaPagamento)
     session.commit()
     mensagem = quote("Forma de pagamento cadastrada com sucesso.")
@@ -119,6 +120,7 @@ async def editar_formaPagamento(id_formaPagamento: int = Form(...),
                                 forma_pagamento: str = Form(...), 
                                 responsavel: str = Form(...), 
                                 data_vencimento: int | None = Form(None), 
+                                data_fechamento: int | None = Form(None),
                                 status_forma_pagamento: str = Form(...), 
                                 session: Session = Depends(pegar_sessao), 
                                 usuario: Usuarios = Depends(verificar_token)):
@@ -134,6 +136,7 @@ async def editar_formaPagamento(id_formaPagamento: int = Form(...),
     FormaPagamento.forma_pagamento = forma_pagamento
     FormaPagamento.responsavel = responsavel
     FormaPagamento.data_vencimento = data_vencimento
+    FormaPagamento.data_fechamento = data_fechamento
     FormaPagamento.status_forma_pagamento = status_forma_pagamento
     session.commit()
 

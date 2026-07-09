@@ -8,7 +8,7 @@ Débitos
 {% block header %}
 <nav class="navegar_rotas">
     <a href="/lancamentos/criar">Criar</a>
-    <a href="/lancamentos">Débitos</a>
+    <a href="/lancamentos">Lançamentos</a>
     <a href="/parcelas">Parcelas</a>
 </nav>
 {% endblock %}
@@ -27,7 +27,7 @@ Débitos
 
         <div class="grupo_campo">
             <select name="id_categoria" id="id_categoria">
-                <option value="" selected disabled>Categoria: </option>
+                <option value="" selected disabled>Categoria:</option>
                 {% for categoria in categorias %}
                     <option value="{{ categoria.id }}">
                         {{ categoria.categoria }}
@@ -79,9 +79,9 @@ Débitos
                     data-id="{{ lancamento.id }}"
                     data-data-compra="{{ lancamento.data_compra }}"
                     data-item-comprado="{{ lancamento.item_comprado }}"
-                    data-categoria="{{ lancamento.categoria.id }}"
+                    data-id-categoria="{{ lancamento.categoria.id }}"
                     data-valor-lancamento="{{ lancamento.valor_lancamento }}"
-                    data-forma_pagamento="{{ lancamento.formaPagamento.id }}"
+                    data-id-forma-pagamento="{{ lancamento.formaPagamento.id }}"
                     data-tipo-lancamento="{{ lancamento.parcela.tipo_lancamento }}"
                     data-qnt-parcelas="{{ lancamento.qnt_parcelas }}">
                     <td>{{ lancamento.data_compra.strftime("%d/%m/%Y") }}</td>

@@ -6,7 +6,7 @@ Débitos
 {% block header %}
 <nav class="navegar_rotas">
     <a href="/lancamentos/criar">Criar</a>
-    <a href="/lancamentos">Débitos</a>
+    <a href="/lancamentos">Lançamentos</a>
     <a href="/parcelas">Parcelas</a>
 
 </nav>
@@ -17,7 +17,7 @@ Débitos
 {% endblock %}
 
 {% block conteudo %}
-<h1 class="titulo-pagina">Contas à Pagar</h1>
+<h1 class="titulo-pagina">Lançamento</h1>
 <section class="formulario">
     <form action="/lancamentos/criar" method="post" id="formulario">
         <div class="grupo_campo">
@@ -39,7 +39,7 @@ Débitos
         <div class="grupo_campo">
             <select name="categoria_id" id="categoria_id" required>
                 <option value="" selected disabled>Categoria: </option>
-                {% for categoria in categorias %}
+                {% for categoria in categorias | sort(attribute='categoria') %}
                     <option value="{{ categoria.id }}">
                         {{ categoria.categoria }}
                     </option>
@@ -74,7 +74,7 @@ Débitos
             <input type="number" id="qnt_parcelas" name="qnt_parcelas" placeholder="Quantidade Parcelas">
         </div>
 
-        <button type="submit" id="enviar_formulario">Salvar Gasto</button>
+        <button type="submit" id="enviar_formulario">Salvar lançamento</button>
 
     </form>
 </section>

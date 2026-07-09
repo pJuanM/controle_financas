@@ -8,7 +8,7 @@ db = create_engine("sqlite:///database/banco.db")
 Base = declarative_base()
 
 # ======= CRIAR COLUNAS/CLASSES BANCO DE DADOS =======
-# ======= CONTAS À PAGAR ======= 
+# ======= LANÇAMENTOS  ======= 
 class Lancamentos(Base):
     __tablename__ = "lancamentos" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
@@ -30,13 +30,14 @@ class Lancamentos(Base):
     parcela = relationship("Parcelas", back_populates="lancamento", cascade="all, delete-orphan")
 
 
-# ======= FORMA DE PAGAMENTO ======= 
+# ======= FORMAS DE PAGAMENTO ======= 
 class FormasPagamento(Base): 
     __tablename__ = "formasPagamento" 
     id = Column(Integer, primary_key=True, autoincrement=True)  
     forma_pagamento = Column(String(40), nullable=False) 
     responsavel = Column(String(150), nullable=False) 
-    data_vencimento = Column(Integer) 
+    data_vencimento = Column(Integer, nullable=True) 
+    data_fechamento = Column(Integer, nullable=True)
     status_forma_pagamento = Column(String, nullable=False)
 
     id_usuario = Column(Integer, ForeignKey("usuarios.id"))
@@ -44,8 +45,7 @@ class FormasPagamento(Base):
     lancamento = relationship("Lancamentos", back_populates="formaPagamento")
 
 
-    
-# ======= CATEGORIA ======= 
+# ======= CATEGORIAS ======= 
 class Categorias(Base):
     __tablename__ = "categorias" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
@@ -58,9 +58,7 @@ class Categorias(Base):
     lancamento = relationship("Lancamentos", back_populates="categoria")
 
 
-        
-    
-# ======= USUÁRIO ======= 
+# ======= USUÁRIOS ======= 
 class Usuarios(Base): 
     __tablename__ = "usuarios" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
@@ -70,13 +68,12 @@ class Usuarios(Base):
     senha = Column(String(16), nullable=False) 
     status_usuario = Column(String, nullable=False)
 
-
     categoria = relationship("Categorias", back_populates= "usuario", cascade= "all, delete-orphan")
     forma_pagamento = relationship("FormasPagamento", back_populates= "usuario", cascade= "all, delete-orphan")
     lancamento = relationship("Lancamentos", back_populates="usuario", cascade="all, delete-orphan")
 
 
-
+# ======= PARCELAS =======
 class Parcelas(Base):
     __tablename__ = "parcelas"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -88,10 +85,6 @@ class Parcelas(Base):
 
     id_lancamento = Column(Integer, ForeignKey("lancamentos.id"))
     lancamento = relationship("Lancamentos", back_populates="parcela")
-
-
-    
-
 
 
 Base.metadata.create_all(db)

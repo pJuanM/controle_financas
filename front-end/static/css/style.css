@@ -7,21 +7,35 @@
     font-family: 'Courier New', Courier, monospace;
 }
 
+
+a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
+
+label {
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: .2em;
+}
 select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
 }
-a {
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
+
+.container {
+    padding: 1em;
 }
 
 .menu_navegacao {
@@ -38,9 +52,6 @@ nav a:hover {
     cursor: pointer;
 }
 
-.container {
-    padding: 1em;
-}
 header{
     color: white;
     text-align: end;
@@ -58,11 +69,13 @@ h2 {
     margin: .4em 0 .7em 0;
 }
 
+/* CLASSE FORMULARIO SE REFERE A TAG SECTION NO HTML */
 .formulario{
     background-color: #D9F0EE;
     padding: 1em;
     border-radius: 15px;
 }
+/* ID FORMULARIO SE REFERE A TAG FORM NO HTML */
 #formulario {
     display: flex;
     flex-direction: column;
@@ -74,47 +87,10 @@ h2 {
     width: 100%;
 }
 
-#formulario input, .botoes_formulario button{
-    background-color: #000E32;
-    color: white;
-    text-align: center;
-    margin-bottom: 1em;
-    padding: .6em;
-    width: 100%;
-    border-radius: 12px;
-    border: none;
-    font-weight: bold;
-}
-optgroup{
-    text-align: left;
-    font-size: 1.1em;
-}
-#formulario input, #enviar_formulario, select{
-    background-color: #000e32b0;
-    color: white;
-    text-align: center;
-    margin-bottom: 1em;
-    padding: .6em;
-    width: 100%;
-    border-radius: 12px;
-    border: none;
-    font-weight: bold;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-optgroup option{
-    text-align: center;
-    font-size: 1em;
-}
-
-
-
 #formulario .campo_data {
     position: relative;
     width: 100%;
 }
-
 #formulario .campo_data input {
     width: 100%;
     background: #000e32b0;
@@ -148,7 +124,6 @@ optgroup option{
 #formulario .campo_data label.escondida {
     opacity: 0;
 }
-
 #formulario input:valid, select:valid {
     background-color: #000e32;
 }
@@ -156,11 +131,47 @@ optgroup option{
 #formulario input::placeholder{
     color: white;
 }
+#formulario input, .botoes_formulario button{
+    background-color: #000E32;
+    color: white;
+    text-align: center;
+    margin-bottom: 1em;
+    padding: .6em;
+    width: 100%;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+}
+
+#formulario input, #enviar_formulario, select{
+    background-color: #000e32b0;
+    color: white;
+    text-align: center;
+    margin-bottom: 1em;
+    padding: .6em;
+    width: 100%;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+optgroup{
+    text-align: left;
+    font-size: 1.1em;
+}
+optgroup option{
+    text-align: center;
+    font-size: 1em;
+}
 
 #enviar_formulario {
     margin-top: auto;
     cursor: pointer;
 }
+
 
 table {
     width: 100%;
@@ -229,15 +240,6 @@ table .tabela_cabecalho {
     transform: translate(50%, 0);
     width: 80vw;
 }
-
-label {
-    text-align: center;
-    color: black;
-    font-weight: bold;
-    font-size: 1em;
-    margin-bottom: .2em;
-}
-
 .overlay {
     position: fixed;
     top: 0;
@@ -253,7 +255,7 @@ label {
 }
 
 
-/* MENU */
+/* MENU ROTATIVO */
 .menu {
     position: fixed;
     right: 3em;

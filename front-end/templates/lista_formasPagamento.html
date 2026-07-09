@@ -25,6 +25,9 @@ Forma de Pagamento
             <input type="number" id="data_vencimento" name="data_vencimento" placeholder="Data de Vencimento" autocomplete="off">
         </div>
         <div class="grupo_campo">
+            <input type="number" id="data_fechamento" name="data_fechamento" placeholder="Data de Fechamento" autocomplete="off">
+        </div>
+        <div class="grupo_campo">
             <input type="text" id="responsavel" name="responsavel" placeholder="Responsavel" autocomplete="off">
         </div>
         <button type="submit" id="enviar_formulario">Filtrar Forma de Pagamento</button>
@@ -48,9 +51,10 @@ Forma de Pagamento
 
                 <tr onclick="editarItem(this)"
                     data-id="{{ formaDePagamento.id }}"
-                    data-forma_pagamento="{{ formaDePagamento.forma_pagamento }}"
+                    data-forma-pagamento="{{ formaDePagamento.forma_pagamento }}"
                     data-responsavel="{{ formaDePagamento.responsavel }}"
-                    data-data_vencimento="{{ formaDePagamento.data_vencimento }}"
+                    data-data-vencimento="{{ formaDePagamento.data_vencimento }}"
+                    data-data-fechamento="{{ formaDePagamento.data_fechamento }}"
                     data-status="{{ formaDePagamento.status_forma_pagamento }}">
                     <td>{{ formaDePagamento.forma_pagamento }}</td>
                     <td>{{ formaDePagamento.responsavel }}</td>
@@ -85,7 +89,11 @@ Forma de Pagamento
         </div>
 
         <div class="grupo_campo">
-            <select name="" id="editar_status_forma_pagamento">
+            <input type="number" id="editar_data_fechamento" name="data_fechamento" placeholder="Data de Fechamento">
+        </div>
+
+        <div class="grupo_campo">
+            <select name="status_forma_pagamento" id="editar_status_forma_pagamento">
                 <option value="" disabled>Status Forma de Pagamento</option>
                 <option value="ATIVO">ATIVO</option>
                 <option value="INATIVO">INATIVO</option>
