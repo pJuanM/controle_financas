@@ -11,9 +11,6 @@ Controle de finanças
   - Tabela com dados
 
 # CRÉDITOS
-- Criar
-- Listar
-- Home
-- Editar
+- DEFINIR O RESPONSÁVEL - SE FOR UM DÉBITO - USUÁRIO RESPONSÁVEL - SE FOR UM CRÉDITO PRECISA DIZER DE QUEM VIRÁ AQUELE PAGAMENTO.
 
 
