@@ -3,19 +3,19 @@
 Débitos
 {% endblock %}
 {% block css %}
-<link rel="stylesheet" href="{{ url_for('static', path='css/debitos.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='css/lancamentos.css') }}">
 {% endblock %}
 {% block header %}
 <nav class="navegar_rotas">
-    <a href="/debitos/criar">Criar</a>
-    <a href="/debitos">Débitos</a>
+    <a href="/lancamentos/criar">Criar</a>
+    <a href="/lancamentos">Débitos</a>
     <a href="/parcelas">Parcelas</a>
 </nav>
 {% endblock %}
 {% block conteudo %}
 <h2>Filtrar Débitos</h2>
 <section class="formulario">
-    <form action="/debitos" method="get" id="formulario">
+    <form action="/lancamentos" method="get" id="formulario">
         <div class="grupo_campo campo_data">
             <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
             <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
@@ -51,6 +51,14 @@ Débitos
             </select>        
         </div>
 
+        <div class="grupo_campo">
+            <select name="tipo_lancamento" id="tipo_lancamento" required>
+                <option value="" selected disabled>Tipo Lançamento: </option>
+                <option value="DEBITO">DÉBITO</option>
+                <option value="CREDITO">CRÉDITO</option>
+            </select>  
+        </div>
+
         <button type="submit" id="enviar_formulario">Filtrar Débitos</button>
     </form>
 </section>
@@ -61,23 +69,24 @@ Débitos
             <tr>
                 <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'data')">DT. COMPRA</th>
                 <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">COMPRA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'numero')">VLR. DEBITO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'numero')">VLR. LANÇAMENTO</th>
             </tr>
         </thead>
         <tbody>
-            {% if debitos %}
-                {% for debito in debitos | sort(attribute='data_compra', reverse=True) %}
+            {% if lancamentos %}
+                {% for lancamento in lancamentos | sort(attribute='data_compra', reverse=True) %}
                 <tr onclick="editarItem(this)"
-                    data-id="{{ debito.id }}"
-                    data-data-compra="{{ debito.data_compra }}"
-                    data-item-comprado="{{ debito.item_comprado }}"
-                    data-categoria="{{ debito.categoria.id }}"
-                    data-valor-debito="{{ debito.valor_debito }}"
-                    data-forma_pagamento="{{ debito.formaPagamento.id }}"
-                    data-qnt-parcelas="{{ debito.qnt_parcelas }}">
-                    <td>{{ debito.data_compra.strftime("%d/%m/%Y") }}</td>
-                    <td>{{ debito.item_comprado }}</td>
-                    <td>R$ {{ "{:,.2f}".format(debito.valor_debito).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
+                    data-id="{{ lancamento.id }}"
+                    data-data-compra="{{ lancamento.data_compra }}"
+                    data-item-comprado="{{ lancamento.item_comprado }}"
+                    data-categoria="{{ lancamento.categoria.id }}"
+                    data-valor-lancamento="{{ lancamento.valor_lancamento }}"
+                    data-forma_pagamento="{{ lancamento.formaPagamento.id }}"
+                    data-tipo-lancamento="{{ lancamento.parcela.tipo_lancamento }}"
+                    data-qnt-parcelas="{{ lancamento.qnt_parcelas }}">
+                    <td>{{ lancamento.data_compra.strftime("%d/%m/%Y") }}</td>
+                    <td>{{ lancamento.item_comprado }}</td>
+                    <td>R$ {{ "{:,.2f}".format(lancamento.valor_lancamento).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                 </tr>
                 {% endfor %}
             {% else %}
@@ -92,8 +101,8 @@ Débitos
 
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="/debitos" method="post" id="formulario">
-        <input type="hidden" id="id_debito" name="id_debito" data-id-principal>
+    <form action="/lancamentos" method="post" id="formulario">
+        <input type="hidden" id="id_lancamento" name="id_lancamento" data-id-principal>
         <div class="grupo_campo_editar">
             <div class="grupo_campo">
                 <label for="item_comprado">Compra:</label>
@@ -107,8 +116,8 @@ Débitos
 
         <div class="grupo_campo_editar">
             <div class="grupo_campo">
-                <label for="valor_debito">Valor:</label>
-                <input type="text" name="valor_debito" id="editar_valor_debito" placeholder="Valor R$" autocomplete="off" oninput="formatarMoeda(this)">
+                <label for="valor_lancamento">Valor:</label>
+                <input type="text" name="valor_lancamento" id="editar_valor_lancamento" placeholder="Valor R$" autocomplete="off" oninput="formatarMoeda(this)">
             </div>
 
 
@@ -157,14 +166,14 @@ Débitos
         </div>
 
         <div class="grupo_campo botoes_formulario">
-            <button type="submit" id="btn_excluir" formaction="/debitos/excluir">Excluir Débito</button>
-            <button type="submit" id="btn_editar" formaction="/debitos/editar">Editar Débito</button>
+            <button type="submit" id="btn_excluir" formaction="/lancamentos/excluir">Excluir Débito</button>
+            <button type="submit" id="btn_editar" formaction="/lancamentos/editar">Editar Débito</button>
         </div>
     </form>
 </aside>
 {% endblock %}
 {% block script %}
-<script src="/static/js/lista_debitos.js"></script>
-<script src="/static/js/debitos.js"></script>
+<script src="/static/js/lista_lancamentos.js"></script>
+<script src="/static/js/lancamentos.js"></script>
 
 {% endblock %}

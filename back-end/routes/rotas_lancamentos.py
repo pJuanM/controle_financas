@@ -4,24 +4,25 @@ from typing import Optional
 from urllib.parse import quote
 from sqlalchemy.orm import Session
 from dependencies import pegar_sessao, verificar_token
-from models import Debitos, Categorias, FormasPagamento, Usuarios, Parcelas
+from models import Lancamentos, Categorias, FormasPagamento, Usuarios, Parcelas
 from main import templates
 from decimal import Decimal
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 
 
-rota_debitos = APIRouter(prefix="/debitos", tags=["debitos"], dependencies=[Depends(verificar_token)])
+rota_lancamentos = APIRouter(prefix="/lancamentos", tags=["lancamentos"], dependencies=[Depends(verificar_token)])
 
 
-@rota_debitos.get("/")
-async def listar_debitos(request: Request,
+@rota_lancamentos.get("/")
+async def listar_lancamentos(request: Request,
                          data_compra_inicio: str | None = Query(None),
                          data_compra_final: str | None = Query(None),
                          data_vencimento_inicio: str | None = Query(None),
                          data_vencimento_final: str | None = Query(None),
                          id_categoria: str | None = Query(None), 
                          id_forma_pagamento: str | None = Query(None), 
+                         tipo_lancamento: str | None = Query(None),
                          session: Session = Depends(pegar_sessao), 
                          usuario: Usuarios = Depends(verificar_token)):
     """
@@ -40,9 +41,10 @@ async def listar_debitos(request: Request,
         data_vencimento_inicio,
         data_vencimento_final,
         id_categoria,
-        id_forma_pagamento
+        id_forma_pagamento,
+        tipo_lancamento
     ])
-    resultadoDebitos = []
+    resultadoLancamentos = []
 
     if filtros_aplicados:
         data_compra_inicio = data_compra_inicio or None 
@@ -50,38 +52,41 @@ async def listar_debitos(request: Request,
         data_vencimento_inicio = data_vencimento_inicio or None 
         data_vencimento_final = data_vencimento_final or None 
 
-        query = session.query(Debitos).filter(Debitos.id_usuario == usuario.id)
+        query = session.query(Lancamentos).join(Lancamentos.parcela).filter(Lancamentos.id_usuario == usuario.id, Parcelas.status_parcela != "CANCELADO")
 
         if data_compra_inicio or data_compra_final:
             if not data_compra_inicio or not data_compra_final:
                 raise HTTPException(status_code= 400, detail="Precisa informar ambas datas compra.")
             query = query.filter(
-                Debitos.data_compra >= datetime.strptime(data_compra_inicio, "%Y-%m-%d").date(), 
-                Debitos.data_compra <= datetime.strptime(data_compra_final, "%Y-%m-%d")
+                Lancamentos.data_compra >= datetime.strptime(data_compra_inicio, "%Y-%m-%d").date(), 
+                Lancamentos.data_compra <= datetime.strptime(data_compra_final, "%Y-%m-%d")
             .date())
 
         if data_vencimento_inicio or data_vencimento_final:
             if not data_vencimento_inicio or not data_vencimento_final:
                 raise HTTPException(status_code= 400, detail="Precisa informar ambas datas vencimento.")
-            query = query.join(Debitos.parcela).filter(
+            query = query.join(Lancamentos.parcela).filter(
                 Parcelas.data_vencimento >= datetime.strptime(data_vencimento_inicio, "%Y-%m-%d").date(), 
                 Parcelas.data_vencimento <= datetime.strptime(data_vencimento_final, "%Y-%m-%d").date()
             ).distinct()
 
         if id_categoria is not None:
-            query = query.filter(Debitos.id_categoria == int(id_categoria))
+            query = query.filter(Lancamentos.id_categoria == int(id_categoria))
 
         if id_forma_pagamento is not None:
-            query = query.filter(Debitos.id_forma_pagamento == int(id_forma_pagamento))
+            query = query.filter(Lancamentos.id_forma_pagamento == int(id_forma_pagamento))
 
-        resultadoDebitos = query.all()
+        if tipo_lancamento is not None:
+            query = query.join(Lancamentos.parcela).filter(Parcelas.tipo_lancamento == tipo_lancamento)
+
+        resultadoLancamentos = query.all()
 
 
     return templates.TemplateResponse(
-        name="lista_debitos.html", 
+        name="lista_lancamentos.html", 
         request=request, 
         context={
-            "debitos": resultadoDebitos,
+            "lancamentos": resultadoLancamentos,
             "usuario": usuario,
             "filtros_aplicados": filtros_aplicados,
             "categorias": categorias,
@@ -90,7 +95,7 @@ async def listar_debitos(request: Request,
     )
 
 
-@rota_debitos.get("/criar")
+@rota_lancamentos.get("/criar")
 async def home(request: Request, 
                mensagem: Optional[str] = None,
                session: Session = Depends(pegar_sessao), 
@@ -104,7 +109,7 @@ async def home(request: Request,
 
 
     return templates.TemplateResponse(
-        name="debitos.html", 
+        name="lancamentos.html", 
         request=request, 
         context={
             "categorias": categorias,
@@ -115,53 +120,54 @@ async def home(request: Request,
     )
 
 
-@rota_debitos.post("/criar")
-async def criar_debito(data_compra: date = Form(...), 
+@rota_lancamentos.post("/criar")
+async def criar_lancamento(data_compra: date = Form(...), 
                       item_comprado: str = Form(...), 
                       categoria_id: int = Form(...),  
                       forma_pagamento: int = Form(...), 
-                      valor_debito: str = Form(...),
+                      valor_lancamento: str = Form(...),
                       parcelado: bool = Form(...), 
+                      tipo_lancamento: str = Form(...),
                       qnt_parcelas: int | None = Form(None), 
                       session: Session = Depends(pegar_sessao), 
                       usuario: Usuarios = Depends(verificar_token)):
     
 
-    valor_debito = (valor_debito.replace("R$", "").replace(".", "").replace(",", ".").strip())
-    valor_debito = Decimal(valor_debito)
-    existeDebito = session.query(Debitos).filter(Debitos.data_compra == data_compra, 
-                                                    Debitos.id_usuario == usuario.id,
-                                                    Debitos.item_comprado == item_comprado, 
-                                                    Debitos.id_forma_pagamento == forma_pagamento).first()
+    valor_lancamento = (valor_lancamento.replace("R$", "").replace(".", "").replace(",", ".").strip())
+    valor_lancamento = Decimal(valor_lancamento)
+    existelancamento = session.query(Lancamentos).filter(Lancamentos.data_compra == data_compra, 
+                                                    Lancamentos.id_usuario == usuario.id,
+                                                    Lancamentos.item_comprado == item_comprado, 
+                                                    Lancamentos.id_forma_pagamento == forma_pagamento).first()
     if parcelado == False:
         qnt_parcelas = 1
     else:
         if qnt_parcelas == None or qnt_parcelas <= 0 :
             raise HTTPException(status_code = 400, detail = "A quantidade de parcelas precisa ser maior do que 0.")
         
-    if existeDebito:
+    if existelancamento:
         return RedirectResponse(
-            url = f"/debitos/criar?mensagem=Já existe uma compra idêntica.",
+            url = f"/lancamentos/criar?mensagem=Já existe uma compra idêntica.",
             status_code = 303
     )
     
-    novoDebito = Debitos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_debito = valor_debito, parcelado = parcelado, qnt_parcelas = qnt_parcelas)
-    session.add(novoDebito)
+    novolancamento = Lancamentos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_lancamento = valor_lancamento, parcelado = parcelado, qnt_parcelas = qnt_parcelas)
+    session.add(novolancamento)
     session.flush()
 
-    valor_total = Decimal(str(novoDebito.valor_debito))
-    qtd = novoDebito.qnt_parcelas
+    valor_total = Decimal(str(novolancamento.valor_lancamento))
+    qtd = novolancamento.qnt_parcelas
     valor_base = (valor_total / qtd).quantize(Decimal("0.01"))
     for numero in range(1, qtd + 1):
         if numero < qtd:
             valor = valor_base
         else:
             valor = valor_total - (valor_base * (qtd - 1))
-        dia_vencimento = novoDebito.formaPagamento.data_vencimento
+        dia_vencimento = novolancamento.formaPagamento.data_vencimento
         vencimento = None
         if dia_vencimento is None:
             if numero <= 1: 
-                vencimento = novoDebito.data_compra
+                vencimento = novolancamento.data_compra
         else:
             if numero <= 1: 
                 if data_compra.day < dia_vencimento:
@@ -170,91 +176,92 @@ async def criar_debito(data_compra: date = Form(...),
             
         parcela = Parcelas(numero_parcela = numero,
                            valor_parcela = valor,
-                           id_debito = novoDebito.id,
-                           data_vencimento = vencimento
+                           id_lancamento = novolancamento.id,
+                           data_vencimento = vencimento,
+                           tipo_lancamento = tipo_lancamento
                            )
         session.add(parcela)
     session.commit()
     mensagem = quote("Compra adicionada com sucesso!")
     return RedirectResponse(
-        url = f"/debitos/criar?mensagem={mensagem}",
+        url = f"/lancamentos/criar?mensagem={mensagem}",
         status_code = 303
     )
     
 
-@rota_debitos.post("/editar")
-async def editar_debito(id_debito: int = Form(...),
+@rota_lancamentos.post("/editar")
+async def editar_lancamento(id_lancamento: int = Form(...),
                         item_comprado: str | None = Form(None),
                         id_categoria: int | None = Form(None),
                         id_forma_pagamento: int | None = Form(None),
-                        valor_debito: str | None = Form(None),
+                        valor_lancamento: str | None = Form(None),
                         parcelado: bool | None = Form(None),
                         qnt_parcelas: int | None = Form(None),
                         session: Session = Depends(pegar_sessao), 
                         usuario: Usuarios= Depends(verificar_token)):
     
 
-    debito = session.query(Debitos).filter(Debitos.id == id_debito, Debitos.id_usuario == usuario.id).first()
+    lancamento = session.query(Lancamentos).filter(Lancamentos.id == id_lancamento, Lancamentos.id_usuario == usuario.id).first()
 
-    if not debito:
-        raise HTTPException(status_code = 400, detail = "Débito não cadastrado")
+    if not lancamento:
+        raise HTTPException(status_code = 400, detail = "Lançamento não cadastrado")
     
     if item_comprado is not None:
-        debito.item_comprado = item_comprado
+        lancamento.item_comprado = item_comprado
 
     if id_categoria is not None:
-        debito.id_categoria = id_categoria
+        lancamento.id_categoria = id_categoria
 
     if id_forma_pagamento is not None:
-        debito.id_forma_pagamento = id_forma_pagamento
+        lancamento.id_forma_pagamento = id_forma_pagamento
 
-    if valor_debito is not None and qnt_parcelas is None:
-        valor_debito = (valor_debito.replace("R$", "").replace(".", "").replace(",", ".").strip())
-        novo_valor = Decimal(str(valor_debito))
-        debito.valor_debito = novo_valor
-        if debito.parcelado:
-            qtd = debito.qnt_parcelas
+    if valor_lancamento is not None and qnt_parcelas is None:
+        valor_lancamento = (valor_lancamento.replace("R$", "").replace(".", "").replace(",", ".").strip())
+        novo_valor = Decimal(str(valor_lancamento))
+        lancamento.valor_lancamento = novo_valor
+        if lancamento.parcelado:
+            qtd = lancamento.qnt_parcelas
             valor_base = (novo_valor / qtd).quantize(Decimal("0.01"))
-            for indice, parcela in enumerate(debito.parcela, start=1):
+            for indice, parcela in enumerate(lancamento.parcela, start=1):
                 if indice < qtd:
                     parcela.valor_parcela = valor_base
                 else:
                     parcela.valor_parcela = novo_valor - (valor_base * (qtd - 1))
             session.commit()
 
-    if valor_debito is None and qnt_parcelas is not None:
-        valor_debito = Decimal(str(debito.valor_debito))
+    if valor_lancamento is None and qnt_parcelas is not None:
+        valor_lancamento = Decimal(str(lancamento.valor_lancamento))
         if qnt_parcelas <= 0:
             raise HTTPException(status_code = 400, detail = "Quantidade de parcelas precisa ser maior do que 0")
         qtd = qnt_parcelas
-        debito.qnt_parcelas = qtd
-        dia_vencimento = debito.formaPagamento.data_vencimento
-        debito.parcela.clear()
-        valor_base = (valor_debito / qtd).quantize(Decimal("0.01"))
+        lancamento.qnt_parcelas = qtd
+        dia_vencimento = lancamento.formaPagamento.data_vencimento
+        lancamento.parcela.clear()
+        valor_base = (valor_lancamento / qtd).quantize(Decimal("0.01"))
 
         for numero in range(1, qtd + 1):
             if numero < qtd:
                 valor = valor_base
             else:
-                valor = valor_debito - (valor_base * (qtd - 1))
-            vencimento = (debito.data_compra.replace(day = dia_vencimento) + relativedelta(months = numero))
+                valor = valor_lancamento - (valor_base * (qtd - 1))
+            vencimento = (lancamento.data_compra.replace(day = dia_vencimento) + relativedelta(months = numero))
             parcela = Parcelas(numero_parcela = numero,
                             valor_parcela = valor,
-                            id_debito = debito.id,
+                            id_lancamento = lancamento.id,
                             data_vencimento = vencimento
                             )
             session.add(parcela)
     
 
     if parcelado is not None:
-        debito.parcelado = parcelado
+        lancamento.parcelado = parcelado
         if parcelado is False:
-            debito.qnt_parcelas = 1
-            vencimento = (debito.data_compra.replace(day = debito.formaPagamento.data_vencimento) + relativedelta(months = 1))
-            debito.parcela.clear()
+            lancamento.qnt_parcelas = 1
+            vencimento = (lancamento.data_compra.replace(day = lancamento.formaPagamento.data_vencimento) + relativedelta(months = 1))
+            lancamento.parcela.clear()
             parcela = Parcelas(numero_parcela = 1,
-                               valor_parcela = debito.valor_debito,
-                               id_debito = debito.id,
+                               valor_parcela = lancamento.valor_lancamento,
+                               id_lancamento = lancamento.id,
                                data_vencimento = vencimento)
             session.add(parcela)
 
@@ -262,19 +269,19 @@ async def editar_debito(id_debito: int = Form(...),
     session.commit()
 
     return RedirectResponse(
-        url = "/debitos",
+        url = "/lancamentos",
         status_code = 303
 
     )
      
 
-@rota_debitos.post("/excluir")
-async def deletar_conta(id_debito: int = Form(...), 
+@rota_lancamentos.post("/excluir")
+async def deletar_conta(id_lancamento: int = Form(...), 
                         session: Session = Depends(pegar_sessao), 
                         usuario: Usuarios = Depends(verificar_token)):
     
     
-    conta = session.query(Debitos).filter(Debitos.id == id_debito).first()
+    conta = session.query(Lancamentos).filter(Lancamentos.id == id_lancamento).first()
 
     if not conta:
         raise HTTPException(status_code = 400, detail = "Conta não encontrada em sistema")

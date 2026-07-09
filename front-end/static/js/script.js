@@ -61,10 +61,10 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
         
         if (tipoDado === 'data') {
             // Transforma o formato DD/MM/AAAA em um objeto Date comparável
-            const [diaA, mesA, anoA] = valorA.split('/');
-            const [diaB, mesB, anoB] = valorB.split('/');
-            const dateA = new Date(anoA, mesA - 1, diaA);
-            const dateB = new Date(anoB, mesB - 1, diaB);
+            const [diaA, mesA] = valorA.split('/');
+            const [diaB, mesB] = valorB.split('/');
+            const dateA = new Date(mesA - 1, diaA);
+            const dateB = new Date(mesB - 1, diaB);
             return direcaoAtual === 'asc' ? dateA - dateB : dateB - dateA;
         }
 
@@ -115,11 +115,11 @@ function editarItem(linha) {
         }
     }
     document.querySelector("[data-id-principal]").value = linha.dataset.id;
-    const inputValor = document.getElementById("editar_valor_debito");
+    const inputValor = document.getElementById("editar_valor_lancamento");
 
 
     if (inputValor) {
-        inputValor.value = linha.dataset.valorDebito;
+        inputValor.value = linha.dataset.valorLancamento;
         formatarMoeda(inputValor);
     }
 }

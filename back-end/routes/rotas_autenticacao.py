@@ -80,7 +80,7 @@ async def login(email: str = Form(...),
     usuario = autenticar_usuario(email, senha, session)
     access_token = criar_token(usuario.id)
     response = RedirectResponse(
-        url="/debitos",
+        url="/lancamentos",
         status_code = 303
     )
 

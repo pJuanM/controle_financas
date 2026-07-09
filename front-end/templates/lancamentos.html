@@ -5,27 +5,35 @@ Débitos
 {% endblock %}
 {% block header %}
 <nav class="navegar_rotas">
-    <a href="/debitos/criar">Criar</a>
-    <a href="/debitos">Débitos</a>
+    <a href="/lancamentos/criar">Criar</a>
+    <a href="/lancamentos">Débitos</a>
     <a href="/parcelas">Parcelas</a>
 
 </nav>
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{{ url_for('static', path='/css/debitos.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/lancamentos.css') }}">
 {% endblock %}
 
 {% block conteudo %}
 <h1 class="titulo-pagina">Contas à Pagar</h1>
 <section class="formulario">
-    <form action="/debitos/criar" method="post" id="formulario">
+    <form action="/lancamentos/criar" method="post" id="formulario">
         <div class="grupo_campo">
             <input type="date" id="data_compra" name="data_compra" placeholder="" onfocus="this.showPicker()" required>
         </div>
 
         <div class="grupo_campo">
             <input type="text" id="item_comprado" name="item_comprado" placeholder="Item Comprado" autocomplete="off" required>
+        </div>
+
+        <div class="grupo_campo">
+            <select name="tipo_lancamento" id="tipo_lancamento" required>
+                <option value="" selected disabled>Tipo Lançamento: </option>
+                <option value="DEBITO">DÉBITO</option>
+                <option value="CREDITO">CRÉDITO</option>
+            </select>  
         </div>
 
         <div class="grupo_campo">
@@ -52,7 +60,7 @@ Débitos
         </div>
 
         <div class="grupo_campo">
-            <input type="text" name="valor_debito" id="valor_debito" placeholder="Valor R$" autocomplete="off" required oninput="formatarMoeda(this)">
+            <input type="text" name="valor_lancamento" id="valor_lancamento" placeholder="Valor R$" autocomplete="off" required oninput="formatarMoeda(this)">
         </div>
         <div class="grupo_campo">
             <select name="parcelado" id="parcelado" onchange="mostrarQuantidadeParcelas()" required>
@@ -79,5 +87,5 @@ Débitos
 
 
 {% block script %}
-<script src="/static/js/debitos.js"></script>
+<script src="/static/js/lancamentos.js"></script>
 {% endblock %}

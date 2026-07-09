@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, Request, Query
 from fastapi.responses import RedirectResponse
-from models import Usuarios, Parcelas, Debitos, FormasPagamento, Categorias
+from models import Usuarios, Parcelas, Lancamentos, FormasPagamento, Categorias
 from dependencies import pegar_sessao, verificar_token
+from urllib.parse import quote 
+from typing import Optional  
 from sqlalchemy.orm import Session
 from datetime import date, datetime
 from main import templates
@@ -27,6 +29,7 @@ async def listar_parcelas(request: Request,
     
     categorias = session.query(Categorias).all()
     formas_pagamento = session.query(FormasPagamento).all()
+
     filtros_aplicados = any([
         data_compra_inicio,
         data_compra_final,
@@ -40,14 +43,14 @@ async def listar_parcelas(request: Request,
     resultado_parcelas = []
 
     if filtros_aplicados:
-        query = session.query(Parcelas).join(Parcelas.debito).filter(Debitos.id_usuario == usuario.id)
+        query = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id)
 
         if data_compra_inicio or data_compra_final:
             if not data_compra_inicio or not data_compra_final  :
                 raise HTTPException(status_code= 400, detail="Precisa informar ambas datas compra.")
             query = query.filter(
-                Debitos.data_compra >= datetime.strptime(data_compra_inicio, "%Y-%m-%d").date(), 
-                Debitos.data_compra <= datetime.strptime(data_compra_final, "%Y-%m-%d").date()
+                Lancamentos.data_compra >= datetime.strptime(data_compra_inicio, "%Y-%m-%d").date(), 
+                Lancamentos.data_compra <= datetime.strptime(data_compra_final, "%Y-%m-%d").date()
             )
 
         if data_vencimento_inicio or data_vencimento_final:
@@ -64,26 +67,16 @@ async def listar_parcelas(request: Request,
             query = query.filter(Parcelas.status_parcela == status_parcela)
 
         if id_forma_pagamento:
-            query = query.filter(Debitos.id_forma_pagamento == id_forma_pagamento)
+            query = query.filter(Lancamentos.id_forma_pagamento == id_forma_pagamento)
 
         if id_categoria:
-            query = query.filter(Debitos.id_categoria == id_categoria)
+            query = query.filter(Lancamentos.id_categoria == id_categoria)
 
         if responsavel:
-            query = query.join(Debitos.formaPagamento).filter(FormasPagamento.responsavel == responsavel)
+            query = query.join(Lancamentos.formaPagamento).filter(FormasPagamento.responsavel == responsavel)
 
         resultado_parcelas = query.all()
         print(resultado_parcelas)
-
-        # resultado = []
-        # for parcela in resultado_parcelas:
-        #     resultado.append({
-        #         "Item Comprado": parcela.debito.item_comprado,
-        #         "Parcelas": f"{parcela.numero_parcela}/{parcela.debito.qnt_parcelas}",
-        #         "Valor Parcela": parcela.valor_parcela,
-        #         "Forma de Pagamento": parcela.debito.formaPagamento.forma_pagamento,
-        #         "Responsável": parcela.debito.formaPagamento.responsavel,
-        #     })
 
     return templates.TemplateResponse(
         name="parcelas.html", 
@@ -93,20 +86,22 @@ async def listar_parcelas(request: Request,
             "parcelas": resultado_parcelas,
             "filtros_aplicados": filtros_aplicados,
             "categorias": categorias,
-            "formas_pagamento": formas_pagamento
+            "formas_pagamento": formas_pagamento,
         }
     )
 
 
 
 @rota_parcelas.post("/editar")                        
-async def editar_parcela(id_parcela: int = Form(...),
+async def editar_parcela(request: Request,
+                         id_parcela: int = Form(...),
+                         mensagem: Optional[str] = None,
                          session : Session = Depends(pegar_sessao),
                          usuario: Usuarios = Depends(verificar_token),
                          status_parcela: str | None = Form(None)):
     
 
-    parcela = session.query(Parcelas).join(Parcelas.debito).filter(Parcelas.id == id_parcela, Debitos.id_usuario == usuario.id).first()
+    parcela = session.query(Parcelas).join(Parcelas.lancamento).filter(Parcelas.id == id_parcela, Lancamentos.id_usuario == usuario.id).first()
 
     if not parcela:
         raise HTTPException(status_code = 400, detail = "Parcela inexistente.")
@@ -117,7 +112,14 @@ async def editar_parcela(id_parcela: int = Form(...),
         parcela.status_parcela = status_parcela
 
     session.commit()
+    mensagem = quote("Parcela alterada com sucesso!")
 
-    return {
-        "mensagem": "Status da parcela alterado com sucesso!"
-    }
+    return templates.TemplateResponse(
+        name="parcelas.html", 
+        request = request,
+        context = {
+            "mensagem":mensagem
+        }
+    )
+
+

@@ -7,7 +7,7 @@ Parcelas
 {% endblock %}
 {% block header %}
 <nav class="navegar_rotas">
-    <a href="/debitos">Débitos</a>
+    <a href="/lancamentos">Débitos</a>
 </nav>
 {% endblock %}
 {% block conteudo %}
@@ -93,18 +93,18 @@ Parcelas
                 {% for parcela in parcelas | sort(attribute='data_vencimento', reverse=True) %}
                 <tr onclick="editarItem(this)"
                     data-id="{{ parcela.id }}"
-                    data-data_compra="{{ parcela.debito.data_compra }}"
-                    data-item_comprado="{{ parcela.debito.item_comprado }}"
-                    data-categoria="{{ parcela.debito.categoria.id }}"
+                    data-data_compra="{{ parcela.lancamento.data_compra }}"
+                    data-item_comprado="{{ parcela.lancamento.item_comprado }}"
+                    data-categoria="{{ parcela.lancamento.categoria.id }}"
                     data-valor-parcela="{{ parcela.valor_parcela }}"
                     data-parcela="{{ parcela.numero_parcela}}"
                     data-data-vencimento="{{ parcela.data_vencimento }}"
-                    data-parcela-responsavel="{{ parcela.debito.formaPagamento.responsavel}}"
+                    data-parcela-responsavel="{{ parcela.lancamento.formaPagamento.responsavel}}"
                     data-status-parcela="{{ parcela.status_parcela }}">
                     <td>{{ parcela.data_vencimento.strftime("%d/%m") }}</td>
-                    <td>{{ parcela.debito.item_comprado }}</td>
+                    <td>{{ parcela.lancamento.item_comprado }}</td>
                     <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
-                    <td>{{ parcela.numero_parcela }}/{{ parcela.debito.qnt_parcelas }}</td>
+                    <td>{{ parcela.numero_parcela }}/{{ parcela.lancamento.qnt_parcelas }}</td>
                 </tr>
                 {% endfor %}
             {% else %}
@@ -192,9 +192,14 @@ Parcelas
         </div>
     </form>
 </aside>
+{% if mensagem %}
+    <div class="mensagem_sucesso">
+        <p> {{ mensagem }} </p>
+    </div>
+{% endif %}
 {% endblock %}
 {% block script %}
-<script src="/static/js/lista_debitos.js"></script>
-<script src="/static/js/debitos.js"></script>
+<script src="/static/js/lista_lancamentos.js"></script>
+<script src="/static/js/lancamentos.js"></script>
 
 {% endblock %}
