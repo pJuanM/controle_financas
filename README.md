@@ -10,7 +10,9 @@ Controle de finanças
   - Relatorio de barras
   - Tabela com dados
 
-# CRÉDITOS
-- DEFINIR O RESPONSÁVEL - SE FOR UM DÉBITO - USUÁRIO RESPONSÁVEL - SE FOR UM CRÉDITO PRECISA DIZER DE QUEM VIRÁ AQUELE PAGAMENTO.
+# EXTRAS
+- Definir no_sensitive case, ou seja se digitar PIX ou Pix ou pIx ele trazer o resultado.
+- Definir pesquisa com base no conteúdo, exemplo: pi -> trazer os resultados que comecem com pi
+
 
 

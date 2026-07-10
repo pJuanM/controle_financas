@@ -21,8 +21,8 @@ async def listar_lancamentos(request: Request,
                          data_compra_final: str | None = Query(None),
                          data_vencimento_inicio: str | None = Query(None),
                          data_vencimento_final: str | None = Query(None),
-                         id_categoria: str | None = Query(None), 
-                         id_forma_pagamento: str | None = Query(None), 
+                         id_categoria: list[str] | None = Query(None), 
+                         id_forma_pagamento: list[str] | None = Query(None), 
                          tipo_lancamento: str | None = Query(None),
                          session: Session = Depends(pegar_sessao), 
                          usuario: Usuarios = Depends(verificar_token)):
@@ -46,6 +46,7 @@ async def listar_lancamentos(request: Request,
         tipo_lancamento
     ])
     resultadoLancamentos = []
+    valor_total = 0
 
     if filtros_aplicados:
         data_compra_inicio = data_compra_inicio or None 
@@ -72,16 +73,18 @@ async def listar_lancamentos(request: Request,
             ).distinct()
 
         if id_categoria is not None:
-            query = query.filter(Lancamentos.id_categoria == int(id_categoria))
+            ids_categorias = [int(i) for i in id_categoria]
+            query = query.filter(Lancamentos.id_categoria.in_(ids_categorias))
 
         if id_forma_pagamento is not None:
-            query = query.filter(Lancamentos.id_forma_pagamento == int(id_forma_pagamento))
+            formasPagamento = [int(i) for i in id_forma_pagamento]
+            query = query.filter(Lancamentos.id_forma_pagamento.in_(formasPagamento))
 
         if tipo_lancamento is not None:
             query = query.join(Lancamentos.parcela).filter(Parcelas.tipo_lancamento == tipo_lancamento)
 
         resultadoLancamentos = query.all()
-
+        valor_total = sum(lancamento.valor_lancamento for lancamento in resultadoLancamentos)
 
     return templates.TemplateResponse(
         name="lista_lancamentos.html", 
@@ -91,7 +94,8 @@ async def listar_lancamentos(request: Request,
             "usuario": usuario,
             "filtros_aplicados": filtros_aplicados,
             "categorias": categorias,
-            "formas_pagamento": formas_pagamento
+            "formas_pagamento": formas_pagamento,
+            "valor_total": valor_total
         }
     )
 
@@ -129,6 +133,7 @@ async def criar_lancamento(data_compra: date = Form(...),
                       valor_lancamento: str = Form(...),
                       parcelado: bool = Form(...), 
                       tipo_lancamento: str = Form(...),
+                      pagador_responsavel: str = Form(...),
                       qnt_parcelas: int | None = Form(None), 
                       session: Session = Depends(pegar_sessao), 
                       usuario: Usuarios = Depends(verificar_token)):
@@ -154,8 +159,14 @@ async def criar_lancamento(data_compra: date = Form(...),
             url = f"/lancamentos/criar?mensagem=Já existe uma compra idêntica.",
             status_code = 303
     )
+
+    if tipo_lancamento == "DEBITO":
+        pagador_responsavel = usuario.nome
+    else:
+        pagador_responsavel = pagador_responsavel
     
-    novolancamento = Lancamentos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_lancamento = valor_lancamento, parcelado = parcelado, qnt_parcelas = qnt_parcelas)
+    
+    novolancamento = Lancamentos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_lancamento = valor_lancamento, parcelado = parcelado, qnt_parcelas = qnt_parcelas, pagador_responsavel = pagador_responsavel)
     session.add(novolancamento)
     session.flush()
 
@@ -227,6 +238,7 @@ async def editar_lancamento(id_lancamento: int = Form(...),
                         valor_lancamento: str | None = Form(None),
                         parcelado: bool | None = Form(None),
                         qnt_parcelas: int | None = Form(None),
+                        pagador_responsavel: str | None = Form(None),
                         session: Session = Depends(pegar_sessao), 
                         usuario: Usuarios= Depends(verificar_token)):
     
@@ -247,6 +259,9 @@ async def editar_lancamento(id_lancamento: int = Form(...),
 
     if id_forma_pagamento is not None:
         lancamento.id_forma_pagamento = id_forma_pagamento
+
+    if pagador_responsavel:
+        lancamento.pagador_responsavel = pagador_responsavel
 
     if valor_lancamento is not None:
         valor_lancamento = (

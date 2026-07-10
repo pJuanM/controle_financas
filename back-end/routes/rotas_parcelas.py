@@ -18,16 +18,18 @@ async def listar_parcelas(request: Request,
                           data_compra_final: str | None = Query(None),
                           data_vencimento_inicio: str | None = Query(None),
                           data_vencimento_final: str | None = Query(None),
-                          status_parcela: str | None = Query(None),
-                          id_forma_pagamento: int | None = Query(None),
-                          id_categoria: int | None = Query(None),
-                          responsavel: str | None = Query(None)):
+                          status_parcela: list[str] | None = Query(None),
+                          id_forma_pagamento: list[int] | None = Query(None),
+                          id_categoria: list[int] | None = Query(None),
+                          pagador_responsavel: list[str] | None = Query(None)):
     
     
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
     
     categorias = session.query(Categorias).all()
+    lancamentos = [responsavel.pagador_responsavel for responsavel in session.query(Lancamentos.pagador_responsavel).distinct().all()]
+
     formas_pagamento = session.query(FormasPagamento).all()
 
     filtros_aplicados = any([
@@ -38,12 +40,12 @@ async def listar_parcelas(request: Request,
         status_parcela,
         id_forma_pagamento,
         id_categoria,
-        responsavel,
+        pagador_responsavel,
     ])
     resultado_parcelas = []
 
     if filtros_aplicados:
-        query = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id, Parcelas.status_parcela != "CANCELADO", Parcelas.tipo_lancamento != "CREDITO")
+        query = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id)
 
         if data_compra_inicio or data_compra_final:
             if not data_compra_inicio or not data_compra_final  :
@@ -62,18 +64,16 @@ async def listar_parcelas(request: Request,
                 )
 
         if status_parcela:
-            if status_parcela not in ["CANCELADO", "PAGO", "PENDENTE"]:
-                raise HTTPException(status_code = 400, detail="Status da parcela precisa estar entre CANCELADO PAGO ou PENDENTE")
-            query = query.filter(Parcelas.status_parcela == status_parcela)
+            query = query.filter(Parcelas.status_parcela.in_(status_parcela))
 
         if id_forma_pagamento:
-            query = query.filter(Lancamentos.id_forma_pagamento == id_forma_pagamento)
+            query = query.filter(Lancamentos.id_forma_pagamento.in_(id_forma_pagamento))
 
         if id_categoria:
-            query = query.filter(Lancamentos.id_categoria == id_categoria)
+            query = query.filter(Lancamentos.id_categoria.in_(id_categoria))
 
-        if responsavel:
-            query = query.join(Lancamentos.formaPagamento).filter(FormasPagamento.responsavel == responsavel)
+        if pagador_responsavel:
+            query = query.filter(Lancamentos.pagador_responsavel.in_(pagador_responsavel))
 
         resultado_parcelas = query.all()
         print(resultado_parcelas)
@@ -83,13 +83,13 @@ async def listar_parcelas(request: Request,
         request=request, 
         context={
             "usuario": usuario,
-            "parcelas": resultado_parcelas,
+            "parcelas": resultado_parcelas, 
+            "lancamentos": lancamentos,
             "filtros_aplicados": filtros_aplicados,
             "categorias": categorias,
             "formas_pagamento": formas_pagamento,
         }
     )
-
 
 
 @rota_parcelas.post("/editar")                        

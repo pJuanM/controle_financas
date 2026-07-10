@@ -16,6 +16,7 @@ class Lancamentos(Base):
     item_comprado = Column(String(150), nullable=False) 
     valor_lancamento = Column(Numeric(10, 2), nullable = False)
     parcelado = Column(Boolean, nullable=False) 
+    pagador_responsavel = Column(String, nullable=True)
     qnt_parcelas = Column(Integer) 
 
     id_usuario = Column(Integer, ForeignKey("usuarios.id"))

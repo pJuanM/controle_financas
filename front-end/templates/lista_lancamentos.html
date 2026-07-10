@@ -13,7 +13,8 @@ Débitos
 </nav>
 {% endblock %}
 {% block conteudo %}
-<h2>Filtrar Débitos</h2>
+<!-------  ======= ABA DE FILTROS DE LANÇAMENTOS ======= ------->
+<h2>Filtrar Lançamentos</h2>
 <section class="formulario">
     <form action="/lancamentos" method="get" id="formulario">
         <div class="grupo_campo campo_data">
@@ -26,43 +27,54 @@ Débitos
         </div>
 
         <div class="grupo_campo">
-            <select name="id_categoria" id="id_categoria">
-                <option value="" selected disabled>Categoria:</option>
-                {% for categoria in categorias %}
-                    <option value="{{ categoria.id }}">
-                        {{ categoria.categoria }}
-                    </option>
+            <details class="filtroDetails">
+                <summary>Categoria</summary>
+                {% for categoria in categorias|sort(attribute='categoria') %}
+                    <div class="opcao_checkbox">
+                        <div class="linha_checkbox">
+                            <input type="checkbox" name="id_categoria" id="id_{{ categoria.categoria }}" value="{{ categoria.id }}">
+                            <label for="id_{{ categoria.categoria }}">{{ categoria.categoria }}</label>
+                        </div>
+                    </div>
+                {% endfor %}
+            </details>  
+        </div>
+
+        <div class="grupo_campo">
+            <details class="filtroDetails">
+                <summary>Pagamento:</summary>
+                {% for grupo in formas_pagamento|groupby('responsavel')|sort(attribute='responsavel')%}  
+                    <div class="grupo_responsavel">
+                        <strong>{{ grupo.grouper}}</strong>
+                    </div>
+                    {% for formaPagamento in grupo.list|sort(attribute='forma_pagamento') %}
+                        <div class="opcao_checkbox">
+                            <div class="linha_checkbox">
+                                <input type="checkbox" name="id_forma_pagamento" id="forma_{{ formaPagamento.id }}" value="{{ formaPagamento.id }}">
+                                <label for="forma_{{ formaPagamento.id }}">
+                                    {{ formaPagamento.forma_pagamento }}
+                                </label>
+                            </div>
+                        </div>
+                    {% endfor %}
                 {% endfor %}
             </select>
         </div>
 
         <div class="grupo_campo">
-            <select name="id_forma_pagamento" id="id_forma_pagamento">
-                <option value="" selected disabled>Forma de Pagamento:</option>
-                {% for grupo in formas_pagamento|groupby('responsavel') %}  
-                    <optgroup label="{{ grupo.grouper }}">
-                        {% for formaPagamento in grupo.list %}
-                            <option value="{{ formaPagamento.id }}">
-                                {{ formaPagamento.forma_pagamento }}
-                            </option>
-                        {% endfor %}
-                    </optgroup>
-                {% endfor %}
-            </select>        
-        </div>
-
-        <div class="grupo_campo">
             <select name="tipo_lancamento" id="tipo_lancamento" required>
                 <option value="" selected disabled>Tipo Lançamento: </option>
-                <option value="DEBITO">DÉBITO</option>
                 <option value="CREDITO">CRÉDITO</option>
+                <option value="DEBITO">DÉBITO</option>
             </select>  
         </div>
 
-        <button type="submit" id="enviar_formulario">Filtrar Débitos</button>
+        <button type="submit" id="enviar_formulario">Filtrar Lançamentos</button>
     </form>
 </section>
-<h1 class="titulo-pagina">Lista de Débitos</h1>
+
+<!-------  ======= ABA DE TABELA DOS LANÇAMENTOS ======= ------->
+<h1 class="titulo-pagina">Lista de Lançamentos</h1>
 <section class="tabela">
     <table>
         <thead>
@@ -83,22 +95,30 @@ Débitos
                     data-valor-lancamento="{{ lancamento.valor_lancamento }}"
                     data-id-forma-pagamento="{{ lancamento.formaPagamento.id }}"
                     data-tipo-lancamento="{{ lancamento.parcela.tipo_lancamento }}"
-                    data-qnt-parcelas="{{ lancamento.qnt_parcelas }}">
+                    data-qnt-parcelas="{{ lancamento.qnt_parcelas }}"
+                    data-pagador-responsavel="{{ lancamento.pagador_responsavel }}"
+                    data-responsavel-forma_pagamento="{{ lancamento.formaPagamento.responsavel }}">
                     <td>{{ lancamento.data_compra.strftime("%d/%m/%Y") }}</td>
                     <td>{{ lancamento.item_comprado }}</td>
                     <td>R$ {{ "{:,.2f}".format(lancamento.valor_lancamento).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                 </tr>
                 {% endfor %}
+                <tr class="linha-total">
+                    <td colspan="2"><strong>Valor Total:</strong></td>
+                    <td>
+                        <strong>R$ {{ "{:,.2f}".format(valor_total).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong>
+                    </td>
+                </tr>
             {% else %}
                 <tr>
-                    <td colspan="6">Nenhuma forma de pagamento encontrada.</td>
+                    <td colspan="3">Nenhuma forma de pagamento encontrada.</td>
                 </tr>
             {% endif %}
         </tbody>
     </table>
 </section>
 
-
+<!-------  ======= ABA DE EDIÇÃO DOS LANÇAMENTOS ======= ------->
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
     <form action="/lancamentos" method="post" id="formulario">
@@ -129,7 +149,7 @@ Débitos
                         <optgroup label="{{ grupo.grouper }}">
                             {% for formaPagamento in grupo.list %}
                                 <option value="{{ formaPagamento.id }}">
-                                    {{ formaPagamento.forma_pagamento }}
+                                    {{ formaPagamento.forma_pagamento }} - {{ formaPagamento.responsavel }}
                                 </option>
                             {% endfor %}
                         </optgroup>
@@ -141,7 +161,7 @@ Débitos
             <div class="grupo_campo">
                 <label for="id_categoria">Categoria:</label>
                 <select name="id_categoria" id="editar_id_categoria">
-                    <option value="" disabled>Categoria: </option>
+                    <option value="" disabled>Categoria:</option>
                     {% for categoria in categorias %}
                         <option value="{{ categoria.id }}">
                             {{ categoria.categoria }}
@@ -163,6 +183,10 @@ Débitos
                 <label for="qnt_parcelas">Parcelas:</label>
                 <input type="number" id="editar_qnt_parcelas" name="qnt_parcelas" placeholder="Quantidade Parcelas">
             </div>
+        </div>
+        <div class="grupo_campo">
+            <label for="pagador_responsavel" id="pagador_responsavel">Pagador Responsável:</label>
+            <input type="text" id="editar_pagador_responsavel" name="pagador_responsavel" placeholder="Quantidade Parcelas">
         </div>
 
         <div class="grupo_campo botoes_formulario">

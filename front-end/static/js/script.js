@@ -9,15 +9,28 @@ toggle.onclick = () => {
 // ORDENAR TABELA
 function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
     const tbody = document.querySelector(".tabela table tbody");
-    const linhas = Array.from(tbody.querySelectorAll('tr'));
+    const todasLinhas = Array.from(tbody.querySelectorAll('tr'));
 
-    // Verificar se a tabela está vazia (aparece a mensagem de "Nenhuma forma encontrada")
-    if (linhas.length === 0 || (linhas.length === 1 && linhas[0].cells.length === 1)) return;
+    // Separar linha do total
+    const linhaTotal = todasLinhas.find(
+        linha => linha.classList.contains("linha-total")
+    );
 
-    // Descobre a direção atual guardada na própria tag HTML
-    const direcaoAtual = colunaElemento.dataset.ordem === 'asc' ? 'desc' : 'asc';   
-    
-    // Remove setas visuais de todos os outros cabeçalhos antes de ordenar o atual
+    // Apenas linhas que podem ser ordenadas
+    const linhas = todasLinhas.filter(
+        linha => !linha.classList.contains("linha-total")
+    );
+
+    // Verificar se a tabela está vazia
+    if (linhas.length === 0 || (linhas.length === 1 && linhas[0].cells.length === 1)) {
+        return;
+    }
+
+    // Descobre direção atual
+    const direcaoAtual = colunaElemento.dataset.ordem === 'asc' ? 'desc' : 'asc';
+
+
+    // Remove setas dos outros cabeçalhos
     document.querySelectorAll(".tabela_cabecalho").forEach(th => {
         if (th !== colunaElemento) {
             th.classList.remove("ordem-asc", "ordem-desc");
@@ -25,24 +38,45 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
         }
     });
 
-    // Ordenação customizada por tipo de dado
+
     linhas.sort((a, b) => {
+
         let valorA = a.cells[indiceColuna].textContent.trim();
         let valorB = b.cells[indiceColuna].textContent.trim();
 
-        if (tipoDado === 'numero') {
-            // Remove "R$", pontos de milhar e troca vírgula por ponto para virar número real
-            valorA = parseFloat(valorA.replace(/[^0-9,-]/g, '').replace('.', '').replace(',', '.')) || 0;
-            valorB = parseFloat(valorB.replace(/[^0-9,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0
 
-            return direcaoAtual === 'asc' ? valorA - valorB : valorB - valorA;
-        } 
+        // Ordenação numérica
+        if (tipoDado === 'numero') {
+
+            valorA = parseFloat(
+                valorA
+                    .replace(/[^0-9,-]/g, '')
+                    .replace(/\./g, '')
+                    .replace(',', '.')
+            ) || 0;
+
+            valorB = parseFloat(
+                valorB
+                    .replace(/[^0-9,-]/g, '')
+                    .replace(/\./g, '')
+                    .replace(',', '.')
+            ) || 0;
+
+
+            return direcaoAtual === 'asc'
+                ? valorA - valorB
+                : valorB - valorA;
+        }
+
+
+        // Ordenação de parcela
         if (tipoDado === 'parcela') {
+
             const itemA = a.cells[2].textContent.trim();
             const itemB = b.cells[2].textContent.trim();
 
-            // Primeiro compara o nome do débito
             const comparacaoItem = itemA.localeCompare(itemB);
+
 
             if (comparacaoItem !== 0) {
                 return direcaoAtual === 'asc'
@@ -50,55 +84,100 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
                     : -comparacaoItem;
             }
 
-            // Se for o mesmo débito, compara o número da parcela
+
             const numeroA = parseInt(valorA.split('/')[0], 10);
             const numeroB = parseInt(valorB.split('/')[0], 10);
+
 
             return direcaoAtual === 'asc'
                 ? numeroA - numeroB
                 : numeroB - numeroA;
         }
-        
+
+
+        // Ordenação por data
         if (tipoDado === 'data') {
-            // Transforma o formato DD/MM/AAAA em um objeto Date comparável
-            const [diaA, mesA] = valorA.split('/');
-            const [diaB, mesB] = valorB.split('/');
-            const dateA = new Date(mesA - 1, diaA);
-            const dateB = new Date(mesB - 1, diaB);
-            return direcaoAtual === 'asc' ? dateA - dateB : dateB - dateA;
+
+            const [diaA, mesA, anoA] = valorA.split('/');
+            const [diaB, mesB, anoB] = valorB.split('/');
+
+
+            const dateA = new Date(anoA, mesA - 1, diaA);
+            const dateB = new Date(anoB, mesB - 1, diaB);
+
+
+            return direcaoAtual === 'asc'
+                ? dateA - dateB
+                : dateB - dateA;
         }
 
-        // Padrão: Texto (Alfabetico)
+
+        // Ordenação texto
         const comparacao = valorA.localeCompare(valorB);
-        return direcaoAtual === 'asc' ? comparacao : -1 * comparacao;
+
+
+        return direcaoAtual === 'asc'
+            ? comparacao
+            : -comparacao;
     });
 
-    // Limpa e reinsere os dados na nova ordem
-    tbody.innerHTML = '';
-    linhas.forEach(linha => tbody.appendChild(linha));
 
-    // Atualiza o estado da direção na tag HTML
+
+    // Recria tabela
+    tbody.innerHTML = '';
+
+
+    linhas.forEach(linha => {
+        tbody.appendChild(linha);
+    });
+
+
+    // Coloca total sempre no final
+    if (linhaTotal) {
+        tbody.appendChild(linhaTotal);
+    }
+
+
+
+    // Atualiza estado da seta
     colunaElemento.dataset.ordem = direcaoAtual;
 
-    // Atualiza o indicador visual de seta (▲ ou ▼) sem apagar o texto original do cabeçalho
-    colunaElemento.classList.remove("ordem-asc", "ordem-desc");
+
+    colunaElemento.classList.remove(
+        "ordem-asc",
+        "ordem-desc"
+    );
+
+
     colunaElemento.classList.add(
-        direcaoAtual === "asc" ? "ordem-asc" : "ordem-desc"
+        direcaoAtual === "asc"
+            ? "ordem-asc"
+            : "ordem-desc"
     );
 }
-
 
 
 // ABRIR OVERLAY
 const menu_editar = document.querySelector('.menu_editar');
 const overlay = document.querySelector('.overlay');
-overlay.addEventListener("click", function() {
+
+function fecharMenu() {
     menu_editar.classList.remove("ativo");
     overlay.classList.remove("ativo");
+}
+
+overlay.addEventListener("click", fecharMenu);
+
+// Fecha ao pressionar Esc
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        fecharMenu();
+    }
 });
 
 // EDITAR ITEM
 function editarItem(linha) {
+    console.log(linha.dataset);
 
     menu_editar.classList.add("ativo");
     overlay.classList.add("ativo");
@@ -122,7 +201,24 @@ function editarItem(linha) {
         inputValor.value = linha.dataset.valorLancamento;
         formatarMoeda(inputValor);
     }
+
+
+    const selectCategoria = document.getElementById("editar_id_categoria");
+
+    console.log("Categoria recebida:", linha.dataset.idCategoria);
+
+    console.log(
+        "Opções:",
+        [...selectCategoria.options].map(op => ({
+            valor: op.value,
+            texto: op.text
+        }))
+    );
+
+    selectCategoria.value = linha.dataset.idCategoria;
+
 }
+
 // ESCONDER BOTOES QUANDO SELECIONAR INPUT OU SELECT
 const campos = document.querySelectorAll('.menu_editar input, .menu_editar select');
 const botoes = document.querySelector(".botoes_formulario");
@@ -140,5 +236,17 @@ campos.forEach(campo => {
             const campoComFoco = [...campos].some(c => c === document.activeElement);
             botoes.style.display = campoComFoco ? 'none' : '';
         }, 0);
+    });
+});
+
+
+// ADICIONAR COMPORTAMENTO DE MENU DROPDOWN NO DETAILS DE SELECIONAR PAGADOR RESPONSAVEL
+document.addEventListener("click", function(event) {
+    const filtros = document.querySelectorAll(".filtroDetails");
+
+    filtros.forEach(function(filtro) {
+        if (!filtro.contains(event.target)) {
+            filtro.open = false;
+        }
     });
 });

@@ -11,6 +11,7 @@ Parcelas
 </nav>
 {% endblock %}
 {% block conteudo %}
+<!-- ======= FILTRO DE PARCELAS ======= -->
 <section class="formulario">
     <form action="/parcelas" method="get" id="formulario">
 
@@ -35,49 +36,95 @@ Parcelas
                 <label for="data_vencimento_final">Dt. Venc. Final</label>
             </div>
         </div>
+
+
+
         <div class="grupo_campo_editar">
             <div class="grupo_campo">
-                <select name="status_parcela" id="status_parcela">
-                    <option value="" selected disabled>Status Parcela</option>
-                    <option value="CANCELADO">CANCELADO</option>
-                    <option value="PAGO">PAGO</option>
-                    <option value="PENDENTE">PENDENTE</option>
-                </select>
+                <details class="filtroDetails">
+                    <summary>Status Parcela</summary>
+                        <div class="opcao_checkbox">
+                            <div class="linha_checkbox">
+                                <input type="checkbox" name="status_parcela" id="status_parcela_cancelado" value="CANCELADO">
+                                <label for="status_parcela_cancelado">CANCELADO</label>
+                            </div>
+                        </div>
+
+                        <div class="opcao_checkbox">
+                            <div class="linha_checkbox">
+                                <input type="checkbox" name="status_parcela" id="status_parcela_pago" value="PAGO">
+                                <label for="status_parcela_pago">PAGO</label>
+                            </div>
+                        </div>
+
+                        <div class="opcao_checkbox">
+                            <div class="linha_checkbox">
+                                <input type="checkbox" name="status_parcela" id="status_parcela_pendente" value="PENDENTE">
+                                <label for="status_parcela_pendente">PENDENTE</label>
+                        </div>
+                </details>  
             </div>
+
             <div class="grupo_campo">
-                <select name="id_categoria" id="id_categoria">
-                    <option value="" selected disabled>Categoria: </option>
+                <details class="filtroDetails">
+                    <summary>Categoria</summary>
                     {% for categoria in categorias %}
-                        <option value="{{ categoria.id }}">
-                            {{ categoria.categoria }}
-                        </option>
+                        <div class="opcao_checkbox">
+                            <div class="linha_checkbox">
+                                <input type="checkbox" name="id_categoria" id="id_{{ categoria.categoria }}" value="{{ categoria.id }}">
+                                <label for="id_{{ categoria.categoria }}">{{ categoria.categoria }}</label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </details>
+            </div>
+
+        </div>
+        
+        <div class="grupo_campo_editar">
+            <div class="grupo_campo">
+                <details class="filtroDetails">
+                    <summary>Pagamento:</summary>
+                    {% for grupo in formas_pagamento|groupby('responsavel') %}  
+                        <div class="grupo_responsavel">
+                            <strong>{{ grupo.grouper}}</strong>
+                        </div>
+                        {% for formaPagamento in grupo.list %}
+
+                            <div class="opcao_checkbox">
+                                <div class="linha_checkbox">
+                                    <input type="checkbox" name="id_forma_pagamento" id="forma_{{ formaPagamento.id }}" value="{{ formaPagamento.id }}">
+                                    <label for="forma_{{ formaPagamento.id }}">
+                                        {{ formaPagamento.forma_pagamento }}
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
                     {% endfor %}
                 </select>
             </div>
-        </div>
-        <div class="grupo_campo_editar">
+
             <div class="grupo_campo">
-                <select name="id_forma_pagamento" id="id_forma_pagamento">
-                    <option value="" selected disabled>Pagamento:</option>
-                    {% for grupo in formas_pagamento|groupby('responsavel') %}  
-                        <optgroup label="{{ grupo.grouper }}">
-                            {% for formaPagamento in grupo.list %}
-                                <option value="{{ formaPagamento.id }}">
-                                    {{ formaPagamento.forma_pagamento }}
-                                </option>
-                            {% endfor %}
-                        </optgroup>
+                <details class="filtroDetails">
+                    <summary>Pagador Responsável</summary>
+                    {% for responsavel in lancamentos %}
+                        <div class="opcao_checkbox">
+                            <div class="linha_checkbox">
+                                <input type="checkbox" name="pagador_responsavel" id="pagador_{{ responsavel }}" value="{{ responsavel }}">
+                                <label for="pagador_{{ responsavel }}">{{ responsavel }}</label>
+                            </div>
+                        </div>
                     {% endfor %}
-                </select>        
-            </div>
-            <div class="grupo_campo">
-                <input type="text" id="responsavel" name="responsavel" placeholder="Responsavel" autocomplete="off">
+                </details>  
             </div>
         </div>
         <button type="submit" id="enviar_formulario">Filtrar Parcelas</button>
     </form>
 </section>
+
+<!-- ======= TABELA DE PARCELAS ======= -->
 <h1 class="titulo-pagina">Lista de Parcelas</h1>
+
 <section class="tabela">
     <table>
         <thead>
@@ -85,7 +132,8 @@ Parcelas
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 0, 'data')">VENC.</th>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 1, 'texto')">COMPRA</th>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'numero')">VALOR</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'parcela')">PARCELA</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'numero')">VALOR</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 4, 'texto')">TIPO</th>
             </tr>
         </thead>
         <tbody>
@@ -93,18 +141,19 @@ Parcelas
                 {% for parcela in parcelas | sort(attribute='data_vencimento', reverse=True) %}
                 <tr onclick="editarItem(this)"
                     data-id="{{ parcela.id }}"
-                    data-data_compra="{{ parcela.lancamento.data_compra }}"
-                    data-item_comprado="{{ parcela.lancamento.item_comprado }}"
+                    data-data-compra="{{ parcela.lancamento.data_compra }}"
+                    data-item-comprado="{{ parcela.lancamento.item_comprado }}"
                     data-categoria="{{ parcela.lancamento.categoria.id }}"
                     data-valor-parcela="{{ parcela.valor_parcela }}"
-                    data-parcela="{{ parcela.numero_parcela}}"
+                    data-parcela="{{ parcela.numero_parcela }}"
                     data-data-vencimento="{{ parcela.data_vencimento }}"
-                    data-parcela-responsavel="{{ parcela.lancamento.formaPagamento.responsavel}}"
+                    data-pagador-responsavel="{{ parcela.lancamento.pagador_responsavel }}"
                     data-status-parcela="{{ parcela.status_parcela }}">
-                    <td>{{ parcela.data_vencimento.strftime("%d/%m") }}</td>
+                    <td>{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
                     <td>{{ parcela.lancamento.item_comprado }}</td>
                     <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                     <td>{{ parcela.numero_parcela }}/{{ parcela.lancamento.qnt_parcelas }}</td>
+                    <td>{{ parcela.tipo_lancamento }}</td>
                 </tr>
                 {% endfor %}
             {% else %}
@@ -116,6 +165,7 @@ Parcelas
     </table>
 </section>
 
+<!-- ======= MENU DE EDITAR PARCELAS ======= -->
 
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
@@ -128,8 +178,8 @@ Parcelas
         </div>
         
         <div class="grupo_campo" >
-            <label for="parcela_responsavel">Parcela Responsável</label>
-            <input type="text" id="editar_parcela_responsavel" name="parcela_responsavel" placeholder="Responsável" disabled>
+            <label for="parcela_responsavel">Pagador Responsável</label>
+            <input type="text" id="editar_pagador_responsavel" name="pagador_responsavel" placeholder="Pagador Responsável" disabled>
         </div>
         
         <div class="grupo_campo_editar">
