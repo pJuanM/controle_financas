@@ -221,6 +221,7 @@ async def criar_lancamento(data_compra: date = Form(...),
 @rota_lancamentos.post("/editar")
 async def editar_lancamento(id_lancamento: int = Form(...),
                         item_comprado: str | None = Form(None),
+                        data_compra: date = Form(...),
                         id_categoria: int | None = Form(None),
                         id_forma_pagamento: int | None = Form(None),
                         valor_lancamento: str | None = Form(None),
@@ -234,6 +235,9 @@ async def editar_lancamento(id_lancamento: int = Form(...),
 
     if not lancamento:
         raise HTTPException(status_code = 400, detail = "Lançamento não cadastrado")
+
+    if data_compra is not None:
+        lancamento.data_compra = data_compra
     
     if item_comprado is not None:
         lancamento.item_comprado = item_comprado

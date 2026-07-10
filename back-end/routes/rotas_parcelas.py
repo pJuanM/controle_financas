@@ -43,7 +43,7 @@ async def listar_parcelas(request: Request,
     resultado_parcelas = []
 
     if filtros_aplicados:
-        query = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id)
+        query = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id, Parcelas.status_parcela != "CANCELADO", Parcelas.tipo_lancamento != "CREDITO")
 
         if data_compra_inicio or data_compra_final:
             if not data_compra_inicio or not data_compra_final  :
