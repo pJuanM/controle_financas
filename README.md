@@ -11,8 +11,8 @@ Controle de finanças
   - Tabela com dados
 
 # EXTRAS
-- Definir no_sensitive case, ou seja se digitar PIX ou Pix ou pIx ele trazer o resultado.
-- Definir pesquisa com base no conteúdo, exemplo: pi -> trazer os resultados que comecem com pi
-
-
-
+- Utilizar requisições fetch do JS para editar os dados;
+- Implementar dashboard;
+- Usuário logado, retornar para tela inicial;
+- Estilizar tabela;
+- Alterar ID dos formularios (filtro + edição)

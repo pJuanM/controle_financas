@@ -5,7 +5,7 @@ from dependencies import pegar_sessao, verificar_token
 from urllib.parse import quote 
 from typing import Optional  
 from sqlalchemy.orm import Session
-from datetime import date, datetime
+from datetime import datetime
 from main import templates
 
 rota_parcelas = APIRouter(prefix="/parcelas", tags=["parcela"], dependencies=[Depends(verificar_token)])
@@ -103,18 +103,13 @@ async def listar_parcelas(request: Request,
 
 
 @rota_parcelas.post("/editar")                        
-async def editar_parcela(request: Request,
-                         id_parcela: int = Form(...),
-                         mensagem: Optional[str] = None,
+async def editar_parcela(id_parcela: int = Form(...),
                          session : Session = Depends(pegar_sessao),
                          usuario: Usuarios = Depends(verificar_token),
                          status_parcela: str | None = Form(None)):
     
 
     parcela = session.query(Parcelas).join(Parcelas.lancamento).filter(Parcelas.id == id_parcela, Lancamentos.id_usuario == usuario.id).first()
-    categorias = session.query(Categorias).all()
-    lancamentos = [responsavel.pagador_responsavel for responsavel in session.query(Lancamentos.pagador_responsavel).distinct().all()]
-    formas_pagamento = session.query(FormasPagamento).all()
     if not parcela:
         raise HTTPException(status_code = 400, detail = "Parcela inexistente.")
     
@@ -124,7 +119,6 @@ async def editar_parcela(request: Request,
         parcela.status_parcela = status_parcela
 
     session.commit()
-    mensagem = quote("Parcela alterada com sucesso!")
 
     return RedirectResponse(
         url="/parcelas",

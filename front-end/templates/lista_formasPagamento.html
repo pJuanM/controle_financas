@@ -13,22 +13,22 @@ Forma de Pagamento
     <form action="/formaPagamento" method="get" id="formulario">
         <div class="grupo_campo">
             <select name="status_forma_pagamento" id="status_forma_pagamento">
-                <option value="" selected disabled>Status Forma de Pagamento</option>
-                <option value="ATIVO">ATIVO</option>
-                <option value="INATIVO">INATIVO</option>
+                <option value="" disabled {% if not status_forma_pagamento %} selected {% endif %}>Status Forma de Pagamento</option>
+                <option value="ATIVO" {% if status_forma_pagamento == "ATIVO" %}selected{% endif %}>ATIVO</option>
+                <option value="INATIVO" {% if status_forma_pagamento == "INATIVO" %}selected{% endif %}>INATIVO</option>
             </select>
         </div>
         <div class="grupo_campo">
-            <input type="text" id="forma_pagamento" name="forma_pagamento" placeholder="Forma de Pagamento" autocomplete="off">
+            <input type="text" id="forma_pagamento" name="forma_pagamento" placeholder="Forma de Pagamento" autocomplete="off" value="{{ forma_pagamento or ''}}">
         </div>
         <div class="grupo_campo">
-            <input type="number" id="data_vencimento" name="data_vencimento" placeholder="Data de Vencimento" autocomplete="off">
+            <input type="number" id="data_vencimento" name="data_vencimento" placeholder="Data de Vencimento" autocomplete="off" value="{{ data_vencimento or ''}}">
         </div>
         <div class="grupo_campo">
-            <input type="number" id="data_fechamento" name="data_fechamento" placeholder="Data de Fechamento" autocomplete="off">
+            <input type="number" id="data_fechamento" name="data_fechamento" placeholder="Data de Fechamento" autocomplete="off" value="{{ data_fechamento or '' }}">
         </div>
         <div class="grupo_campo">
-            <input type="text" id="responsavel" name="responsavel" placeholder="Responsavel" autocomplete="off">
+            <input type="text" id="responsavel" name="responsavel" placeholder="Responsavel" autocomplete="off" value="{{ responsavel or '' }}">
         </div>
         <button type="submit" id="enviar_formulario">Filtrar Forma de Pagamento</button>
     </form>

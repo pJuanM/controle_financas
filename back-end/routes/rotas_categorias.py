@@ -34,7 +34,8 @@ async def listar_categoria(request: Request,
         request=request, 
         context={
             "categorias": categorias,
-            "usuario": usuario
+            "usuario": usuario,
+            "status_categoria": status_categoria
         }
     )
 

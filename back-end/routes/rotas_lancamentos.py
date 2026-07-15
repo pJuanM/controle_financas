@@ -21,8 +21,8 @@ async def listar_lancamentos(request: Request,
                          data_compra_final: str | None = Query(None),
                          data_vencimento_inicio: str | None = Query(None),
                          data_vencimento_final: str | None = Query(None),
-                         id_categoria: list[str] | None = Query(None), 
-                         id_forma_pagamento: list[str] | None = Query(None), 
+                         id_categoria: list[int] | None = Query(None), 
+                         id_forma_pagamento: list[int] | None = Query(None), 
                          tipo_lancamento: str | None = Query(None),
                          session: Session = Depends(pegar_sessao), 
                          usuario: Usuarios = Depends(verificar_token)):
@@ -81,21 +81,28 @@ async def listar_lancamentos(request: Request,
             query = query.filter(Lancamentos.id_forma_pagamento.in_(formasPagamento))
 
         if tipo_lancamento is not None:
-            query = query.join(Lancamentos.parcela).filter(Parcelas.tipo_lancamento == tipo_lancamento)
+            query = query.filter(Lancamentos.tipo_lancamento == tipo_lancamento)
 
         resultadoLancamentos = query.all()
         valor_total = sum(lancamento.valor_lancamento for lancamento in resultadoLancamentos)
 
     return templates.TemplateResponse(
         name="lista_lancamentos.html", 
-        request=request, 
+        request=request,    
         context={
             "lancamentos": resultadoLancamentos,
             "usuario": usuario,
             "filtros_aplicados": filtros_aplicados,
             "categorias": categorias,
             "formas_pagamento": formas_pagamento,
-            "valor_total": valor_total
+            "valor_total": valor_total,
+            "data_compra_inicio" : data_compra_inicio,
+            "data_compra_final" : data_compra_final,
+            "data_vencimento_inicio" : data_vencimento_inicio,
+            "data_vencimento_final" : data_vencimento_final,
+            "id_categoria" : id_categoria,
+            "id_forma_pagamento" : id_forma_pagamento,
+            "tipo_lancamento" : tipo_lancamento,
         }
     )
 
@@ -145,7 +152,7 @@ async def criar_lancamento(data_compra: date = Form(...),
                                                     Lancamentos.id_usuario == usuario.id,
                                                     Lancamentos.item_comprado == item_comprado,
                                                     Parcelas.status_parcela != "CANCELADO",
-                                                    Parcelas.tipo_lancamento == tipo_lancamento,
+                                                    Lancamentos.tipo_lancamento == tipo_lancamento,
                                                     Lancamentos.valor_lancamento == valor_lancamento,
                                                     Lancamentos.id_forma_pagamento == forma_pagamento).first()
     if parcelado == False:
@@ -166,7 +173,7 @@ async def criar_lancamento(data_compra: date = Form(...),
         pagador_responsavel = pagador_responsavel
     
     
-    novolancamento = Lancamentos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_lancamento = valor_lancamento, parcelado = parcelado, qnt_parcelas = qnt_parcelas, pagador_responsavel = pagador_responsavel)
+    novolancamento = Lancamentos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_lancamento = valor_lancamento, parcelado = parcelado, qnt_parcelas = qnt_parcelas, pagador_responsavel = pagador_responsavel, tipo_lancamento = tipo_lancamento)
     session.add(novolancamento)
     session.flush()
 
@@ -218,7 +225,6 @@ async def criar_lancamento(data_compra: date = Form(...),
                            valor_parcela = valor,
                            id_lancamento = novolancamento.id,
                            data_vencimento = vencimento,
-                           tipo_lancamento = tipo_lancamento
                            )
         session.add(parcela)
     session.commit()
@@ -335,11 +341,13 @@ async def editar_lancamento(id_lancamento: int = Form(...),
     
     session.commit()
 
-    return RedirectResponse(
-        url = "/lancamentos",
-        status_code = 303
-
-    )
+    return {
+        "sucesso": True,
+        "mensagem": "Lançamento atualizado com sucesso!!",
+        "item_comprado": lancamento.item_comprado,
+        "data_compra": lancamento.data_compra,
+        "valor_lancamento": f"R$ {lancamento.valor_lancamento:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
+    }
      
 
 @rota_lancamentos.post("/excluir")

@@ -17,7 +17,8 @@ class Lancamentos(Base):
     valor_lancamento = Column(Numeric(10, 2), nullable = False)
     parcelado = Column(Boolean, nullable=False) 
     pagador_responsavel = Column(String, nullable=True)
-    qnt_parcelas = Column(Integer) 
+    qnt_parcelas = Column(Integer)
+    tipo_lancamento = Column(String, nullable=False)
 
     id_usuario = Column(Integer, ForeignKey("usuarios.id"))
     usuario = relationship("Usuarios", back_populates="lancamento")
@@ -82,7 +83,6 @@ class Parcelas(Base):
     data_vencimento = Column(Date, nullable= False)
     status_parcela = Column(String, default="PENDENTE", nullable=False)
     valor_parcela = Column(Numeric(10, 2), nullable = False)
-    tipo_lancamento = Column(String, nullable=False)
 
     id_lancamento = Column(Integer, ForeignKey("lancamentos.id"))
     lancamento = relationship("Lancamentos", back_populates="parcela")

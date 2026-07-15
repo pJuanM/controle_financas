@@ -18,11 +18,11 @@ Débitos
 <section class="formulario">
     <form action="/lancamentos" method="get" id="formulario">
         <div class="grupo_campo campo_data">
-            <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
+            <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()" value="{{ data_compra_inicio or '' }}">
             <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
         </div>
         <div class="grupo_campo campo_data" >
-            <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()">
+            <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()" value="{{ data_compra_final or '' }}">
             <label for="data_compra_final">Intervalo de Compra Final</label>
         </div>
 
@@ -32,7 +32,7 @@ Débitos
                 {% for categoria in categorias|sort(attribute='categoria') %}
                     <div class="opcao_checkbox">
                         <div class="linha_checkbox">
-                            <input type="checkbox" name="id_categoria" id="id_{{ categoria.categoria }}" value="{{ categoria.id }}">
+                            <input type="checkbox" name="id_categoria" id="id_{{ categoria.categoria }}" value="{{ categoria.id }}" {% if id_categoria and categoria.id in id_categoria %}checked {% endif %}>
                             <label for="id_{{ categoria.categoria }}">{{ categoria.categoria }}</label>
                         </div>
                     </div>
@@ -50,7 +50,7 @@ Débitos
                     {% for formaPagamento in grupo.list|sort(attribute='forma_pagamento') %}
                         <div class="opcao_checkbox">
                             <div class="linha_checkbox">
-                                <input type="checkbox" name="id_forma_pagamento" id="forma_{{ formaPagamento.id }}" value="{{ formaPagamento.id }}">
+                                <input type="checkbox" name="id_forma_pagamento" id="forma_{{ formaPagamento.id }}" value="{{ formaPagamento.id }}" {% if id_forma_pagamento and formaPagamento.id in id_forma_pagamento %} checked {% endif %}>
                                 <label for="forma_{{ formaPagamento.id }}">
                                     {{ formaPagamento.forma_pagamento }}
                                 </label>
@@ -63,9 +63,9 @@ Débitos
 
         <div class="grupo_campo">
             <select name="tipo_lancamento" id="tipo_lancamento" required>
-                <option value="" selected disabled>Tipo Lançamento: </option>
-                <option value="CREDITO">CRÉDITO</option>
-                <option value="DEBITO">DÉBITO</option>
+                <option value="" {% if not tipo_lancamento %} selected {% endif %} disabled>Tipo Lançamento: </option>
+                <option value="CREDITO" {% if tipo_lancamento == "CREDITO" %}selected {% endif %}>CRÉDITO</option>
+                <option value="DEBITO" {% if tipo_lancamento == "DEBITO" %}selected {% endif %}>DÉBITO</option>
             </select>  
         </div>
 

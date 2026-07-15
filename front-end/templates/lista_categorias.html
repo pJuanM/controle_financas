@@ -13,9 +13,9 @@ Categoria
     <form action="/categorias" method="get" id="formulario">
         <div class="grupo_campo">
             <select name="status_categoria" id="status_categoria">
-                <option value="" selected disabled>Status Categoria</option>
-                <option value="ATIVO">ATIVO</option>
-                <option value="INATIVO">INATIVO</option>
+                <option value="" {% if not status_categoria %}selected{% endif %} disabled>Status Categoria</option>
+                <option value="ATIVO" {% if status_categoria == "ATIVO" %}selected{% endif %}>ATIVO</option>
+                <option value="INATIVO" {% if status_categoria == "INATIVO" %}selected{% endif %}>INATIVO</option>
             </select>
         </div>
         <button type="submit" id="enviar_formulario">Filtrar Categoria</button>

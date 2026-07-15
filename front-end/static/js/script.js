@@ -167,7 +167,6 @@ function fecharMenu() {
 }
 
 overlay.addEventListener("click", fecharMenu);
-
 // Fecha ao pressionar Esc
 document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
@@ -175,9 +174,51 @@ document.addEventListener("keydown", function (event) {
     }
 });
 
+
+// EDITAR VIA FETCH
+const form = document.querySelector(".menu_editar form");
+let linhaSelecionada = null;
+console.log(form);
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const dados = new FormData(form);
+
+    const resposta = await fetch("/lancamentos/editar", {
+        method: "POST",
+        body: dados
+    });
+
+    const resultado = await resposta.json();
+    
+
+    if (resultado.sucesso) {
+
+        const novoItem = document.getElementById("editar_item_comprado").value;
+        const novoValor = document.getElementById("editar_valor_lancamento").value;
+        const novaDtCompra = document.getElementById("editar_data_compra").value;
+
+        const dataCompraFormatada = novaDtCompra.split("-").reverse().join("/");
+
+        // Atualiza visual da tabela
+        linhaSelecionada.cells[0].textContent = resultado.data_compra;
+        linhaSelecionada.cells[1].textContent = resultado.item_comprado;
+        linhaSelecionada.cells[2].textContent = resultado.valor_lancamento;
+
+        // Atualiza os dados usados pelo editarItem()
+        linhaSelecionada.dataset.dataCompra = novaDtCompra;
+        linhaSelecionada.dataset.itemComprado = novoItem;
+        linhaSelecionada.dataset.valorLancamento = novoValor;
+
+        fecharMenu();
+        alert("Lançamento atualizado com sucesso!");
+    }
+});
+
+
 // EDITAR ITEM
 function editarItem(linha) {
-    console.log(linha.dataset);
+    linhaSelecionada = linha;
 
     menu_editar.classList.add("ativo");
     overlay.classList.add("ativo");
@@ -222,8 +263,6 @@ function editarItem(linha) {
 // ESCONDER BOTOES QUANDO SELECIONAR INPUT OU SELECT
 const campos = document.querySelectorAll('.menu_editar input, .menu_editar select');
 const botoes = document.querySelector(".botoes_formulario");
-
-
 campos.forEach(campo => {
     if (campo.type === 'hidden') return;
 

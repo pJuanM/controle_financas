@@ -16,6 +16,7 @@ async def listar_formaPagamento(request: Request,
                                 forma_pagamento: str | None = Query(None),
                                 responsavel: str | None = Query(None),
                                 data_vencimento: str | None = Query(None),
+                                data_fechamento: str | None = Query(None),
                                 status_forma_pagamento: str | None = Query(None),
                                 session: Session = Depends(pegar_sessao), 
                                 usuario: Usuarios = Depends(verificar_token)):
@@ -30,19 +31,25 @@ async def listar_formaPagamento(request: Request,
         forma_pagamento,
         responsavel,
         data_vencimento,
+        data_fechamento,
         status_forma_pagamento
     ])
     formasDePagamento = []
     if filtros_aplicados:
         query = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
         if forma_pagamento:
+            forma_pagamento = forma_pagamento.upper()
             query = query.filter(FormasPagamento.forma_pagamento == forma_pagamento)
         
         if responsavel:
+            responsavel = responsavel.upper()
             query = query.filter(FormasPagamento.responsavel == responsavel)
 
         if data_vencimento:
             query = query.filter(FormasPagamento.data_vencimento == int(data_vencimento))
+
+        if data_fechamento:
+            query = query.filter(FormasPagamento.data_fechamento == int(data_fechamento))
 
         if status_forma_pagamento:
             query = query.filter(FormasPagamento.status_forma_pagamento == status_forma_pagamento)
@@ -54,7 +61,12 @@ async def listar_formaPagamento(request: Request,
         request=request, 
         context={
             "formasDePagamento": formasDePagamento,
-            "usuario": usuario
+            "usuario": usuario,
+            "forma_pagamento": forma_pagamento,
+            "responsavel": responsavel,
+            "data_vencimento": data_vencimento,
+            "status_forma_pagamento": status_forma_pagamento,
+            "data_fechamento": data_fechamento  
         }
     )
 
@@ -105,7 +117,7 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
         )
 
 
-    nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, forma_pagamento = forma_pagamento, responsavel = responsavel, status_forma_pagamento = "ATIVO", data_vencimento = data_vencimento, data_fechamento = data_fechamento)
+    nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, forma_pagamento = forma_pagamento.upper(), responsavel = responsavel.upper(), status_forma_pagamento = "ATIVO", data_vencimento = data_vencimento, data_fechamento = data_fechamento)
     session.add(nova_formaPagamento)
     session.commit()
     mensagem = quote("Forma de pagamento cadastrada com sucesso.")

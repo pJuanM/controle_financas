@@ -130,9 +130,9 @@ Parcelas
             <tr>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 0, 'data')">VENC.</th>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 1, 'texto')">COMPRA</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'parcela')">PARCELA</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 4, 'texto')">TIPO</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'numero')">VALOR</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'parcela')">PARCELA</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'texto')">TIPO</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 4, 'numero')">VALOR</th>
             </tr>
         </thead>
         <tbody>
@@ -151,7 +151,7 @@ Parcelas
                     <td>{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
                     <td>{{ parcela.lancamento.item_comprado }}</td>
                     <td>{{ parcela.numero_parcela }}/{{ parcela.lancamento.qnt_parcelas }}</td>
-                    <td>{{ parcela.tipo_lancamento }}</td>
+                    <td>{{ parcela.lancamento.tipo_lancamento }}</td>
                     <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                 </tr>
                 {% endfor %}

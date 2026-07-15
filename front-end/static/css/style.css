@@ -324,10 +324,14 @@ table .tabela_cabecalho {
 /* MENU ROTATIVO */
 .menu {
     position: fixed;
-    right: 3em;
+    right: -1em;
     bottom: 6em;
+    transition: .4s ease;
 }
+.menu.active {
+    right: 4em;
 
+}
 .toggle {
     position: absolute;
     width: 2em;

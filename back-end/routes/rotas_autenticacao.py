@@ -60,7 +60,10 @@ async def criar_usuario(usuario: str = Form(...),
     session.commit()
 
 
-    return {"mensagem" : "Usuário cadastrado com sucesso!"}
+    return RedirectResponse(
+        url = "/usuario/login",
+        status_code = 303
+    )
 
 
 @rota_autenticacao.get("/login")
