@@ -29,7 +29,6 @@ async def listar_parcelas(request: Request,
     
     categorias = session.query(Categorias).all()
     lancamentos = [responsavel.pagador_responsavel for responsavel in session.query(Lancamentos.pagador_responsavel).distinct().all()]
-
     formas_pagamento = session.query(FormasPagamento).all()
 
     filtros_aplicados = any([
@@ -43,6 +42,7 @@ async def listar_parcelas(request: Request,
         pagador_responsavel,
     ])
     resultado_parcelas = []
+    valor_total = 0
 
     if filtros_aplicados:
         query = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id)
@@ -70,13 +70,14 @@ async def listar_parcelas(request: Request,
             query = query.filter(Lancamentos.id_forma_pagamento.in_(id_forma_pagamento))
 
         if id_categoria:
-            query = query.filter(Lancamentos.id_categoria.in_(id_categoria))
+            ids_categorias = [int(i) for i in id_categoria]
+            query = query.filter(Lancamentos.id_categoria.in_(ids_categorias))
 
         if pagador_responsavel:
             query = query.filter(Lancamentos.pagador_responsavel.in_(pagador_responsavel))
 
         resultado_parcelas = query.all()
-        print(resultado_parcelas)
+        valor_total = sum(parcela.valor_parcela for parcela in resultado_parcelas)
 
     return templates.TemplateResponse(
         name="parcelas.html", 
@@ -85,9 +86,18 @@ async def listar_parcelas(request: Request,
             "usuario": usuario,
             "parcelas": resultado_parcelas, 
             "lancamentos": lancamentos,
+            "valor_total": valor_total,
             "filtros_aplicados": filtros_aplicados,
             "categorias": categorias,
             "formas_pagamento": formas_pagamento,
+            "data_compra_inicio": data_compra_inicio,
+            "data_compra_final": data_compra_final,
+            "data_vencimento_inicio": data_vencimento_inicio,
+            "data_vencimento_final": data_vencimento_final,
+            "status_parcela": status_parcela,
+            "id_forma_pagamento": id_forma_pagamento,
+            "id_categoria": id_categoria,
+            "pagador_responsavel": pagador_responsavel,
         }
     )
 
@@ -102,7 +112,9 @@ async def editar_parcela(request: Request,
     
 
     parcela = session.query(Parcelas).join(Parcelas.lancamento).filter(Parcelas.id == id_parcela, Lancamentos.id_usuario == usuario.id).first()
-
+    categorias = session.query(Categorias).all()
+    lancamentos = [responsavel.pagador_responsavel for responsavel in session.query(Lancamentos.pagador_responsavel).distinct().all()]
+    formas_pagamento = session.query(FormasPagamento).all()
     if not parcela:
         raise HTTPException(status_code = 400, detail = "Parcela inexistente.")
     
@@ -114,12 +126,9 @@ async def editar_parcela(request: Request,
     session.commit()
     mensagem = quote("Parcela alterada com sucesso!")
 
-    return templates.TemplateResponse(
-        name="parcelas.html", 
-        request = request,
-        context = {
-            "mensagem":mensagem
-        }
+    return RedirectResponse(
+        url="/parcelas",
+        status_code = 303
     )
 
 

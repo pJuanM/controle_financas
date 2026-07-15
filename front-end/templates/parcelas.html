@@ -17,26 +17,25 @@ Parcelas
 
         <div class="grupo_campo_editar">
             <div class="grupo_campo campo_data">
-                <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
+                <input type="date" id="data_compra_inicio" name="data_compra_inicio" value="{{ data_compra_inicio or '' }}" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
                 <label for="data_compra_inicio">Dt. Compra Ínicio</label>
             </div>
-            <div class="grupo_campo campo_data" >
-                <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()">
+            <div class="grupo_campo campo_data">
+                <input type="date" id="data_compra_final" name="data_compra_final"  value="{{ data_compra_final or '' }}" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()">
                 <label for="data_compra_final">Dt. Compra Final</label>
             </div>
         </div>
 
         <div class="grupo_campo_editar">
             <div class="grupo_campo campo_data">
-                <input type="date" id="data_vencimento_inicio" name="data_vencimento_inicio" placeholder="Data Vencimento início" autocomplete="off" onclick="this.showPicker()">
+                <input type="date" id="data_vencimento_inicio" name="data_vencimento_inicio"  value="{{ data_vencimento_inicio or '' }}" placeholder="Data Vencimento início" autocomplete="off" onclick="this.showPicker()">
                 <label for="data_vencimento_inicio">Dt. Venc. Ínicio</label>
             </div>
             <div class="grupo_campo campo_data" >
-                <input type="date" id="data_vencimento_final" name="data_vencimento_final" placeholder="Data Vencimento final" autocomplete="off" onclick="this.showPicker()">
+                <input type="date" id="data_vencimento_final" name="data_vencimento_final" value="{{ data_vencimento_final or '' }}" placeholder="Data Vencimento final" autocomplete="off" onclick="this.showPicker()">
                 <label for="data_vencimento_final">Dt. Venc. Final</label>
             </div>
         </div>
-
 
 
         <div class="grupo_campo_editar">
@@ -45,21 +44,21 @@ Parcelas
                     <summary>Status Parcela</summary>
                         <div class="opcao_checkbox">
                             <div class="linha_checkbox">
-                                <input type="checkbox" name="status_parcela" id="status_parcela_cancelado" value="CANCELADO">
+                                <input type="checkbox" name="status_parcela" id="status_parcela_cancelado" value="CANCELADO" {% if status_parcela and 'CANCELADO' in status_parcela %}checked {% endif %}>
                                 <label for="status_parcela_cancelado">CANCELADO</label>
                             </div>
                         </div>
 
                         <div class="opcao_checkbox">
                             <div class="linha_checkbox">
-                                <input type="checkbox" name="status_parcela" id="status_parcela_pago" value="PAGO">
+                                <input type="checkbox" name="status_parcela" id="status_parcela_pago" value="PAGO" {% if status_parcela and 'PAGO' in status_parcela %}checked {% endif %}>
                                 <label for="status_parcela_pago">PAGO</label>
                             </div>
                         </div>
 
                         <div class="opcao_checkbox">
                             <div class="linha_checkbox">
-                                <input type="checkbox" name="status_parcela" id="status_parcela_pendente" value="PENDENTE">
+                                <input type="checkbox" name="status_parcela" id="status_parcela_pendente" value="PENDENTE" {% if status_parcela and 'PENDENTE' in status_parcela %}checked {% endif %}>
                                 <label for="status_parcela_pendente">PENDENTE</label>
                         </div>
                 </details>  
@@ -71,7 +70,7 @@ Parcelas
                     {% for categoria in categorias %}
                         <div class="opcao_checkbox">
                             <div class="linha_checkbox">
-                                <input type="checkbox" name="id_categoria" id="id_{{ categoria.categoria }}" value="{{ categoria.id }}">
+                                <input type="checkbox" name="id_categoria" id="id_{{ categoria.categoria }}" value="{{ categoria.id }}" {% if id_categoria and categoria.id in id_categoria %}checked {% endif %}>
                                 <label for="id_{{ categoria.categoria }}">{{ categoria.categoria }}</label>
                             </div>
                         </div>
@@ -93,7 +92,7 @@ Parcelas
 
                             <div class="opcao_checkbox">
                                 <div class="linha_checkbox">
-                                    <input type="checkbox" name="id_forma_pagamento" id="forma_{{ formaPagamento.id }}" value="{{ formaPagamento.id }}">
+                                    <input type="checkbox" name="id_forma_pagamento" id="forma_{{ formaPagamento.id }}" value="{{ formaPagamento.id }}" {% if id_forma_pagamento and formaPagamento.id in id_forma_pagamento %}checked {% endif %}>
                                     <label for="forma_{{ formaPagamento.id }}">
                                         {{ formaPagamento.forma_pagamento }}
                                     </label>
@@ -110,7 +109,7 @@ Parcelas
                     {% for responsavel in lancamentos %}
                         <div class="opcao_checkbox">
                             <div class="linha_checkbox">
-                                <input type="checkbox" name="pagador_responsavel" id="pagador_{{ responsavel }}" value="{{ responsavel }}">
+                                <input type="checkbox" name="pagador_responsavel" id="pagador_{{ responsavel }}" value="{{ responsavel }}" {% if pagador_responsavel and responsavel in pagador_responsavel %}checked {% endif %}>
                                 <label for="pagador_{{ responsavel }}">{{ responsavel }}</label>
                             </div>
                         </div>
@@ -131,9 +130,9 @@ Parcelas
             <tr>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 0, 'data')">VENC.</th>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 1, 'texto')">COMPRA</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'numero')">VALOR</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'numero')">VALOR</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'parcela')">PARCELA</th>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 4, 'texto')">TIPO</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'numero')">VALOR</th>
             </tr>
         </thead>
         <tbody>
@@ -143,7 +142,7 @@ Parcelas
                     data-id="{{ parcela.id }}"
                     data-data-compra="{{ parcela.lancamento.data_compra }}"
                     data-item-comprado="{{ parcela.lancamento.item_comprado }}"
-                    data-categoria="{{ parcela.lancamento.categoria.id }}"
+                    data-id-categoria="{{ parcela.lancamento.categoria.id }}"
                     data-valor-parcela="{{ parcela.valor_parcela }}"
                     data-parcela="{{ parcela.numero_parcela }}"
                     data-data-vencimento="{{ parcela.data_vencimento }}"
@@ -151,11 +150,17 @@ Parcelas
                     data-status-parcela="{{ parcela.status_parcela }}">
                     <td>{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
                     <td>{{ parcela.lancamento.item_comprado }}</td>
-                    <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                     <td>{{ parcela.numero_parcela }}/{{ parcela.lancamento.qnt_parcelas }}</td>
                     <td>{{ parcela.tipo_lancamento }}</td>
+                    <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                 </tr>
                 {% endfor %}
+                <tr class="linha-total">
+                    <td colspan="4"><strong>Valor Total:</strong></td>
+                    <td>
+                        <strong>R$ {{ "{:,.2f}".format(valor_total).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong>
+                    </td>
+                </tr>
             {% else %}
                 <tr>
                     <td colspan="4">Nenhuma forma de pagamento encontrada.</td>
