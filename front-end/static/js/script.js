@@ -1,9 +1,10 @@
-// MENU
-const menu = document.getElementById('menu');
-const toggle = document.querySelector('.toggle');
-toggle.onclick = () => {
-    menu.classList.toggle('active');
-}
+// PEGAR ELEMENTOS #MENU E .TOGGLE
+1.
+2.
+// DEFINIR TOGGLE COM EVENTO DE ONCLICK PASSANDO O TOGGLE PAARA A ACLASSE ACTIVE
+1.
+2.
+3.
 
 // ORDENAR TABELA
 function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
@@ -106,21 +107,22 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
 }
 
 // ABRIR OVERLAY
-const menu_editar = document.querySelector('.menu_editar');
-const overlay = document.querySelector('.overlay');
-function fecharMenu() {
-    menu_editar.classList.remove("ativo");
-    overlay.classList.remove("ativo");
-}
-overlay.addEventListener("click", fecharMenu);
-
-// Fecha ao pressionar Esc
-document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
-        fecharMenu();
-    }
-});
-
+// PEGAR ELEMENTOS .MENU_EDITAR E .OVERLAY 
+1.
+2.
+// DECLARAR FUNCAO FECHAR MENU() QUE REMOVE A CLASSE ATIVO DO MENU EDITAR E DO OVERLAY
+1.
+2.
+3.
+4.
+// ADICIONAR EVENTO DE CLICK NO OVERLAY PARA ELE FECHAR O MENU
+1.
+// ADICIONAR EVENTO DE FECHAR O MENU QUANDO PRESSIONAR O BOTAO ESCAPE BASEADO NO EVENTO REALIZADO
+1.
+2.
+3.
+4.
+5.
 
 // EDITAR VIA FETCH
 const formEditar = document.getElementById("formulario_editar");
