@@ -100,10 +100,13 @@ async def editar_categoria(categoria_id: int = Form(...),
     categoria.status_categoria = categoria_status
     session.commit()
 
-    return RedirectResponse(
-        url = "/categorias",
-        status_code = 303
-    )
+    return {
+        "sucesso": True,
+        "mensagem": "Categoria editada com sucesso!",
+        "categoria": categoria.categoria,
+        "descricao": categoria.descricao,
+        "status_categoria": categoria.status_categoria
+    }
 
 
 @rota_categorias.post("/excluir")

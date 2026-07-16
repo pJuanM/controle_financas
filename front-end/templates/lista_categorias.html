@@ -10,7 +10,7 @@ Categoria
 {% endblock %}
 {% block conteudo %}
 <section class="formulario">
-    <form action="/categorias" method="get" id="formulario">
+    <form action="/categorias" method="get" id="formulario_filtrar">
         <div class="grupo_campo">
             <select name="status_categoria" id="status_categoria">
                 <option value="" {% if not status_categoria %}selected{% endif %} disabled>Status Categoria</option>
@@ -38,7 +38,7 @@ Categoria
                 data-id="{{ categoria.id }}"
                 data-categoria="{{ categoria.categoria }}"
                 data-descricao="{{ categoria.descricao }}"
-                data-status="{{ categoria.status_categoria }}">
+                data-status-categoria="{{ categoria.status_categoria }}">
                     <td>{{ categoria.categoria }}</td>
                     <td>{{ categoria.descricao }}</td>
                     <td>{{ categoria.status_categoria }}</td>
@@ -54,7 +54,7 @@ Categoria
 </section>
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="" method="post" id="formulario">
+    <form action="/categorias/editar" method="post" id="formulario_editar" data-url="/categorias/editar" data-tipo="categorias">
         <input type="hidden" id="categoria_id" name="categoria_id" data-id-principal>
         <div class="grupo_campo">
             <select name="categoria_status" id="editar_status_categoria">
@@ -70,9 +70,9 @@ Categoria
         <div class="grupo_campo">
             <input type="text" id="editar_descricao" name="categoria_descricao" placeholder="Descrição" autocomplete="off" required>
         </div>
-        <div class="grupo_campo">
-            <button type="submit" id="enviar_formulario" formaction="/categorias/excluir">Excluir Categoria</button>
-            <button type="submit" id="enviar_formulario" formaction="/categorias/editar">Editar Categoria</button>
+        <div class="grupo_campo botoes_formulario">
+            <button type="submit" id="btn_excluir" formaction="/categorias/excluir">Excluir Categoria</button>
+            <button type="submit" id="btn_editar" formaction="/categorias/editar">Editar Categoria</button>
         </div>
 
     </form>

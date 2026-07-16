@@ -13,7 +13,7 @@ Parcelas
 {% block conteudo %}
 <!-- ======= FILTRO DE PARCELAS ======= -->
 <section class="formulario">
-    <form action="/parcelas" method="get" id="formulario">
+    <form action="/parcelas" method="get" id="formulario_filtrar">
 
         <div class="grupo_campo_editar">
             <div class="grupo_campo campo_data">
@@ -174,7 +174,7 @@ Parcelas
 
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="/parcelas" method="post" id="formulario">
+    <form action="/parcelas" method="post" id="formulario_editar" data-url="/parcelas/editar" data-tipo="parcelas">
         <input type="hidden" id="id_parcela" name="id_parcela" data-id-principal>
 
         <div class="grupo_campo">

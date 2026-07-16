@@ -76,23 +76,23 @@ h2 {
     border-radius: 15px;
 }
 /* ID FORMULARIO SE REFERE A TAG FORM NO HTML */
-#formulario {
+form {
     display: flex;
     flex-direction: column;
     min-height: 40vh; 
 }
-#formulario .grupo_campo {
+form .grupo_campo {
     display: flex;
     flex-direction: column;
     width: 100%;
     margin-bottom: .3em;
 }
 
-#formulario .campo_data {
+form .campo_data {
     position: relative;
     width: 100%;
 }
-#formulario .campo_data input {
+form .campo_data input {
     width: 100%;
     background: #000e32b0;
     color: #000e32b0;
@@ -101,12 +101,12 @@ h2 {
     border-radius: 12px;
 }
 
-#formulario .campo_data input:focus,
-#formulario .campo_data input.tem_valor {
+form .campo_data input:focus,
+form .campo_data input.tem_valor {
     color: white;
 }
 
-#formulario .campo_data label {
+form .campo_data label {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -121,18 +121,18 @@ h2 {
     width: 100%;
     font-size: .9em;
 }
-#formulario .campo_data:focus-within label,
-#formulario .campo_data label.escondida {
+form .campo_data:focus-within label,
+form .campo_data label.escondida {
     opacity: 0;
 }
-#formulario input:valid, select:valid, summary::marker {
+form input:valid, select:valid, summary::marker {
     background-color: #000e32;
 }
 
-#formulario input::placeholder{
+form input::placeholder{
     color: white;
 }
-#formulario input, .botoes_formulario button{
+form input, .botoes_formulario button{
     background-color: #000E32;
     color: white;
     text-align: center;
@@ -144,7 +144,7 @@ h2 {
     font-weight: bold;
 }
 
-#formulario input, #enviar_formulario, select{
+form input, #enviar_formulario, select{
     background-color: #000e32b0;
     color: white;
     text-align: center;

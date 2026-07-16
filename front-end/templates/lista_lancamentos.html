@@ -16,7 +16,7 @@ Débitos
 <!-------  ======= ABA DE FILTROS DE LANÇAMENTOS ======= ------->
 <h2>Filtrar Lançamentos</h2>
 <section class="formulario">
-    <form action="/lancamentos" method="get" id="formulario">
+    <form action="/lancamentos" method="get" id="formulario_filtrar">
         <div class="grupo_campo campo_data">
             <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()" value="{{ data_compra_inicio or '' }}">
             <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
@@ -121,7 +121,7 @@ Débitos
 <!-------  ======= ABA DE EDIÇÃO DOS LANÇAMENTOS ======= ------->
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="/lancamentos" method="post" id="formulario">
+    <form action="/lancamentos" method="post" id="formulario_editar" data-url="/lancamentos/editar" data-tipo="lancamentos">
         <input type="hidden" id="id_lancamento" name="id_lancamento" data-id-principal>
         <div class="grupo_campo_editar">
             <div class="grupo_campo">
@@ -172,7 +172,7 @@ Débitos
 
             <div class="grupo_campo">
                 <label for="parcelado">Parcelado:</label>
-                <select name="parcelado" id="editar_parcelado" onchange="mostrarQuantidadeParcelas()">
+                <select disabled name="parcelado" id="editar_parcelado" onchange="mostrarQuantidadeParcelas()">
                     <option value="" disabled>Parcelar:</option>
                     <option value="true">SIM</option>
                     <option value="false">NÃO</option>
@@ -186,7 +186,7 @@ Débitos
         </div>
         <div class="grupo_campo">
             <label for="pagador_responsavel" id="pagador_responsavel">Pagador Responsável:</label>
-            <input type="text" id="editar_pagador_responsavel" name="pagador_responsavel" placeholder="Quantidade Parcelas">
+            <input  type="text" id="editar_pagador_responsavel" name="pagador_responsavel" placeholder="Pagador Responsável">
         </div>
 
         <div class="grupo_campo botoes_formulario">

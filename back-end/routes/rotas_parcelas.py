@@ -119,10 +119,10 @@ async def editar_parcela(id_parcela: int = Form(...),
         parcela.status_parcela = status_parcela
 
     session.commit()
-
-    return RedirectResponse(
-        url="/parcelas",
-        status_code = 303
-    )
+    print(f"VENCIMENTO: {parcela.data_vencimento}")
+    return {
+        "sucesso": True,
+        "mensagem": "Parcela alterada com sucesso!",
+    }
 
 

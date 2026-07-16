@@ -152,10 +152,16 @@ async def editar_formaPagamento(id_formaPagamento: int = Form(...),
     FormaPagamento.status_forma_pagamento = status_forma_pagamento
     session.commit()
 
-    return RedirectResponse(
-        "/formaPagamento",
-        status_code=303
-    )
+    if FormaPagamento.data_vencimento == None:
+        FormaPagamento.data_vencimento = "À vista"
+    return {
+        "sucesso": True,
+        "mensagem": "Forma de pagamento editada com sucesso!",
+        "formaPagamento": FormaPagamento.forma_pagamento,
+        "responsavel": FormaPagamento.responsavel,
+        "data_vencimento": FormaPagamento.data_vencimento,
+        "status": FormaPagamento.status_forma_pagamento
+    }
 
 
 @rota_formasPagamento.post("/excluir")

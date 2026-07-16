@@ -10,7 +10,7 @@ Forma de Pagamento
 {% endblock %}
 {% block conteudo %}
 <section class="formulario">
-    <form action="/formaPagamento" method="get" id="formulario">
+    <form action="/formaPagamento" method="get" id="formulario_filtrar">
         <div class="grupo_campo">
             <select name="status_forma_pagamento" id="status_forma_pagamento">
                 <option value="" disabled {% if not status_forma_pagamento %} selected {% endif %}>Status Forma de Pagamento</option>
@@ -55,10 +55,10 @@ Forma de Pagamento
                     data-responsavel="{{ formaDePagamento.responsavel }}"
                     data-data-vencimento="{{ formaDePagamento.data_vencimento }}"
                     data-data-fechamento="{{ formaDePagamento.data_fechamento }}"
-                    data-status="{{ formaDePagamento.status_forma_pagamento }}">
+                    data-status-forma-pagamento="{{ formaDePagamento.status_forma_pagamento }}">
                     <td>{{ formaDePagamento.forma_pagamento }}</td>
                     <td>{{ formaDePagamento.responsavel }}</td>
-                    <td>{{ formaDePagamento.data_vencimento }}</td>
+                    <td>{{ formaDePagamento.data_vencimento or 'À vista' }}</td>
                     <td>{{ formaDePagamento.status_forma_pagamento }}</td>
                 </tr>
                 {% endfor %}
@@ -74,7 +74,7 @@ Forma de Pagamento
 
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="/formaPagamento" method="post" id="formulario">
+    <form action="/formaPagamento" method="post" id="formulario_editar" data-url="/formaPagamento/editar" data-tipo="formasPagamento">
         <input type="hidden" id="id_formaPagamento" name="id_formaPagamento" data-id-principal>
         <div class="grupo_campo">
             <input type="text" id="editar_forma_pagamento" name="forma_pagamento" placeholder="Forma de Pagamento" autocomplete="off" required>

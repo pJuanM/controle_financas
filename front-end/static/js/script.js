@@ -1,7 +1,6 @@
 // MENU
 const menu = document.getElementById('menu');
 const toggle = document.querySelector('.toggle');
-
 toggle.onclick = () => {
     menu.classList.toggle('active');
 }
@@ -10,26 +9,20 @@ toggle.onclick = () => {
 function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
     const tbody = document.querySelector(".tabela table tbody");
     const todasLinhas = Array.from(tbody.querySelectorAll('tr'));
-
     // Separar linha do total
     const linhaTotal = todasLinhas.find(
         linha => linha.classList.contains("linha-total")
     );
-
     // Apenas linhas que podem ser ordenadas
     const linhas = todasLinhas.filter(
         linha => !linha.classList.contains("linha-total")
     );
-
     // Verificar se a tabela está vazia
     if (linhas.length === 0 || (linhas.length === 1 && linhas[0].cells.length === 1)) {
         return;
     }
-
     // Descobre direção atual
     const direcaoAtual = colunaElemento.dataset.ordem === 'asc' ? 'desc' : 'asc';
-
-
     // Remove setas dos outros cabeçalhos
     document.querySelectorAll(".tabela_cabecalho").forEach(th => {
         if (th !== colunaElemento) {
@@ -37,118 +30,74 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
             delete th.dataset.ordem;
         }
     });
-
-
     linhas.sort((a, b) => {
-
         let valorA = a.cells[indiceColuna].textContent.trim();
         let valorB = b.cells[indiceColuna].textContent.trim();
-
-
         // Ordenação numérica
         if (tipoDado === 'numero') {
-
             valorA = parseFloat(
                 valorA
                     .replace(/[^0-9,-]/g, '')
                     .replace(/\./g, '')
                     .replace(',', '.')
             ) || 0;
-
             valorB = parseFloat(
                 valorB
                     .replace(/[^0-9,-]/g, '')
                     .replace(/\./g, '')
                     .replace(',', '.')
             ) || 0;
-
-
             return direcaoAtual === 'asc'
                 ? valorA - valorB
                 : valorB - valorA;
         }
-
-
         // Ordenação de parcela
         if (tipoDado === 'parcela') {
-
             const itemA = a.cells[2].textContent.trim();
             const itemB = b.cells[2].textContent.trim();
-
             const comparacaoItem = itemA.localeCompare(itemB);
-
-
             if (comparacaoItem !== 0) {
                 return direcaoAtual === 'asc'
                     ? comparacaoItem
                     : -comparacaoItem;
             }
-
-
             const numeroA = parseInt(valorA.split('/')[0], 10);
             const numeroB = parseInt(valorB.split('/')[0], 10);
-
-
             return direcaoAtual === 'asc'
                 ? numeroA - numeroB
                 : numeroB - numeroA;
         }
-
-
         // Ordenação por data
         if (tipoDado === 'data') {
-
             const [diaA, mesA, anoA] = valorA.split('/');
             const [diaB, mesB, anoB] = valorB.split('/');
-
-
             const dateA = new Date(anoA, mesA - 1, diaA);
             const dateB = new Date(anoB, mesB - 1, diaB);
-
-
             return direcaoAtual === 'asc'
                 ? dateA - dateB
                 : dateB - dateA;
         }
-
-
         // Ordenação texto
         const comparacao = valorA.localeCompare(valorB);
-
-
         return direcaoAtual === 'asc'
             ? comparacao
             : -comparacao;
     });
-
-
-
     // Recria tabela
     tbody.innerHTML = '';
-
-
     linhas.forEach(linha => {
         tbody.appendChild(linha);
     });
-
-
     // Coloca total sempre no final
     if (linhaTotal) {
         tbody.appendChild(linhaTotal);
     }
-
-
-
     // Atualiza estado da seta
     colunaElemento.dataset.ordem = direcaoAtual;
-
-
     colunaElemento.classList.remove(
         "ordem-asc",
         "ordem-desc"
     );
-
-
     colunaElemento.classList.add(
         direcaoAtual === "asc"
             ? "ordem-asc"
@@ -156,17 +105,15 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
     );
 }
 
-
 // ABRIR OVERLAY
 const menu_editar = document.querySelector('.menu_editar');
 const overlay = document.querySelector('.overlay');
-
 function fecharMenu() {
     menu_editar.classList.remove("ativo");
     overlay.classList.remove("ativo");
 }
-
 overlay.addEventListener("click", fecharMenu);
+
 // Fecha ao pressionar Esc
 document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
@@ -176,45 +123,112 @@ document.addEventListener("keydown", function (event) {
 
 
 // EDITAR VIA FETCH
-const form = document.querySelector(".menu_editar form");
+const formEditar = document.getElementById("formulario_editar");
 let linhaSelecionada = null;
-console.log(form);
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+if (formEditar) {
+    formEditar.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    const dados = new FormData(form);
+        const dados = new FormData(formEditar);
 
-    const resposta = await fetch("/lancamentos/editar", {
-        method: "POST",
-        body: dados
+        const tipoDados = formEditar.dataset.tipo;
+
+        const url = formEditar.dataset.url;
+
+        const resposta = await fetch(url, {
+            method: "POST",
+            body: dados
+        });
+
+        const resultado = await resposta.json();
+        
+        if (resultado.sucesso) {
+            // Pega o valor setado nos inputs de edição
+            function pegarValor(id){
+                const elemento = document.getElementById(id);
+                return elemento ? elemento.value : '';
+            }
+            // LANÇAENTOS
+            const novaDtCompra = pegarValor("editar_data_compra");
+            const novoItem = pegarValor("editar_item_comprado");
+            const novoValor = pegarValor("editar_valor_lancamento");
+            const novoPagamentoLancamento = pegarValor("editar_id_forma_pagamento");
+            const novaCategoriaLancamento = pegarValor("editar_id_categoria");
+            const novaParcelas = pegarValor("editar_qnt_parcelas");
+            const novoPagador = pegarValor("editar_pagador_responsavel");
+
+            // PARCELAS  
+            const novoStatusParcela = pegarValor("editar_status_parcela");
+            
+            // FORMAS DE PAGAMENTO
+            const novaFormaPagamento = pegarValor("editar_forma_pagamento");
+            const novaDtVencimento = pegarValor("editar_data_vencimento");
+            const novaDtFechamento = pegarValor("editar_data_fechamento");
+            const novoStatusFormaPagamento = pegarValor("editar_status_forma_pagamento");
+            
+
+            // CATEGORIAS
+            const novaCategoria = pegarValor("editar_categoria");
+            const novaDescricao = pegarValor("editar_descricao");
+            const novoStatusCategoria = pegarValor("editar_status_categoria");
+            // AJUSTAR DATA DE COMPRA (TIPO DATE)
+            let dataCompraFormatada = "";
+            if (novaDtCompra) {
+                dataCompraFormatada = novaDtCompra.split("-").reverse().join("/");
+            }
+
+            // Atualiza os dados usados pelo editarItem()
+
+            // LANÇAMENTOS
+            linhaSelecionada.dataset.dataCompra = novaDtCompra;
+            linhaSelecionada.dataset.itemComprado = novoItem;
+            linhaSelecionada.dataset.valorLancamento = novoValor;
+            linhaSelecionada.dataset.idFormaPagamento = novoPagamentoLancamento;
+            linhaSelecionada.dataset.idCategoria = novaCategoriaLancamento;
+            linhaSelecionada.dataset.qntParcelas = novaParcelas;
+            linhaSelecionada.dataset.pagadorResponsavel = novoPagador;
+
+            // PARCELAS
+            linhaSelecionada.dataset.statusParcela = novoStatusParcela;
+
+            // FORMAS DE PAGAMENTO
+            linhaSelecionada.dataset.dataVencimento = novaDtVencimento;
+            linhaSelecionada.dataset.formaPagamento = novaFormaPagamento;
+            linhaSelecionada.dataset.dataFechamento = novaDtFechamento;
+            linhaSelecionada.dataset.statusFormaPagamento = novoStatusFormaPagamento;
+
+            // CATEGORIAS
+            linhaSelecionada.dataset.categoria = novaCategoria;
+            linhaSelecionada.dataset.descricao = novaDescricao;
+            linhaSelecionada.dataset.statusCategoria = novoStatusCategoria;
+
+            // Atualiza visual da tabela
+            // FORMAS DE PAGAMENTO
+            
+            if (tipoDados === "formasPagamento") {
+                linhaSelecionada.cells[0].textContent = resultado.formaPagamento;
+                linhaSelecionada.cells[1].textContent = resultado.responsavel;
+                linhaSelecionada.cells[2].textContent = resultado.data_vencimento;
+                linhaSelecionada.cells[3].textContent = resultado.status;
+            }
+            // CATEGORIAS
+            if (tipoDados === "categorias") {
+                linhaSelecionada.cells[0].textContent = resultado.categoria;
+                linhaSelecionada.cells[1].textContent = resultado.descricao;
+                linhaSelecionada.cells[2].textContent = resultado.status_categoria;
+            }
+            // LANÇAMENTOS
+            if (tipoDados === "lancamentos") {
+                linhaSelecionada.cells[0].textContent = dataCompraFormatada;
+                linhaSelecionada.cells[1].textContent = resultado.item_comprado;
+                linhaSelecionada.cells[2].textContent = resultado.valor_lancamento;
+            }
+
+            fecharMenu();
+            alert("Lançamento atualizado com sucesso!");
+        }
     });
-
-    const resultado = await resposta.json();
-    
-
-    if (resultado.sucesso) {
-
-        const novoItem = document.getElementById("editar_item_comprado").value;
-        const novoValor = document.getElementById("editar_valor_lancamento").value;
-        const novaDtCompra = document.getElementById("editar_data_compra").value;
-
-        const dataCompraFormatada = novaDtCompra.split("-").reverse().join("/");
-
-        // Atualiza visual da tabela
-        linhaSelecionada.cells[0].textContent = resultado.data_compra;
-        linhaSelecionada.cells[1].textContent = resultado.item_comprado;
-        linhaSelecionada.cells[2].textContent = resultado.valor_lancamento;
-
-        // Atualiza os dados usados pelo editarItem()
-        linhaSelecionada.dataset.dataCompra = novaDtCompra;
-        linhaSelecionada.dataset.itemComprado = novoItem;
-        linhaSelecionada.dataset.valorLancamento = novoValor;
-
-        fecharMenu();
-        alert("Lançamento atualizado com sucesso!");
-    }
-});
-
+}
 
 // EDITAR ITEM
 function editarItem(linha) {
@@ -222,42 +236,39 @@ function editarItem(linha) {
 
     menu_editar.classList.add("ativo");
     overlay.classList.add("ativo");
-    
 
     for (const campo in linha.dataset) {
-
         const id = "editar_" + campo.replace(/[A-Z]/g, letra => "_" + letra.toLowerCase());
-
         const input = document.getElementById(id);
-
         if (input) {
             input.value = linha.dataset[campo];
         }
     }
     document.querySelector("[data-id-principal]").value = linha.dataset.id;
-    const inputValor = document.getElementById("editar_valor_lancamento");
+    const inputValorLancamento = document.getElementById("editar_valor_lancamento");
+    const inputValorParcela = document.getElementById("editar_valor_parcela");
 
-
-    if (inputValor) {
-        inputValor.value = linha.dataset.valorLancamento;
-        formatarMoeda(inputValor);
+    if (inputValorLancamento) {
+        inputValorLancamento.value = linha.dataset.valorLancamento;
+        formatarMoeda(inputValorLancamento);
+    };
+    if (inputValorParcela) {
+        inputValorParcela.value = linha.dataset.valorParcela;
+        formatarMoeda(inputValorParcela);
     }
 
 
     const selectCategoria = document.getElementById("editar_id_categoria");
-
-    console.log("Categoria recebida:", linha.dataset.idCategoria);
-
-    console.log(
-        "Opções:",
-        [...selectCategoria.options].map(op => ({
-            valor: op.value,
-            texto: op.text
-        }))
-    );
-
-    selectCategoria.value = linha.dataset.idCategoria;
-
+    if (selectCategoria != null) {
+        selectCategoria.value = linha.dataset.idCategoria;
+        console.log(
+            "Opções:",
+            [...selectCategoria.options].map(op => ({
+                valor: op.value,
+                texto: op.text
+            }))
+        );
+    }
 }
 
 // ESCONDER BOTOES QUANDO SELECIONAR INPUT OU SELECT

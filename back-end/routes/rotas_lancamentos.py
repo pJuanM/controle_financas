@@ -14,6 +14,36 @@ from dateutil.relativedelta import relativedelta
 
 rota_lancamentos = APIRouter(prefix="/lancamentos", tags=["lancamentos"], dependencies=[Depends(verificar_token)])
 
+def calcular_primeiro_vencimento(data_compra, forma_pagamento):
+    dia_fechamento = forma_pagamento.data_fechamento
+    dia_vencimento = forma_pagamento.data_vencimento
+
+    if dia_fechamento is None or dia_vencimento is None:
+        return data_compra
+    
+    ultimo_dia = calendar.monthrange(data_compra.year, data_compra.month)[1]
+
+    fechamento = date(data_compra.year, 
+                      data_compra.month,
+                      min(dia_fechamento, ultimo_dia))
+
+    if data_compra < fechamento:
+        ultimo_dia = calendar.monthrange(data_compra.year, data_compra.month)[1]
+        return date(
+            data_compra.year,
+            data_compra.month,
+            min(dia_vencimento, ultimo_dia)
+        )
+    proximo_mes = data_compra + relativedelta(months=1)
+
+    ultimo_dia = calendar.monthrange(proximo_mes.year, proximo_mes.month)[1]
+
+    return date(
+        proximo_mes.year,
+        proximo_mes.month,
+        min(dia_vencimento, ultimo_dia)
+    )   
+
 
 @rota_lancamentos.get("/")
 async def listar_lancamentos(request: Request,
@@ -22,7 +52,7 @@ async def listar_lancamentos(request: Request,
                          data_vencimento_inicio: str | None = Query(None),
                          data_vencimento_final: str | None = Query(None),
                          id_categoria: list[int] | None = Query(None), 
-                         id_forma_pagamento: list[int] | None = Query(None), 
+                         id_forma_pagamento: list[int] | None = Query(None),
                          tipo_lancamento: str | None = Query(None),
                          session: Session = Depends(pegar_sessao), 
                          usuario: Usuarios = Depends(verificar_token)):
@@ -140,7 +170,7 @@ async def criar_lancamento(data_compra: date = Form(...),
                       valor_lancamento: str = Form(...),
                       parcelado: bool = Form(...), 
                       tipo_lancamento: str = Form(...),
-                      pagador_responsavel: str = Form(...),
+                      pagador_responsavel: str | None = Form(None),
                       qnt_parcelas: int | None = Form(None), 
                       session: Session = Depends(pegar_sessao), 
                       usuario: Usuarios = Depends(verificar_token)):
@@ -170,7 +200,10 @@ async def criar_lancamento(data_compra: date = Form(...),
     if tipo_lancamento == "DEBITO":
         pagador_responsavel = usuario.nome
     else:
-        pagador_responsavel = pagador_responsavel
+        if pagador_responsavel:
+            pagador_responsavel = pagador_responsavel
+        else:
+            raise HTTPException(status_code = 401, detail = "Precisa declarar responsável por pagamento quando se é um CRÉDITO.")
     
     
     novolancamento = Lancamentos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_lancamento = valor_lancamento, parcelado = parcelado, qnt_parcelas = qnt_parcelas, pagador_responsavel = pagador_responsavel, tipo_lancamento = tipo_lancamento)
@@ -180,39 +213,7 @@ async def criar_lancamento(data_compra: date = Form(...),
     valor_total = Decimal(str(novolancamento.valor_lancamento))
     qtd = novolancamento.qnt_parcelas
     valor_base = (valor_total / qtd).quantize(Decimal("0.01"))
-
-    # ======= DT. VENC. PARCELAS COM BASE NO FECHAMENTO + COMPRA + VENCIMENTO =======
-    dia_fechamento = novolancamento.formaPagamento.data_fechamento
-    dia_vencimento = novolancamento.formaPagamento.data_vencimento
-
-    if dia_fechamento is None or dia_vencimento is None:
-        primeiro_vencimento = data_compra
-    else:
-        ultimo_dia = calendar.monthrange(data_compra.year, data_compra.month)[1]
-        fechamento = date(
-                data_compra.year,
-                data_compra.month,
-                min(dia_fechamento, ultimo_dia)
-            )
-        if data_compra < fechamento:
-                ultimo_dia = calendar.monthrange(data_compra.year, data_compra.month)[1]
-                primeiro_vencimento = date(
-                    data_compra.year,
-                    data_compra.month,
-                    min(dia_vencimento, ultimo_dia)
-                )
-        else:
-            proximo_mes = data_compra + relativedelta(months = 1)
-
-            ultimo_dia = calendar.monthrange(proximo_mes.year, proximo_mes.month)[1]
-            
-            primeiro_vencimento = date(
-                proximo_mes.year,
-                proximo_mes.month,
-                min(dia_vencimento, ultimo_dia)
-                )
-
-    
+    primeiro_vencimento = calcular_primeiro_vencimento(data_compra, novolancamento.formaPagamento)
     for numero in range(1, qtd + 1):
         if numero < qtd:
             valor = valor_base
@@ -254,8 +255,14 @@ async def editar_lancamento(id_lancamento: int = Form(...),
     if not lancamento:
         raise HTTPException(status_code = 400, detail = "Lançamento não cadastrado")
 
-    if data_compra is not None:
+    if data_compra:
         lancamento.data_compra = data_compra
+        primeiro_vencimento = calcular_primeiro_vencimento(lancamento.data_compra, lancamento.formaPagamento)
+
+        for indice, parcela in enumerate(lancamento.parcela):
+            parcela.data_vencimento = (
+                primeiro_vencimento + relativedelta(months=indice)
+            )
     
     if item_comprado is not None:
         lancamento.item_comprado = item_comprado
@@ -265,8 +272,14 @@ async def editar_lancamento(id_lancamento: int = Form(...),
 
     if id_forma_pagamento is not None:
         lancamento.id_forma_pagamento = id_forma_pagamento
+        session.flush()
+        primeiro_vencimento = calcular_primeiro_vencimento(lancamento.data_compra, lancamento.formaPagamento)
+        for indice, parcela in enumerate(lancamento.parcela):
+            parcela.data_vencimento = (
+                primeiro_vencimento + relativedelta(months=indice)
+            )
 
-    if pagador_responsavel:
+    if pagador_responsavel is not None:
         lancamento.pagador_responsavel = pagador_responsavel
 
     if valor_lancamento is not None:
@@ -300,11 +313,10 @@ async def editar_lancamento(id_lancamento: int = Form(...),
         valor_total = Decimal(str(lancamento.valor_lancamento))
         lancamento.qnt_parcelas = qnt_parcelas
 
-        dia_vencimento = lancamento.formaPagamento.data_vencimento
-
         lancamento.parcela.clear()
 
         valor_base = (valor_total / qnt_parcelas).quantize(Decimal("0.01"))
+        primeiro_vencimento = calcular_primeiro_vencimento(lancamento.data_compra, lancamento.formaPagamento)
 
         for numero in range(1, qnt_parcelas + 1):
             if numero < qnt_parcelas:
@@ -313,8 +325,7 @@ async def editar_lancamento(id_lancamento: int = Form(...),
                 valor = valor_total - (valor_base * (qnt_parcelas - 1))
 
             vencimento = (
-                lancamento.data_compra.replace(day=dia_vencimento)
-                + relativedelta(months=numero)
+                primeiro_vencimento + relativedelta(months = numero - 1)
             )
 
             parcela = Parcelas(
@@ -329,13 +340,13 @@ async def editar_lancamento(id_lancamento: int = Form(...),
     if parcelado is not None:
         lancamento.parcelado = parcelado
         if parcelado is False:
+            primeiro_vencimento = calcular_primeiro_vencimento(lancamento.data_compra, lancamento.formaPagamento)
             lancamento.qnt_parcelas = 1
-            vencimento = (lancamento.data_compra.replace(day = lancamento.formaPagamento.data_vencimento) + relativedelta(months = 1))
             lancamento.parcela.clear()
             parcela = Parcelas(numero_parcela = 1,
                                valor_parcela = lancamento.valor_lancamento,
                                id_lancamento = lancamento.id,
-                               data_vencimento = vencimento)
+                               data_vencimento = primeiro_vencimento)
             session.add(parcela)
 
     
