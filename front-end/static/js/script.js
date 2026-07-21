@@ -1,10 +1,12 @@
 // PEGAR ELEMENTOS #MENU E .TOGGLE
-1.
-2.
-// DEFINIR TOGGLE COM EVENTO DE ONCLICK PASSANDO O TOGGLE PAARA A ACLASSE ACTIVE
-1.
-2.
-3.
+const menu = document.querySelector("#menu");
+const toggle = document.querySelector(".toggle")
+// DEFINIR TOGGLE COM EVENTO DE CLIQUE, PASSANDO O MENU PARA RECEBER A CLASSE ACTIVE
+toggle.addEventListener("click", function() {
+    menu.classList.toggle("active")
+    console.log("clicado")
+})
+
 
 // ORDENAR TABELA
 function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
@@ -108,21 +110,24 @@ function ordenarTabela(colunaElemento, indiceColuna, tipoDado) {
 
 // ABRIR OVERLAY
 // PEGAR ELEMENTOS .MENU_EDITAR E .OVERLAY 
-1.
-2.
+const menu_editar = document.querySelector(".menu_editar");
+const overlay = document.querySelector(".overlay")
+
 // DECLARAR FUNCAO FECHAR MENU() QUE REMOVE A CLASSE ATIVO DO MENU EDITAR E DO OVERLAY
-1.
-2.
-3.
-4.
+function fechar_menu(){
+    menu_editar.classList.toggle("ativo");
+    overlay.classList.toggle("ativo");
+}
 // ADICIONAR EVENTO DE CLICK NO OVERLAY PARA ELE FECHAR O MENU
-1.
+overlay.addEventListener("click", function() {
+    fechar_menu()
+})
 // ADICIONAR EVENTO DE FECHAR O MENU QUANDO PRESSIONAR O BOTAO ESCAPE BASEADO NO EVENTO REALIZADO
-1.
-2.
-3.
-4.
-5.
+addEventListener("keydown", function(e) {
+    if (e.key === "Escape" && menu_editar.classList.contains("ativo")) {
+        fechar_menu() ;
+    }   
+})
 
 // EDITAR VIA FETCH
 const formEditar = document.getElementById("formulario_editar");

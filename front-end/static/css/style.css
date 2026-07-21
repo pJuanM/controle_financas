@@ -320,6 +320,20 @@ table .tabela_cabecalho {
     display: block;
 }
 
+.homepage_navegacao {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    text-align: center;
+    font-weight: bold;
+}
+.homepage_navegacao a {
+
+    background-image: linear-gradient(to right, #18E474,#19AEA2 , #2F85E8);
+    padding: 1.4em;
+    border-radius: 15px;
+}
+
 
 /* MENU ROTATIVO */
 .menu {

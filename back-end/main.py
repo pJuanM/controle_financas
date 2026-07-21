@@ -24,9 +24,12 @@ from routes.rotas_formaPagamento import rota_formasPagamento
 from routes.rotas_autenticacao import rota_autenticacao
 from routes.rotas_lancamentos import rota_lancamentos
 from routes.rotas_parcelas import rota_parcelas
+from routes.rota_home import rota_home
 
 app.include_router(rota_categorias)
 app.include_router(rota_formasPagamento)
 app.include_router(rota_autenticacao)
 app.include_router(rota_lancamentos)
 app.include_router(rota_parcelas)
+app.include_router(rota_home)
+
