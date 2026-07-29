@@ -114,18 +114,18 @@ const menu_editar = document.querySelector(".menu_editar");
 const overlay = document.querySelector(".overlay")
 
 // DECLARAR FUNCAO FECHAR MENU() QUE REMOVE A CLASSE ATIVO DO MENU EDITAR E DO OVERLAY
-function fechar_menu(){
+function fecharMenu(){
     menu_editar.classList.toggle("ativo");
     overlay.classList.toggle("ativo");
 }
 // ADICIONAR EVENTO DE CLICK NO OVERLAY PARA ELE FECHAR O MENU
 overlay.addEventListener("click", function() {
-    fechar_menu()
+    fecharMenu()
 })
 // ADICIONAR EVENTO DE FECHAR O MENU QUANDO PRESSIONAR O BOTAO ESCAPE BASEADO NO EVENTO REALIZADO
 addEventListener("keydown", function(e) {
     if (e.key === "Escape" && menu_editar.classList.contains("ativo")) {
-        fechar_menu() ;
+        fecharMenu() ;
     }   
 })
 

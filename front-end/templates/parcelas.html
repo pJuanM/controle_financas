@@ -105,7 +105,7 @@ Parcelas
 
             <div class="grupo_campo">
                 <details class="filtroDetails">
-                    <summary>Pagador Responsável</summary>
+                    <summary>Pagador resp.</summary>
                     {% for responsavel in lancamentos %}
                         <div class="opcao_checkbox">
                             <div class="linha_checkbox">
@@ -130,9 +130,7 @@ Parcelas
             <tr>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 0, 'data')">VENC.</th>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 1, 'texto')">COMPRA</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'parcela')">PARCELA</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 3, 'texto')">TIPO</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 4, 'numero')">VALOR</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'numero')">VALOR</th>
             </tr>
         </thead>
         <tbody>
@@ -146,24 +144,22 @@ Parcelas
                     data-valor-parcela="{{ parcela.valor_parcela }}"
                     data-parcela="{{ parcela.numero_parcela }}"
                     data-data-vencimento="{{ parcela.data_vencimento }}"
+                    data-data-compra="{{ parcela.lancamento.data_compra }}"
                     data-pagador-responsavel="{{ parcela.lancamento.pagador_responsavel }}"
-                    data-status-parcela="{{ parcela.status_parcela }}">
-                    <td>{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
-                    <td>{{ parcela.lancamento.item_comprado }}</td>
-                    <td>{{ parcela.numero_parcela }}/{{ parcela.lancamento.qnt_parcelas }}</td>
-                    <td>{{ parcela.lancamento.tipo_lancamento }}</td>
+                    data-status-parcela="{{ parcela.status_parcela }}"
+                    class="badge-tipo {{ parcela.lancamento.tipo_lancamento|lower }}">
+                    <td class="col-data-vencimento">{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
+                    <td class="col-item">{{ parcela.numero_parcela }}/{{ parcela.lancamento.qnt_parcelas }} - {{ parcela.lancamento.item_comprado }}</td>
                     <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                 </tr>
                 {% endfor %}
                 <tr class="linha-total">
-                    <td colspan="4"><strong>Valor Total:</strong></td>
-                    <td>
-                        <strong>R$ {{ "{:,.2f}".format(valor_total).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong>
-                    </td>
+                    <td colspan="2"><strong>Valor Total:</strong></td>
+                    <td><strong>R$ {{ "{:,.2f}".format(valor_total).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="4">Nenhuma forma de pagamento encontrada.</td>
+                    <td colspan="3">Nenhuma forma de pagamento encontrada.</td>
                 </tr>
             {% endif %}
         </tbody>

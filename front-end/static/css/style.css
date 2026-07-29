@@ -262,6 +262,28 @@ table .tabela_cabecalho {
     color: red;
 }
 
+table .badge-tipo.credito{
+    background:#d1fae5;
+    color:#065f46;
+}
+
+table .badge-tipo.debito{
+    background:#fee2e2;
+    color:#991b1b;
+}
+table .col-item {
+    max-width: 8em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+table .col-data-vencimento {
+    max-width: 4.5em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
 .menu_editar {
     min-height: 70vh;
