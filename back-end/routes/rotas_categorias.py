@@ -68,7 +68,7 @@ async def criar_categoria(categoria: str = Form(...),
             status_code = 303
         )
 
-    nova_categoria = Categorias(id_usuario = usuario.id, categoria = categoria, status_categoria = "ATIVO", descricao = descricao)
+    nova_categoria = Categorias(id_usuario = usuario.id, categoria = categoria.upper(), status_categoria = "ATIVO", descricao = descricao.upper())
     session.add(nova_categoria)
     session.commit()
     
@@ -95,9 +95,9 @@ async def editar_categoria(categoria_id: int = Form(...),
     if categoria_status not in ["ATIVO", "INATIVO"]:
         raise HTTPException(status_code = 401, detail = "A categoria só pode ser ATIVO ou INATIVO.")
     
-    categoria.categoria = categoria_titulo
-    categoria.descricao = categoria_descricao
-    categoria.status_categoria = categoria_status
+    categoria.categoria = categoria_titulo.upper()
+    categoria.descricao = categoria_descricao.upper()
+    categoria.status_categoria = categoria_status.upper()
     session.commit()
 
     return {

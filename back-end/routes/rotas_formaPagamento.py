@@ -145,11 +145,11 @@ async def editar_formaPagamento(id_formaPagamento: int = Form(...),
     if status_forma_pagamento not in ["ATIVO", "INATIVO"]:
         raise HTTPException(status_code = 401, detail = "O status precisa ser ATIVO ou INATIVO.")
     
-    FormaPagamento.forma_pagamento = forma_pagamento
-    FormaPagamento.responsavel = responsavel
+    FormaPagamento.forma_pagamento = forma_pagamento.upper()
+    FormaPagamento.responsavel = responsavel.upper()
     FormaPagamento.data_vencimento = data_vencimento
     FormaPagamento.data_fechamento = data_fechamento
-    FormaPagamento.status_forma_pagamento = status_forma_pagamento
+    FormaPagamento.status_forma_pagamento = status_forma_pagamento.upper()
     session.commit()
 
     if FormaPagamento.data_vencimento == None:

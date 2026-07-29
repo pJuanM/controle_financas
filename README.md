@@ -11,8 +11,24 @@ Controle de finanças
   - Tabela com dados
 
 # EXTRAS
-- Implementar dashboard;
-- Usuário logado, retornar para tela inicial;
 - Estilizar tabela;
 - Poder marcar várias parcelas como paga ao mesmo tempo
-- Ajuste rota de cancelar lançamentos
+- Ajuste rota de exclusão.
+
+
+LANÇAMENTOS
+ - CRIAR
+ - LISTAR
+  
+PARCELAS
+ - LISTAR
+
+CATEGORIAS
+ - CRIAR
+ - LISTAR
+
+FORMAS DE PAGAMENTO
+ - CRIAR
+ - LISTAR
+
+DASHBOARD

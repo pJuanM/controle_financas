@@ -1,5 +1,3 @@
-console.log("Oláaaaa")
-
 const dashboard = window.dashboard;
 
 // GRÁFICO DE LINHA - CUSTOS POR DIA - BASEADO NO MÊS (VENCIMENTO JULHO - COMPRAS QUE VENCE EM JULHO PORÉM COM DATA DE COMPRA DE OUTROS MESES)
@@ -66,12 +64,12 @@ new Chart(
 
 
 // GRÁFICO DE BARRA HORIZONTAL - GASTOS POR CATEGORIA MÊS FILTRADO
-const labelsCategoria = dashboard.labels_gastos_categoria;
-const data_gastos_categoria = dashboard.data_gastos_categoria
+const labelsCategoria = dashboard.label_gastos_categoria;
+const data_gastos_categoria = dashboard.data_gastos_categoria;
 const dataGastosCategoria = {
     labels: labelsCategoria,
     datasets: [{
-        label: '',
+        label: 'Gastos Por Categoria',
         data: data_gastos_categoria,
         backgroundColor: [
         'rgb(255, 99, 132)',

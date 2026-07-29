@@ -10,13 +10,52 @@
     {% endblock %}
 </head>
 <body>
+    <aside class="menu_lateral_navegacao">
+        <nav class="navegar_rotas">
+            <div class="navegar_rotas_secoes">
+                <p class="navegar_rotas_menu">
+                    <a href="/lancamentos">Lançamentos</a>
+                    <strong class="navegar_rotas_secao"> ⮞</strong>
+                </p>
+                <span class="navegar_rotas_submenu"><a href="#">Criar</a></span>
+                <span class="navegar_rotas_submenu"><a href="#">Listar</a></span>
+            </div>
+            <div class="navegar_rotas_secoes">
+                <p class="navegar_rotas_menu">
+                    <a href="/parcelas">Parcelas</a>
+                    <strong class="navegar_rotas_secao"> ⮞</strong>
+                </p>
+                <span class="navegar_rotas_submenu"><a href="#">Listar</a></span>
+            </div>
+            <div class="navegar_rotas_secoes">
+                <p class="navegar_rotas_menu">
+                    <a href="/categorias">Categorias</a>
+                    <strong class="navegar_rotas_secao"> ⮞</strong>
+                </p>
+                <span class="navegar_rotas_submenu"><a href="#">Criar</a></span>
+                <span class="navegar_rotas_submenu"><a href="#">Listar</a></span>
+            </div>
+            <div class="navegar_rotas_secoes">
+                <p class="navegar_rotas_menu">
+                    <a href="/formaPagamento">Formas de Pagamento</a>
+                    <strong class="navegar_rotas_secao"> ⮞</strong>
+                </p>
+                <span class="navegar_rotas_submenu"><a href="#">Criar</a></span>
+                <span class="navegar_rotas_submenu"><a href="#">Listar</a></span>
+            </div>
+            <div class="navegar_rotas_secoes">
+                <p class="navegar_rotas_menu">
+                    <a href="/home">Dashboard</a>
+                </p>
+                
+            </div>
+        </nav>
+    </aside>
     <header class="container menu_navegacao">
         {% block header %}
         {% endblock %}
-        <nav class="navegar_rotas">
-            {% block navegar_rotas %}
-            {% endblock %}
-        </nav>
+        <div></div>
+        <div></div>
         <nav>
             <a href="/home">Home</a>
             <span>|</span>
@@ -30,6 +69,7 @@
     </main>
 
     <script src="/static/js/script.js"></script>
+    <script src="/static/js/navegacao.js"></script>
     
     {% block script %}
     {% endblock %}
