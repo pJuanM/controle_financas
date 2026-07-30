@@ -3,6 +3,7 @@
 Forma de Pagamento
 {% endblock %}
 {% block conteudo %}
+<h1 class="titulo-pagina">Formas Pagamento</h1>
 <section class="formulario">
     <form action="/formaPagamento" method="get" id="formulario_filtrar">
         <div class="grupo_campo">
@@ -28,14 +29,14 @@ Forma de Pagamento
     </form>
     
 </section>
-<h1 class="titulo-pagina">Lista de Formas de Pagamento</h1>
+<h1 class="titulo-pagina">Lista de Formas</h1>
 <section class="tabela">
     <table>
         <thead>
             <tr>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'texto')">FORMA DE PAGAMENTO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'texto')">FORMA</th>
                 <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">RESPONSÁVEL</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'numero')">DATA DE VENCIMENTO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'numero')">VENCIMENTO</th>
                 <th class="tabela_cabecalho" onclick="ordenarTabela(this, 3, 'texto')">STATUS</th>
             </tr>
         </thead>
@@ -50,7 +51,7 @@ Forma de Pagamento
                     data-data-vencimento="{{ formaDePagamento.data_vencimento }}"
                     data-data-fechamento="{{ formaDePagamento.data_fechamento }}"
                     data-status-forma-pagamento="{{ formaDePagamento.status_forma_pagamento }}">
-                    <td>{{ formaDePagamento.forma_pagamento }}</td>
+                    <td class="col-item">{{ formaDePagamento.forma_pagamento }}</td>
                     <td>{{ formaDePagamento.responsavel }}</td>
                     <td>{{ formaDePagamento.data_vencimento or 'À vista' }}</td>
                     <td>{{ formaDePagamento.status_forma_pagamento }}</td>

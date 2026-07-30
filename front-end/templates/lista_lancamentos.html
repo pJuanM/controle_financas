@@ -7,7 +7,7 @@ Débitos
 {% endblock %}
 {% block conteudo %}
 <!-------  ======= ABA DE FILTROS DE LANÇAMENTOS ======= ------->
-<h2>Filtrar Lançamentos</h2>
+<h1 class="titulo-pagina">Lançamentos</h1>
 <section class="formulario">
     <form action="/lancamentos" method="get" id="formulario_filtrar">
         <div class="grupo_campo campo_data">
@@ -81,9 +81,9 @@ Débitos
     <table>
         <thead>
             <tr>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'data')">DT. COMPRA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">COMPRA</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'numero')">VLR. LANÇAMENTO</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'data')">COMPRA</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">ITEM</th>
+                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'numero')">VALOR</th>
             </tr>
         </thead>
         <tbody>
@@ -100,8 +100,8 @@ Débitos
                     data-qnt-parcelas="{{ lancamento.qnt_parcelas }}"
                     data-pagador-responsavel="{{ lancamento.pagador_responsavel }}"
                     data-responsavel-forma_pagamento="{{ lancamento.formaPagamento.responsavel }}">
-                    <td>{{ lancamento.data_compra.strftime("%d/%m/%Y") }}</td>
-                    <td>{{ lancamento.item_comprado }}</td>
+                    <td class="col-data-compra">{{ lancamento.data_compra.strftime("%d/%m/%Y") }}</td>
+                    <td class="col-item">{{ lancamento.item_comprado }}</td>
                     <td>R$ {{ "{:,.2f}".format(lancamento.valor_lancamento).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
                 </tr>
                 {% endfor %}

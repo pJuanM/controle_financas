@@ -39,7 +39,7 @@ const dataGastosMes = {
         },
         {
             label: 'Créditos por mês',
-            data: data_creditos_mes,  
+            data: data_creditos_mes, 
             backgroundColor: 'rgba(34, 197, 94, 0.4)',
             borderColor: 'rgb(22, 163, 74)',
             borderWidth: 1

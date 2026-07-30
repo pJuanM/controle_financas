@@ -4,6 +4,7 @@ Categoria
 {% endblock %}
 
 {% block conteudo %}
+<h1 class="titulo-pagina">Categorias</h1>
 <section class="formulario">
     <form action="/categorias" method="get" id="formulario_filtrar">
         <div class="grupo_campo">
@@ -35,7 +36,7 @@ Categoria
                 data-descricao="{{ categoria.descricao }}"
                 data-status-categoria="{{ categoria.status_categoria }}">
                     <td>{{ categoria.categoria }}</td>
-                    <td>{{ categoria.descricao }}</td>
+                    <td class="col-item">{{ categoria.descricao }}</td>
                     <td>{{ categoria.status_categoria }}</td>
                 </tr>
                 {% endfor %}

@@ -1,11 +1,11 @@
-// PEGAR ELEMENTOS #MENU E .TOGGLE
-const menu = document.querySelector("#menu");
-const toggle = document.querySelector(".toggle")
-// DEFINIR TOGGLE COM EVENTO DE CLIQUE, PASSANDO O MENU PARA RECEBER A CLASSE ACTIVE
-toggle.addEventListener("click", function() {
-    menu.classList.toggle("active")
-    console.log("clicado")
-})
+// // PEGAR ELEMENTOS #MENU E .TOGGLE
+// const menu = document.querySelector("#menu");
+// const toggle = document.querySelector(".toggle")
+// // DEFINIR TOGGLE COM EVENTO DE CLIQUE, PASSANDO O MENU PARA RECEBER A CLASSE ACTIVE
+// toggle.addEventListener("click", function() {
+//     menu.classList.toggle("active")
+//     console.log("clicado")
+// })
 
 
 // ORDENAR TABELA

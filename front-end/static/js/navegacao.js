@@ -9,3 +9,14 @@ document.querySelectorAll(".navegar_rotas_menu").forEach(menu => {
         };
     });
 });
+
+
+const menu_hamburguer = document.querySelector(".menu_hamburguer")
+const fechar_menu_lateral = document.querySelector("#fechar_menu_lateral")
+menu_hamburguer.addEventListener("click", () => {
+    document.querySelector(".menu_lateral_navegacao").classList.toggle("ativo");
+});
+
+fechar_menu_lateral.addEventListener("click", () => {
+    document.querySelector(".menu_lateral_navegacao").classList.remove("ativo");
+})

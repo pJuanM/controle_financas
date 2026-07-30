@@ -8,6 +8,7 @@ Parcelas
 
 {% block conteudo %}
 <!-- ======= FILTRO DE PARCELAS ======= -->
+<h1 class="titulo-pagina">Parcelas</h1>
 <section class="formulario">
     <form action="/parcelas" method="get" id="formulario_filtrar">
 
@@ -125,7 +126,7 @@ Parcelas
         <thead>
             <tr>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 0, 'data')">VENC.</th>
-                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 1, 'texto')">COMPRA</th>
+                <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 1, 'texto')">ITEM</th>
                 <th class="tabela_cabecalho"  onclick="ordenarTabela(this, 2, 'numero')">VALOR</th>
             </tr>
         </thead>
