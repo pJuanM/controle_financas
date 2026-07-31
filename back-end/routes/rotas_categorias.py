@@ -123,6 +123,10 @@ async def excluir_categoria(categoria_id: int = Form(...),
     categoria.status_categoria = "INATIVO"
     session.commit()
 
+    return {
+        "sucesso": True,
+        "mensagem": "Categoria inativada com sucesso!"
+    }
 
 
 

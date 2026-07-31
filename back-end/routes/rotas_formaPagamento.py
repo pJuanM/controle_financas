@@ -178,6 +178,9 @@ async def excluir_formaPagamento(id_formaPagamento: int = Form(...),
     existeFormaPagamento.status_forma_pagamento = "INATIVO"
     session.commit()
 
-    return {"mensagem": "Forma de pagamento excluida com sucesso."}
+    return {
+        "sucesso": True,
+        "mensagem": "Forma de pagamento excluida com sucesso."
+    }
 
 

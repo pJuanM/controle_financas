@@ -379,6 +379,9 @@ async def deletar_conta(id_lancamento: int = Form(...),
         parcela.status_parcela = "CANCELADO"
     session.commit()
 
-    return {"mensagem": f"Conta excluída com sucesso! - ID da conta {conta.id}",
-            "conta": conta}
+    return {
+        "sucesso": True,
+        "mensagem": f"Conta excluída com sucesso! - ID da conta {conta.id}",
+        "conta": conta
+    }
 

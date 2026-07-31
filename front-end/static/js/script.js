@@ -136,11 +136,12 @@ if (formEditar) {
     formEditar.addEventListener("submit", async (e) => {
         e.preventDefault();
 
+        const botao = e.submitter;
+        const url = botao.formAction;
+
         const dados = new FormData(formEditar);
 
         const tipoDados = formEditar.dataset.tipo;
-
-        const url = formEditar.dataset.url;
 
         const resposta = await fetch(url, {
             method: "POST",
