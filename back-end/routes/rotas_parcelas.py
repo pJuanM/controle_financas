@@ -27,9 +27,9 @@ async def listar_parcelas(request: Request,
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
     
-    categorias = session.query(Categorias).all()
-    lancamentos = [responsavel.pagador_responsavel for responsavel in session.query(Lancamentos.pagador_responsavel).distinct().all()]
-    formas_pagamento = session.query(FormasPagamento).all()
+    categorias = session.query(Categorias).filter(Categorias.id_usuario == usuario.id)
+    lancamentos = [responsavel.pagador_responsavel for responsavel in session.query(Lancamentos.pagador_responsavel).filter(Lancamentos.id_usuario == usuario.id).distinct().all()]
+    formas_pagamento = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
 
     filtros_aplicados = any([
         data_compra_inicio,

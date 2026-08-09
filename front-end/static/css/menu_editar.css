@@ -1,0 +1,44 @@
+.menu_editar {
+    min-height: 70vh;
+    width: 90vw;
+    border: 1px solid;
+    padding: 1.5em;
+    border-radius: 15px;
+    position: fixed;
+    top: 10vh;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffffd6;
+    z-index: 999;
+    visibility: hidden;
+}
+.menu_editar.ativo {
+    visibility: visible;
+}
+
+.menu_editar.ativo button{
+    position: absolute;
+    bottom: 0;
+    width: 45% !important;
+}
+.menu_editar.ativo button:first-child{
+    left: 2%;
+}
+.menu_editar.ativo button:last-child {
+    right: 2%;
+}
+.menu_editar .grupo_campo_editar, .formulario .grupo_campo_editar{
+    display: flex;
+    gap: .8em;
+    width: 100%;
+}
+
+.menu_editar .botoes_formulario {
+    flex-direction: row !important;
+    gap: 1em;
+    position: absolute;
+    bottom: 0;
+    right: 50%;
+    transform: translate(50%, 0);
+    width: 80vw;
+}

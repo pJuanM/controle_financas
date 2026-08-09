@@ -10,22 +10,23 @@ Débitos
 <h1 class="titulo-pagina">Lançamentos</h1>
 <section class="formulario">
     <form action="/lancamentos" method="get" id="formulario_filtrar">
+        
         <div class="grupo_campo campo_data">
             <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()" value="{{ data_compra_inicio or '' }}">
-            <label for="data_compra_inicio">Intervalo de Compra Ínicio</label>
+            <label for="data_compra_inicio">Data de Compra Ínicio</label>
         </div>
         <div class="grupo_campo campo_data" >
             <input type="date" id="data_compra_final" name="data_compra_final" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()" value="{{ data_compra_final or '' }}">
-            <label for="data_compra_final">Intervalo de Compra Final</label>
+            <label for="data_compra_final">Data de Compra Final</label>
         </div>
 
         <div class="grupo_campo campo_data">
             <input type="date" id="data_vencimento_inicio" name="data_vencimento_inicio" placeholder="Data vencimento início" autocomplete="off" onclick="this.showPicker()" value="{{ data_vencimento_inicio or '' }}">
-            <label for="data_vencimento_inicio">Intervalo de Vencimento Ínicio</label>
+            <label for="data_vencimento_inicio">Data de Vencimento Ínicio</label>
         </div>
         <div class="grupo_campo campo_data" >
             <input type="date" id="data_vencimento_final" name="data_vencimento_final" placeholder="Data vencimento final" autocomplete="off" onclick="this.showPicker()" value="{{ data_vencimento_final or '' }}">
-            <label for="data_vencimento_final">Intervalo de Vencimento Final</label>
+            <label for="data_vencimento_final">Data de Vencimento Final</label>
         </div>
 
         <div class="grupo_campo">

@@ -1,0 +1,168 @@
+/* CLASSE FORMULARIO SE REFERE A TAG SECTION NO HTML */
+.formulario{
+    background-color: #D9F0EE;
+    padding: 1em;
+    border-radius: 15px;
+}
+/* ID FORMULARIO SE REFERE A TAG FORM NO HTML */
+form {
+    display: flex;
+    flex-direction: column;
+    min-height: 35vh;
+}
+form .grupo_campo {
+    display: flex;
+    flex-direction: column;
+    min-width: 0 ;
+    margin-bottom: .3em;
+    width: 100%;
+}
+
+form .campo_data {
+    position: relative; 
+}
+form .campo_data input {
+    background: #000e32;
+    color: #000e32b0;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+}
+form .campo_data input:focus,
+form .campo_data input.tem_valor {
+    color: white;
+}
+form .campo_data label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    pointer-events: none;
+    transition: .2s;
+    width: 100%;
+    font-size: .9em;
+}
+form .campo_data:focus-within label,
+form .campo_data label.escondida {
+    opacity: 0;
+}
+form input:valid, select:valid, summary::marker {
+    background-color: #000e32;
+}
+form input::placeholder{
+    color: white;
+}
+form input, 
+.botoes_formulario button,
+input:not([type="checkbox"]){
+    background-color: #000E32;
+    color: white;
+    text-align: center;
+    margin-bottom: 1em;
+    padding: .6em;
+    width: 100%;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+}
+
+form input, 
+#enviar_formulario, 
+select,
+input:not([type="checkbox"]) {
+    background-color: #000e32;
+    color: white;
+    text-align: center;
+    margin-bottom: 1em;
+    padding: .6em;
+    width: 100%;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: .8em;
+}
+
+optgroup{
+    text-align: center;
+    font-size: 1.2em;
+}
+optgroup option{
+    text-align: center;
+    font-size: .8em;
+}
+
+details {
+    background-color: #000e32;
+    color: white;
+    padding: .6em;
+    width: 100%;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: .8em;
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+details label {
+    color: white !important;
+    text-align: left !important;
+    width: 100%;
+    padding: .5em;
+}
+
+details summary {
+    cursor: pointer;
+    list-style: none;
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details .grupo_responsavel {
+    margin-top: 1em;
+    padding: 1em;
+    font-size: 1em;
+}
+details .opcao_checkbox {
+    display: flex;
+    gap: .5em;
+    margin: .4em 0;
+    align-items: center;
+    border: 1px solid white;
+    background-color: #000E32;
+    margin-top: .5em;
+    padding-left: .5em;
+    border-radius: 8px;
+}
+details .linha_checkbox {
+    display: flex;
+    gap: 1em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-wrap: nowrap;
+    width: 100%;
+}
+
+.opcao_checkbox input {
+    width: auto !important;
+    margin-bottom: 0 !important;
+}
+
+.opcao_checkbox span {
+    color: white;
+    text-align: left;
+}
+
+#enviar_formulario {
+    margin-top: auto;
+    cursor: pointer;
+}

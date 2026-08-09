@@ -2,9 +2,7 @@
 {% block titulo %}
 Parcelas
 {% endblock %}
-{% block css %}
-<link rel="stylesheet" href="{{ url_for('static', path='css/parcelas.css') }}">
-{% endblock %}
+
 
 {% block conteudo %}
 <!-- ======= FILTRO DE PARCELAS ======= -->
@@ -12,26 +10,23 @@ Parcelas
 <section class="formulario">
     <form action="/parcelas" method="get" id="formulario_filtrar">
 
-        <div class="grupo_campo_editar">
-            <div class="grupo_campo campo_data">
-                <input type="date" id="data_compra_inicio" name="data_compra_inicio" value="{{ data_compra_inicio or '' }}" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
-                <label for="data_compra_inicio">Dt. Compra Ínicio</label>
-            </div>
-            <div class="grupo_campo campo_data">
-                <input type="date" id="data_compra_final" name="data_compra_final"  value="{{ data_compra_final or '' }}" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()">
-                <label for="data_compra_final">Dt. Compra Final</label>
-            </div>
+        <div class="grupo_campo campo_data">
+            <input type="date" id="data_compra_inicio" name="data_compra_inicio" value="{{ data_compra_inicio or '' }}" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()">
+            <label for="data_compra_inicio">Data de Compra Ínicio</label>
+        </div>
+        <div class="grupo_campo campo_data">
+            <input type="date" id="data_compra_final" name="data_compra_final"  value="{{ data_compra_final or '' }}" placeholder="Data compra final" autocomplete="off" onclick="this.showPicker()">
+            <label for="data_compra_final">Data de Compra Final</label>
         </div>
 
-        <div class="grupo_campo_editar">
-            <div class="grupo_campo campo_data">
-                <input type="date" id="data_vencimento_inicio" name="data_vencimento_inicio"  value="{{ data_vencimento_inicio or '' }}" placeholder="Data Vencimento início" autocomplete="off" onclick="this.showPicker()">
-                <label for="data_vencimento_inicio">Dt. Venc. Ínicio</label>
-            </div>
-            <div class="grupo_campo campo_data" >
-                <input type="date" id="data_vencimento_final" name="data_vencimento_final" value="{{ data_vencimento_final or '' }}" placeholder="Data Vencimento final" autocomplete="off" onclick="this.showPicker()">
-                <label for="data_vencimento_final">Dt. Venc. Final</label>
-            </div>
+
+        <div class="grupo_campo campo_data">
+            <input type="date" id="data_vencimento_inicio" name="data_vencimento_inicio"  value="{{ data_vencimento_inicio or '' }}" placeholder="Data Vencimento início" autocomplete="off" onclick="this.showPicker()">
+            <label for="data_vencimento_inicio">Data de Vencimento Ínicio</label>
+        </div>
+        <div class="grupo_campo campo_data" >
+            <input type="date" id="data_vencimento_final" name="data_vencimento_final" value="{{ data_vencimento_final or '' }}" placeholder="Data Vencimento final" autocomplete="off" onclick="this.showPicker()">
+            <label for="data_vencimento_final">Data de Vencimento Final</label>
         </div>
 
 
@@ -122,6 +117,11 @@ Parcelas
 <h1 class="titulo-pagina">Lista de Parcelas</h1>
 
 <section class="tabela">
+    <div class="acoes_liquidacao">
+        <button type="button" id="btn-liquidar">
+            LIQUIDAR
+        </button>
+    </div>
     <table>
         <thead>
             <tr>
@@ -147,7 +147,14 @@ Parcelas
                     class="badge-tipo {{ parcela.lancamento.tipo_lancamento|lower }}">
                     <td class="col-data-vencimento">{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
                     <td class="col-item">{{ parcela.numero_parcela }}/{{ parcela.lancamento.qnt_parcelas }} - {{ parcela.lancamento.item_comprado }}</td>
-                    <td>R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
+                    <td class="col-valor">
+                        <span>
+                            R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                        </span>
+
+                        <input type="checkbox" class="btn-liquidar">
+                    </td> 
+          
                 </tr>
                 {% endfor %}
                 <tr class="linha-total">

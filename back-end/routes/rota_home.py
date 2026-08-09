@@ -38,8 +38,8 @@ async def homepage(request: Request,
     # ======= ALTERAR PARA O MES JÁ SER SORT, E ELE RECEBER UMA LISTA =======
     mes = [8]
 
-    parcelas = (session.query(Parcelas).join(Parcelas.lancamento).filter(extract('month', Parcelas.data_vencimento).in_(mes), extract('year', Parcelas.data_vencimento)== 2026, Parcelas.status_parcela != "CANCELADO"))
-    mesesParcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(Parcelas.status_parcela != "CANCELADO", extract('year', Parcelas.data_vencimento) == 2026)
+    parcelas = (session.query(Parcelas).join(Parcelas.lancamento).filter(extract('month', Parcelas.data_vencimento).in_(mes), extract('year', Parcelas.data_vencimento)== 2026, Parcelas.status_parcela != "CANCELADO", Lancamentos.id_usuario == usuario.id))
+    mesesParcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id, Parcelas.status_parcela != "CANCELADO", extract('year', Parcelas.data_vencimento) == 2026)
 
 
     # ======= LOOPING PRINCIPAL PARA ITERAR SOBRE CADA PARCELA =======

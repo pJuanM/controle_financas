@@ -1,0 +1,117 @@
+/* MENU ROTATIVO */
+.menu {
+    position: fixed;
+    right: -1em;
+    bottom: 6em;
+    transition: .4s ease;
+}
+.menu.active {
+    right: 4em;
+
+}
+.toggle {
+    position: absolute;
+    width: 2em;
+    height: 2em;
+    background: #000E32;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 2em;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: 0.3s;
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
+}
+
+.menu.active .toggle {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.item {
+    position: absolute;
+    width: 2.4em;
+    height: 2.4em;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.3em;
+    background: #000E32;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: 0.4s;
+    opacity: 0;
+    box-shadow: rgba(37, 99, 235, 0.5) 0px 0px 15px;
+}
+
+/* MENU ABERTO */
+.menu.active .item {
+    opacity: 1;
+}
+.item svg {
+    width: 28px;
+    height: 28px;
+    fill: white;
+}
+
+/* DASHBOARD */
+.menu.active .item:nth-child(2) {
+    transform: translate(-50%, -50%) translate(-20px, -110px);
+}
+
+/* CONTAS A PAGAR */
+.menu.active .item:nth-child(3) {
+    transform: translate(-50%, -50%) translate(-90px, -75px);
+}
+
+/* FORMA DE PAGAMENTO */
+.menu.active .item:nth-child(4) {
+    transform: translate(-50%, -50%) translate(-120px, -10px);
+}
+
+/* CATEGORIA */
+.menu.active .item:nth-child(5) {
+    transform: translate(-50%, -50%) translate(-80px, 55px);
+}
+
+/* HOVER COM SCALE SEM PERDER POSIÇÃO */
+.menu.active .item:nth-child(2):hover {
+    transform: translate(-50%, -50%) translate(-20px, -110px) scale(1.1);
+}
+
+.menu.active .item:nth-child(3):hover {
+    transform: translate(-50%, -50%) translate(-90px, -75px) scale(1.1);
+}
+
+.menu.active .item:nth-child(4):hover {
+    transform: translate(-50%, -50%) translate(-120px, -10px) scale(1.1);
+}
+
+.menu.active .item:nth-child(5):hover {
+    transform: translate(-50%, -50%) translate(-80px, 55px) scale(1.1);
+}
+
+/* COR NO HOVER */
+.item:hover {
+    background: #2F85E8;
+
+}
+
+/* TEXTO */
+.label {
+    position: absolute;
+    bottom: -25px;
+    font-size: 12px;
+    white-space: nowrap;
+    color: #cbd5e1;
+}
