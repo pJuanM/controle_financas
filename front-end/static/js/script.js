@@ -119,9 +119,18 @@ function fecharMenu(){
     overlay.classList.toggle("ativo");
 }
 // ADICIONAR EVENTO DE CLICK NO OVERLAY PARA ELE FECHAR O MENU
-overlay.addEventListener("click", function() {
-    fecharMenu()
-})
+try {
+    const overlay = document.querySelector(".overlay");
+
+    if (overlay) {
+        overlay.addEventListener("click", function() {
+            fecharMenu();
+        });
+    }
+} catch (error) {
+    console.error("Erro ao configurar o overlay:", error);
+}
+
 // ADICIONAR EVENTO DE FECHAR O MENU QUANDO PRESSIONAR O BOTAO ESCAPE BASEADO NO EVENTO REALIZADO
 addEventListener("keydown", function(e) {
     if (e.key === "Escape" && menu_editar.classList.contains("ativo")) {

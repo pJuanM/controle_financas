@@ -8,7 +8,7 @@
 form {
     display: flex;
     flex-direction: column;
-    min-height: 35vh;
+    min-height: 25vh;
 }
 form .grupo_campo {
     display: flex;
@@ -24,7 +24,6 @@ form .campo_data {
 form .campo_data input {
     background: #000e32;
     color: #000e32b0;
-    border: none;
     outline: none;
     border-radius: 12px;
 }
@@ -51,8 +50,14 @@ form .campo_data:focus-within label,
 form .campo_data label.escondida {
     opacity: 0;
 }
-form input:valid, select:valid, summary::marker {
+ 
+select, 
+summary::marker,
+details,
+input:not([type="checkbox"]) {
     background-color: #000e32;
+    border: 2px solid #00ffb6;
+    box-shadow: 2px -2px 7px 1px #6a11a9;
 }
 form input::placeholder{
     color: white;
@@ -67,7 +72,6 @@ input:not([type="checkbox"]){
     padding: .6em;
     width: 100%;
     border-radius: 12px;
-    border: none;
     font-weight: bold;
 }
 
@@ -82,7 +86,6 @@ input:not([type="checkbox"]) {
     padding: .6em;
     width: 100%;
     border-radius: 12px;
-    border: none;
     font-weight: bold;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -164,5 +167,10 @@ details .linha_checkbox {
 
 #enviar_formulario {
     margin-top: auto;
+    cursor: pointer;
+    border: 1px solid #0000ff;
+    background-image: linear-gradient(to left, #18E474, #19AEA2, #2F85E8);
+    color: white;
+    font-weight: bold;
     cursor: pointer;
 }

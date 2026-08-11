@@ -24,4 +24,6 @@ nav a:hover {
     background-image: linear-gradient(to right, #18E474,#19AEA2 , #2F85E8);
     padding: 1.4em;
     border-radius: 15px;
+    border: 2px solid #8d1313;
+    box-shadow: 2px -2px 7px 0px #1fe1c1;
 }

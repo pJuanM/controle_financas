@@ -12,20 +12,28 @@
     align-items: center;
     box-shadow: -1px 2px 9px 0px black;
     font-weight: bold;
+    cursor: pointer;
 
 }
 
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-radius: 1em;
+    border: 1px solid black;
+    overflow: hidden;
+    border-spacing: 0;
 }
+
 th, td {
-    border: 1px solid #ddd;
+    border: 1px dotted #808080;
     padding: 8px;
     text-align: center;
 }
 th {
-    background-color: #f2f2f2;
+    background-color: black;
+    color: white;
+    text-align: center;
 }
 table .tabela_cabecalho {
     cursor: pointer;
@@ -44,9 +52,7 @@ table .badge-tipo.credito{
 }
 
 table .badge-tipo.debito{
-    background:#fee2e2;
-    color:#991b1b;
-
+    color: #FF0000;
 }
 table .col-item {
     max-width: 8em;
@@ -66,6 +72,7 @@ table .col-data-compra {
     text-align: center;
     align-items: center;
     display: flex;
+    gap: 1em;
     justify-content: center;
     vertical-align: middle;
 }
@@ -74,7 +81,6 @@ table .col-data-compra {
     display: inline-block;
     width: 8em;
     text-align: right;
-    margin-right: 8px;
 }
 
 input.btn-liquidar {
@@ -82,4 +88,10 @@ input.btn-liquidar {
     margin: 0;
     margin: 0;
     flex-shrink: 0;
+}
+
+.linha-total {
+    background: black;
+    color: white;
+
 }

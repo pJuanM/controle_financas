@@ -15,15 +15,53 @@ rota_home = APIRouter(prefix="/home", tags=["home"], dependencies=[Depends(verif
 
 @rota_home.get("/")
 async def homepage(request: Request,
-                                session: Session = Depends(pegar_sessao),
-                                mes: int | None = Form(None),
-                                ano: int | None = Form(None),
-                                usuario: Usuarios = Depends(verificar_token)):
+                   session: Session = Depends(pegar_sessao),
+                   usuario: Usuarios = Depends(verificar_token)):
     """
     Essa é a rota padrão das formas de pagamentos.
     """
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
+
+    return templates.TemplateResponse(
+            request = request,
+            name = "home.html",
+            context = {
+                "parcelas" : None,
+
+                "valor_pago": 0,
+                "valor_pendente": 0,
+                "valor_total": 0,
+                "valor_credito": 0,
+                "valor_debito": 0,
+                "saldo": 0,
+
+                "label_gastos_dia": [],
+                "data_gastos_dia": [],
+
+                "labels_mes": list(range(1, 13)),
+                "data_gastos_mes": [0] * 12,
+                "data_creditos_mes": [0] * 12,
+
+                "label_gastos_categoria": [],
+                "data_gastos_categoria": [],
+
+                "label_gastos_forma_pagamento": [],
+                "data_gastos_forma_pagamento": [],
+            }
+        )
+
+
+@rota_home.post("/")
+async def homepage(request: Request,
+                   session: Session = Depends(pegar_sessao),
+                   mes: list[int] | None = Form(None),
+                   ano: list[int] | None = Form(None),
+                   usuario: Usuarios = Depends(verificar_token)):
+
+    if usuario is None:
+            return templates.TemplateResponse(request= request, name="sem_login.html")
+    
     # ======= VARIÁVEIS PARA INICIALIZAR VALORES =======
     valor_pago = 0
     valor_pendente = 0
@@ -36,10 +74,14 @@ async def homepage(request: Request,
     gastosDia = {}
 
     # ======= ALTERAR PARA O MES JÁ SER SORT, E ELE RECEBER UMA LISTA =======
-    mes = [8]
+    if mes is None:
+        mes = []
+    if ano is None:
+        ano = []
 
-    parcelas = (session.query(Parcelas).join(Parcelas.lancamento).filter(extract('month', Parcelas.data_vencimento).in_(mes), extract('year', Parcelas.data_vencimento)== 2026, Parcelas.status_parcela != "CANCELADO", Lancamentos.id_usuario == usuario.id))
-    mesesParcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id, Parcelas.status_parcela != "CANCELADO", extract('year', Parcelas.data_vencimento) == 2026)
+    parcelas = (session.query(Parcelas).join(Parcelas.lancamento).filter(extract('month', Parcelas.data_vencimento).in_(mes), extract('year', Parcelas.data_vencimento).in_(ano), Parcelas.status_parcela != "CANCELADO", Lancamentos.id_usuario == usuario.id))
+
+    mesesParcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id, Parcelas.status_parcela != "CANCELADO", extract('year', Parcelas.data_vencimento).in_(ano))
 
 
     # ======= LOOPING PRINCIPAL PARA ITERAR SOBRE CADA PARCELA =======
@@ -113,7 +155,6 @@ async def homepage(request: Request,
 
     # ======= SALDO =======
     saldo = valor_credito - valor_debito
-
     return templates.TemplateResponse(
         request = request,
         name = "home.html",

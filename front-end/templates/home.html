@@ -1,89 +1,115 @@
 {% extends "base.html" %}
-{% block titulo %}HomePage {% endblock %}
-{% block css %}
-<link rel="stylesheet" href="/static/css/dashboard.css">
+{% block titulo %}
+HomePage
 {% endblock %}
-{% block conteudo %}
-    <h1>Home</h1>
-    <nav class="homepage_navegacao">
-        <a href="/parcelas">Parcelas</a>
-        <a href="/lancamentos">Lançamentos</a>
-        <a href="/formaPagamento">Formas de Pagamento</a>
-        <a href="/categorias">Categorias</a>
-    </nav>
 
+{% block conteudo %}
+    <h1>HOME</h1>
+    <nav class="homepage_navegacao">
+        <a href="/parcelas">PARCELAS</a>
+        <a href="/lancamentos">LANÇAMENTOS</a>
+        <a href="/formaPagamento">FORMAS DE PAGAMENTO</a>
+        <a href="/categorias">CATEGORIAS</a>
+    </nav>
+    <form action="/home" method="post">
+        <div class="filtros_insights">
+            <h2>FILTROS</h2>
+            <div class="grupo_campo_filtro_dashboard">
+                <select id="mes_dashboard" name="mes">
+                    <option value="" selected disabled>MÊS</option>
+                    <option value="01">JAN.</option>
+                    <option value="02">FEV.</option>
+                    <option value="03">MAR.</option>
+                    <option value="04">ABR.</option>
+                    <option value="05">MAI.</option>
+                    <option value="06">JUN.</option>
+                    <option value="07">JUL.</option>
+                    <option value="08">AGO.</option>
+                    <option value="09">SET.</option>
+                    <option value="10">OUT.</option>
+                    <option value="11">NOV.</option>
+                    <option value="12">DEZ.</option>
+                </select>
+                <select id="ano_dashboard" name="ano">
+                    <option value="" selected disabled>ANO</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-filtrar">FILTRAR</button>
+    </form>
+    {% if parcelas %}
     <div class="cards_dashboard">
-        <h2>Cards</h2>
+        <h2>CARDS</h2>
         <div class="card_dashboard">
-            <h3>Pago</h3>
+            <h3>PAGO</h3>
             <span>R$ {{ valor_pago }}</span>
         </div>
 
         <div class="card_dashboard">
-            <h3>Pendente</h3>
+            <h3>PENDENTE</h3>
             <span>R$ {{ valor_pendente }}</span>
         </div>
 
         <div class="card_dashboard">
-            <h3>Total Gasto</h3>
+            <h3>TOTAL GASTO</h3>
             <span>R$ {{ valor_total }}</span>
         </div>
 
         <div class="card_dashboard">
-            <h3>Crédito</h3>
+            <h3>CRÉDITO</h3>
             <span>R$ {{ valor_credito }}</span>
         </div>
 
             <div class="card_dashboard">
-            <h3>Saldo</h3>
+            <h3>SALDO</h3>
             <span>R$ {{ saldo }}</span>
         </div>
 
     </div>
-    <div class="insights_dashboard">
-        <h2>Dasboard</h2>
-        <div class="grafico_dashboard">
-            <h3>Gastos por Dia</h3>
-            <canvas id="gastosDia"></canvas>
+        <div class="insights_dashboard">
+            <h2>DASBOARD</h2>
+            <div class="grafico_dashboard">
+                <h3>GASTOS POR DIA</h3>
+                <canvas id="gastosDia"></canvas>
+            </div>
+
+            <div class="grafico_dashboard">
+                <h3>GASTOS POR MÊS</h3>
+                <canvas id="gastosMes"></canvas>
+            </div>
+
+            <div class="grafico_dashboard">
+                <h3>GASTOS POR CATEGORIA</h3>
+                <canvas id="gastosCategoria"></canvas>
+            </div>
+
+            <div class="grafico_dashboard">
+                <h3>GASTOS POR PAGAMENTO</h3>
+                <canvas id="gastosFormaPagamento"></canvas>
+            </div>
         </div>
-
-        <div class="grafico_dashboard">
-            <h3>Gastos por Mês</h3>
-            <canvas id="gastosMes"></canvas>
-        </div>
-
-        <div class="grafico_dashboard">
-            <h3>Gastos por Categoria</h3>
-            <canvas id="gastosCategoria"></canvas>
-        </div>
-
-        <div class="grafico_dashboard">
-            <h3>Gastos por Pagamento</h3>
-            <canvas id="gastosFormaPagamento"></canvas>
-        </div>
-    </div>
-    {% block script %}
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        
-        <script>
-            window.dashboard = {
-                label_gastos_dia: {{ label_gastos_dia | tojson }},
-                data_gastos_dia: {{ data_gastos_dia | tojson }},
-                
-                labels_mes: {{ labels_mes | tojson }},
-                data_gastos_mes: {{ data_gastos_mes | tojson }},
-                data_creditos_mes: {{ data_creditos_mes | tojson }},
-
-                label_gastos_categoria: {{ label_gastos_categoria | tojson }},
-                data_gastos_categoria: {{ data_gastos_categoria | tojson }},
-
-                label_gastos_forma_pagamento: {{ label_gastos_forma_pagamento | tojson }},
-                data_gastos_forma_pagamento: {{ data_gastos_forma_pagamento | tojson }},
-                 
-            };
-        </script>
-        <script src="/static/js/home.js"></script>
-
-    {% endblock %}
-
+    {% endif %}
 {% endblock %} 
+
+{% block script %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        window.dashboard = {
+            label_gastos_dia: {{ label_gastos_dia | tojson }},
+            data_gastos_dia: {{ data_gastos_dia | tojson }},
+            
+            labels_mes: {{ labels_mes | tojson }},
+            data_gastos_mes: {{ data_gastos_mes | tojson }},
+            data_creditos_mes: {{ data_creditos_mes | tojson }},
+
+            label_gastos_categoria: {{ label_gastos_categoria | tojson }},
+            data_gastos_categoria: {{ data_gastos_categoria | tojson }},
+
+            label_gastos_forma_pagamento: {{ label_gastos_forma_pagamento | tojson }},
+            data_gastos_forma_pagamento: {{ data_gastos_forma_pagamento | tojson }},
+                
+        };
+    </script>
+    <script src="/static/js/home.js"></script>
+{% endblock %}

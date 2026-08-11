@@ -1,3 +1,22 @@
+.grupo_campo_filtro_dashboard {
+    display: flex;
+    gap: 2em;
+}
+.grupo_campo_filtro_dashboard select {
+    cursor: pointer;
+
+}
+.btn-filtrar {
+    padding: 0.4em;
+    border-radius: 15px;
+    border: 1px solid #0000ff;
+    background-image: linear-gradient(to left, #18E474, #19AEA2, #2F85E8);
+    color: white;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
 .cards_dashboard,
 .insights_dashboard {
     margin: 1em 0;
@@ -9,7 +28,6 @@
     flex-direction: column;
 }
 .cards_dashboard .card_dashboard {
-    border: 1px solid white;
     padding: .9em;
     color: white;
     border-radius: 30px;
@@ -19,18 +37,22 @@
     font-size: 1.1em;
     cursor: pointer;
     position: relative;
+    border: 2px solid #8d1313;
+    box-shadow: 2px -2px 7px 0px #1fe1c1;
 }
 
 .cards_dashboard .card_dashboard h3 {
-    background: #000000ad;
+    background: #000000;
     color: white;
     border-radius: 2em;
     margin: 0 auto .5em;
     width: 45%;
     position: absolute;
-    top: -26%;
+    top: -30%;
     left: 50%;
     transform: translateX(-50%);
+    border: 2px solid #64c9c4;
+    box-shadow: 1px -1px 4px 1px black;
 }
 
 .cards_dashboard .card_dashboard span {
