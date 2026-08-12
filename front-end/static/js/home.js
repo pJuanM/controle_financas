@@ -1,5 +1,4 @@
 const dashboard = window.dashboard;
-
 // GRÁFICO DE LINHA - CUSTOS POR DIA - BASEADO NO MÊS (VENCIMENTO JULHO - COMPRAS QUE VENCE EM JULHO PORÉM COM DATA DE COMPRA DE OUTROS MESES)
 const labelsGastosDia = dashboard.label_gastos_dia;
 const data_gastos_dia = dashboard.data_gastos_dia;
@@ -128,6 +127,7 @@ try{
 catch (error) {
     console.log(error)
 }
+
 // FILTROS DASHOBARD 
 const selectAno = document.querySelector("#ano_dashboard");
 const anoAtual = new Date().getFullYear();
@@ -138,5 +138,20 @@ for (let ano = 2022; ano <= anoAtual + 4; ano++) {
     option.textContent = ano;
 
     selectAno.appendChild(option);
-
 }
+
+// BOTAO FILTRAR DASHBOARD
+const btnFiltrar = document.querySelector(".btn-filtrar")
+const
+btnFiltrar.addEventListener("click", (e) => {
+    e.preventDefault()
+
+        const url = formEditar.dataset.url;
+
+        const resposta = await fetch(url, {
+            method: "POST",
+            body: dados
+        });
+})
+
+

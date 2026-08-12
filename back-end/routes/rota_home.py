@@ -72,16 +72,18 @@ async def homepage(request: Request,
     formasPagamento = {}
     categorias = {}
     gastosDia = {}
+    mesesParcelas = []
 
     # ======= ALTERAR PARA O MES JÁ SER SORT, E ELE RECEBER UMA LISTA =======
-    if mes is None:
-        mes = []
-    if ano is None:
-        ano = []
+    parcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(Parcelas.status_parcela != "CANCELADO", Lancamentos.id_usuario == usuario.id)
 
-    parcelas = (session.query(Parcelas).join(Parcelas.lancamento).filter(extract('month', Parcelas.data_vencimento).in_(mes), extract('year', Parcelas.data_vencimento).in_(ano), Parcelas.status_parcela != "CANCELADO", Lancamentos.id_usuario == usuario.id))
+    if ano:
+        parcelas = parcelas.filter(extract('year', Parcelas.data_vencimento).in_(ano))
+        mesesParcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id, Parcelas.status_parcela != "CANCELADO", extract('year', Parcelas.data_vencimento).in_(ano))
 
-    mesesParcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id, Parcelas.status_parcela != "CANCELADO", extract('year', Parcelas.data_vencimento).in_(ano))
+    if mes:
+        parcelas = parcelas.filter(extract('month', Parcelas.data_vencimento).in_(mes))
+
 
 
     # ======= LOOPING PRINCIPAL PARA ITERAR SOBRE CADA PARCELA =======
