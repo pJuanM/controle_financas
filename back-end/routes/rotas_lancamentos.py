@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Form, Depends, HTTPException, Request, Query
+from fastapi import APIRouter, Form, File, Depends, HTTPException, UploadFile, Request, Query
 from fastapi.responses import RedirectResponse
 from typing import Optional
 from urllib.parse import quote
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from dependencies import pegar_sessao, verificar_token
 from models import Lancamentos, Categorias, FormasPagamento, Usuarios, Parcelas
 from main import templates
@@ -10,6 +11,8 @@ from decimal import Decimal
 from datetime import date, datetime
 import calendar
 from dateutil.relativedelta import relativedelta
+from ofxparse import OfxParser
+import pandas as pd
 
 
 rota_lancamentos = APIRouter(prefix="/lancamentos", tags=["lancamentos"], dependencies=[Depends(verificar_token)])
@@ -63,8 +66,8 @@ async def listar_lancamentos(request: Request,
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
     
-    categorias = session.query(Categorias).all()
-    formas_pagamento = session.query(FormasPagamento).all()
+    categorias = session.query(Categorias).filter(Categorias.id_usuario == usuario.id)
+    formas_pagamento = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
     
     filtros_aplicados = any([
         data_compra_inicio,
@@ -146,8 +149,8 @@ async def home(request: Request,
 
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
-    categorias = session.query(Categorias).all()
-    formas_pagamento = session.query(FormasPagamento).all()
+    categorias = session.query(Categorias).filter(Categorias.id_usuario == usuario.id)
+    formas_pagamento = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
 
 
     return templates.TemplateResponse(
@@ -205,7 +208,8 @@ async def criar_lancamento(data_compra: date = Form(...),
         else:
             raise HTTPException(status_code = 401, detail = "Precisa declarar responsável por pagamento quando se é um CRÉDITO.")
     
-    
+    item_comprado = item_comprado.upper()
+    pagador_responsavel = pagador_responsavel.upper()
     novolancamento = Lancamentos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_lancamento = valor_lancamento, parcelado = parcelado, qnt_parcelas = qnt_parcelas, pagador_responsavel = pagador_responsavel, tipo_lancamento = tipo_lancamento)
     session.add(novolancamento)
     session.flush()
@@ -235,6 +239,141 @@ async def criar_lancamento(data_compra: date = Form(...),
         status_code = 303
     )
     
+
+@rota_lancamentos.get("/importacao")
+def tela_importacao(
+    request: Request,
+    session: Session = Depends(pegar_sessao),
+    usuario: Usuarios = Depends(verificar_token)
+):
+    if usuario is None:
+            return templates.TemplateResponse(request= request, name="sem_login.html")
+    
+    return templates.TemplateResponse(name="importacao.html", request = request, 
+                                      context= {
+                                        "request": request
+                                        })
+
+@rota_lancamentos.post("/importacao/ofx")
+async def importar_ofx(request: Request, 
+                        arquivo: UploadFile = File(...), 
+                        confirmar_nubank: bool = Form(False),
+                        data_vencimento: int | None = Form(None),
+                        data_fechamento: int | None = Form(None),
+                        usuario: Usuarios = Depends(verificar_token),
+                        session: Session = Depends(pegar_sessao)):
+    # VERIFICAR SE ESTÁ LOGADO
+    if usuario is None:
+        return templates.TemplateResponse(request = request, name =     "sem_login.html")
+
+    # INTERPRETAR ARQUIVO UPADO
+    if not arquivo.filename:
+        raise HTTPException(
+            status_code = 400,
+            detail="Nenhum arquivo foi selecionado"
+        )
+    if not arquivo.filename.lower().endswith(".ofx"):
+        raise HTTPException(
+            status_code = 400,
+            detail = "Necessário ser arquivo .ofx"
+        )
+    
+    arquivo.file.seek(0)
+    ofx = OfxParser.parse(arquivo.file)
+
+    # INTERAGIR COM O ARQUIVO PARA LEITURA DOS DADOS
+    id_conta = ofx.signon.fi_fid
+    conta = ofx.account
+    
+    # CASO SEJA NUBANK
+    if id_conta == "260":
+        nome_forma_pagamento = "CARTÃO DE CRÉDITO - NUBANK"
+        cartao_nubank_existe = (
+            session.query(FormasPagamento)
+            .filter(
+                func.unaccent(FormasPagamento.forma_pagamento) == func.unaccent(nome_forma_pagamento),
+                FormasPagamento.responsavel == usuario.nome,
+                FormasPagamento.id_usuario == usuario.id
+            ).first())
+
+        if not cartao_nubank_existe and not confirmar_nubank:
+            return {
+                "precisa_criar_forma_pagamento": True,
+                "forma_pagamento": nome_forma_pagamento
+            }
+        
+        if not cartao_nubank_existe and confirmar_nubank:
+            if data_vencimento is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Data de vencimento não informada."
+                )
+
+            if data_fechamento is None:
+                raise HTTPException(
+                    status_code = 400,
+                    detail = "Data de fechamento não informada."
+                )
+
+            if not 1 <= data_vencimento <= 31:
+                raise HTTPException(
+                    status_code = 400,
+                    detail = "Data de vencimento deve estar entre 01 e 31.  "
+                )
+            
+            if not 1 <= data_fechamento <= 31:
+                raise HTTPException(
+                    status_code = 400,
+                    detail = "Data de fechamento deve estar entre 01 e 31."
+                )
+
+            nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, 
+                                                  forma_pagamento = nome_forma_pagamento, 
+                                                  responsavel = usuario.nome, 
+                                                  status_forma_pagamento = "ATIVO", 
+                                                  data_vencimento = data_vencimento, 
+                                                  data_fechamento = data_fechamento)
+            session.add(nova_formaPagamento)
+            session.flush()
+
+        transacoes = []
+        for t in conta.statement.transactions:
+            transacoes.append({
+                "data_compra": t.date,
+                "tipo": t.type,
+                "valor_lancamento": t.amount,
+                "item_comprado": t.memo,
+                "id_transacao": t.id,
+            })
+
+        df = pd.DataFrame(transacoes)
+        df = df[~df["item_comprado"].str.contains("Parcela", case=False, na=False)]
+        df["data_compra"] = pd.to_datetime(df["data_compra"]).dt.date
+        df_filtrado = df["tipo"] == "debit"
+        df["valor_lancamento"] = df["valor_lancamento"].abs()
+        novo_df = df[df_filtrado]
+
+        for _, linha in novo_df.iterrows():
+
+            novolancamento = Lancamentos(id_usuario = usuario.id, 
+                                        data_compra = linha["data_compra"], 
+                                        item_comprado = linha["item_comprado"], 
+                                        id_categoria = '', 
+                                        id_forma_pagamento = nova_formaPagamento.id, 
+                                        valor_lancamento = linha["valor_lancamento"], 
+                                        parcelado = False, 
+                                        qnt_parcelas = 1, 
+                                        pagador_responsavel = usuario.nome, 
+                                        tipo_lancamento = "DEBITO"
+                                        )
+            session.add(novolancamento)
+        session.commit()
+        return {
+            "sucesso": True,
+            "mensagem": "Arquivo OFX importado com sucesso."
+        }
+        
+
 
 @rota_lancamentos.post("/editar")
 async def editar_lancamento(id_lancamento: int = Form(...),
@@ -366,7 +505,6 @@ async def deletar_conta(id_lancamento: int = Form(...),
                         session: Session = Depends(pegar_sessao), 
                         usuario: Usuarios = Depends(verificar_token)):
     
-    print("mandaram coisa pra cá")
     conta = session.query(Lancamentos).filter(Lancamentos.id == id_lancamento).first()
 
     if not conta:

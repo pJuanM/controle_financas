@@ -54,7 +54,11 @@ async def criar_usuario(usuario: str = Form(...),
                         senha: str = Form(...), 
                         session: Session = Depends(pegar_sessao)):
     
-
+    # === PASSANDO CADASTRO EM UPPERCASE ===
+    usuario = usuario.upper()
+    nome = nome.upper()
+    email = email.upper()
+    
     existe_usuario = session.query(Usuarios).filter(Usuarios.email == email).first()
     if existe_usuario:
         raise HTTPException(status_code= 400, detail = "Este e-mail já foi cadastrado em sistema.")
@@ -83,6 +87,7 @@ async def login(nome_usuario: str = Form(...),
                 senha: str = Form(...), 
                 session: Session = Depends(pegar_sessao)):
     
+    nome_usuario = nome_usuario.upper()
     
     usuario = autenticar_usuario(nome_usuario, senha, session)
     access_token = criar_token(usuario.id)

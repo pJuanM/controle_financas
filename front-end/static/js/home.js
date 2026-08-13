@@ -140,18 +140,3 @@ for (let ano = 2022; ano <= anoAtual + 4; ano++) {
     selectAno.appendChild(option);
 }
 
-// BOTAO FILTRAR DASHBOARD
-const btnFiltrar = document.querySelector(".btn-filtrar")
-const
-btnFiltrar.addEventListener("click", (e) => {
-    e.preventDefault()
-
-        const url = formEditar.dataset.url;
-
-        const resposta = await fetch(url, {
-            method: "POST",
-            body: dados
-        });
-})
-
-

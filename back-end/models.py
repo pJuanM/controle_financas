@@ -12,11 +12,12 @@ Base = declarative_base()
 class Lancamentos(Base):
     __tablename__ = "lancamentos" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
+    # id_transacao_bancaria = Column(String, nullable=True)
     data_compra = Column(Date, nullable=False) 
     item_comprado = Column(String(150), nullable=False) 
     valor_lancamento = Column(Numeric(10, 2), nullable = False)
     parcelado = Column(Boolean, nullable=False) 
-    pagador_responsavel = Column(String, nullable=True)
+    pagador_responsavel = Column(String, nullable=False)
     qnt_parcelas = Column(Integer)
     tipo_lancamento = Column(String, nullable=False)
 

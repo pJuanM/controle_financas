@@ -47,7 +47,8 @@ label {
     -webkit-text-fill-color: #ffffff !important;
     cursor: not-allowed;
 }
-.menu_editar select:disabled {
+.menu_editar select:disabled,
+select {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
