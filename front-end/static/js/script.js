@@ -145,105 +145,162 @@ if (formEditar) {
     formEditar.addEventListener("submit", async (e) => {
         e.preventDefault();
 
+        const botaoClicado = e.submitter;
+        
+        if (!botaoClicado) {
+            console.error("Não foi possível identificar botão clicado!");
+            return;
+        }
         const dados = new FormData(formEditar);
 
-        const tipoDados = formEditar.dataset.tipo;
 
-        const url = formEditar.dataset.url;
+        // EXCLUIR
+        if (botaoClicado.id === "btn_excluir") {
+            const confirmar = confirm("Deseja realmente excluir este lançamento?");
 
-        const resposta = await fetch(url, {
-            method: "POST",
-            body: dados
-        });
-
-        const resultado = await resposta.json();
-        
-        if (resultado.sucesso) {
-            // Pega o valor setado nos inputs de edição
-            function pegarValor(id){
-                const elemento = document.getElementById(id);
-                return elemento ? elemento.value : '';
+            if (!confirmar) {
+                return;
             }
-            // LANÇAENTOS
-            const novaDtCompra = pegarValor("editar_data_compra");
-            const novoItem = pegarValor("editar_item_comprado");
-            const novoValor = pegarValor("editar_valor_lancamento");
-            const novoPagamentoLancamento = pegarValor("editar_id_forma_pagamento");
-            const novaCategoriaLancamento = pegarValor("editar_id_categoria");
-            const novaParcelas = pegarValor("editar_qnt_parcelas");
-            const novoPagador = pegarValor("editar_pagador_responsavel");
 
-            // PARCELAS  
-            const novoStatusParcela = pegarValor("editar_status_parcela");
+            try {
+                const resposta = await fetch(
+                    "/lancamentos/excluir",
+                    {
+                        method: "POST",
+                        body:dados
+                    }
+                );
+                const resultado = await resposta.json();
+
+                if (!resposta.ok) {
+                    throw new Error(
+                        resultado.detail || "Erro ao excluir lançamento."
+                    );
+                };
+
+                if (linhaSelecionada) {
+                    linhaSelecionada.remove();
+                };
+
+                fecharMenu();
+
+                alert(
+                    resultado.mensagem || "Lançamento excluído com sucesso."
+                );
+
+            } catch (erro) {
+                console.error(
+                    "Erro ao excluir lançamento: ",
+                    erro
+                );
+                alert(
+                    erro.message || "Ocorreu um erro ao excluir o lançamento!"
+                );
+            }
+            return;
+        }
+
+
+        // EDITAR
+        if (botaoClicado.id === "btn_editar") {
+            const tipoDados = formEditar.dataset.tipo;
+
+            const url = formEditar.dataset.url;
+
+            const resposta = await fetch(url, {
+                method: "POST",
+                body: dados
+            });
+
+            const resultado = await resposta.json();
             
-            // FORMAS DE PAGAMENTO
-            const novaFormaPagamento = pegarValor("editar_forma_pagamento");
-            const novoResponsavelPagamento = pegarValor("editar_responsavel")
-            const novaDtVencimento = pegarValor("editar_data_vencimento");
-            const novaDtFechamento = pegarValor("editar_data_fechamento");
-            const novoStatusFormaPagamento = pegarValor("editar_status_forma_pagamento");
-            
+            if (resultado.sucesso) {
+                // Pega o valor setado nos inputs de edição
+                function pegarValor(id){
+                    const elemento = document.getElementById(id);
+                    return elemento ? elemento.value : '';
+                }
+                // LANÇAENTOS
+                const novaDtCompra = pegarValor("editar_data_compra");
+                const novoItem = pegarValor("editar_item_comprado");
+                const novoValor = pegarValor("editar_valor_lancamento");
+                const novoPagamentoLancamento = pegarValor("editar_id_forma_pagamento");
+                const novaCategoriaLancamento = pegarValor("editar_id_categoria");
+                const novaParcelas = pegarValor("editar_qnt_parcelas");
+                const novoPagador = pegarValor("editar_pagador_responsavel");
 
-            // CATEGORIAS
-            const novaCategoria = pegarValor("editar_categoria");
-            const novaDescricao = pegarValor("editar_descricao");
-            const novoStatusCategoria = pegarValor("editar_status_categoria");
-            // AJUSTAR DATA DE COMPRA (TIPO DATE)
-            let dataCompraFormatada = "";
-            if (novaDtCompra) {
-                dataCompraFormatada = novaDtCompra.split("-").reverse().join("/");
+                // PARCELAS  
+                const novoStatusParcela = pegarValor("editar_status_parcela");
+                
+                // FORMAS DE PAGAMENTO
+                const novaFormaPagamento = pegarValor("editar_forma_pagamento");
+                const novoResponsavelPagamento = pegarValor("editar_responsavel")
+                const novaDtVencimento = pegarValor("editar_data_vencimento");
+                const novaDtFechamento = pegarValor("editar_data_fechamento");
+                const novoStatusFormaPagamento = pegarValor("editar_status_forma_pagamento");
+                
+
+                // CATEGORIAS
+                const novaCategoria = pegarValor("editar_categoria");
+                const novaDescricao = pegarValor("editar_descricao");
+                const novoStatusCategoria = pegarValor("editar_status_categoria");
+                // AJUSTAR DATA DE COMPRA (TIPO DATE)
+                let dataCompraFormatada = "";
+                if (novaDtCompra) {
+                    dataCompraFormatada = novaDtCompra.split("-").reverse().join("/");
+                }
+
+                // Atualiza os dados usados pelo editarItem()
+
+                // LANÇAMENTOS
+                linhaSelecionada.dataset.dataCompra = novaDtCompra;
+                linhaSelecionada.dataset.itemComprado = novoItem;
+                linhaSelecionada.dataset.valorLancamento = novoValor;
+                linhaSelecionada.dataset.idFormaPagamento = novoPagamentoLancamento;
+                linhaSelecionada.dataset.idCategoria = novaCategoriaLancamento;
+                linhaSelecionada.dataset.qntParcelas = novaParcelas;
+                linhaSelecionada.dataset.pagadorResponsavel = novoPagador;
+
+                // PARCELAS
+                linhaSelecionada.dataset.statusParcela = novoStatusParcela;
+
+                // FORMAS DE PAGAMENTO
+                linhaSelecionada.dataset.dataVencimento = novaDtVencimento;
+                linhaSelecionada.dataset.formaPagamento = novaFormaPagamento;
+                linhaSelecionada.dataset.responsavel = novoResponsavelPagamento;
+                linhaSelecionada.dataset.dataFechamento = novaDtFechamento;
+                linhaSelecionada.dataset.statusFormaPagamento = novoStatusFormaPagamento;
+
+                // CATEGORIAS
+                linhaSelecionada.dataset.categoria = novaCategoria;
+                linhaSelecionada.dataset.descricao = novaDescricao;
+                linhaSelecionada.dataset.statusCategoria = novoStatusCategoria;
+
+                // Atualiza visual da tabela
+                // FORMAS DE PAGAMENTO
+                
+                if (tipoDados === "formasPagamento") {
+                    linhaSelecionada.cells[0].textContent = resultado.formaPagamento;
+                    linhaSelecionada.cells[1].textContent = resultado.responsavel;
+                    linhaSelecionada.cells[2].textContent = resultado.data_vencimento;
+                    linhaSelecionada.cells[3].textContent = resultado.status;
+                }
+                // CATEGORIAS
+                if (tipoDados === "categorias") {
+                    linhaSelecionada.cells[0].textContent = resultado.categoria;
+                    linhaSelecionada.cells[1].textContent = resultado.descricao;
+                    linhaSelecionada.cells[2].textContent = resultado.status_categoria;
+                }
+                // LANÇAMENTOS
+                if (tipoDados === "lancamentos") {
+                    linhaSelecionada.cells[0].textContent = dataCompraFormatada;
+                    linhaSelecionada.cells[1].textContent = resultado.item_comprado;
+                    linhaSelecionada.cells[2].textContent = resultado.valor_lancamento;
+                }
+
+                fecharMenu();
+                alert("Lançamento atualizado com sucesso!");
             }
-
-            // Atualiza os dados usados pelo editarItem()
-
-            // LANÇAMENTOS
-            linhaSelecionada.dataset.dataCompra = novaDtCompra;
-            linhaSelecionada.dataset.itemComprado = novoItem;
-            linhaSelecionada.dataset.valorLancamento = novoValor;
-            linhaSelecionada.dataset.idFormaPagamento = novoPagamentoLancamento;
-            linhaSelecionada.dataset.idCategoria = novaCategoriaLancamento;
-            linhaSelecionada.dataset.qntParcelas = novaParcelas;
-            linhaSelecionada.dataset.pagadorResponsavel = novoPagador;
-
-            // PARCELAS
-            linhaSelecionada.dataset.statusParcela = novoStatusParcela;
-
-            // FORMAS DE PAGAMENTO
-            linhaSelecionada.dataset.dataVencimento = novaDtVencimento;
-            linhaSelecionada.dataset.formaPagamento = novaFormaPagamento;
-            linhaSelecionada.dataset.responsavel = novoResponsavelPagamento;
-            linhaSelecionada.dataset.dataFechamento = novaDtFechamento;
-            linhaSelecionada.dataset.statusFormaPagamento = novoStatusFormaPagamento;
-
-            // CATEGORIAS
-            linhaSelecionada.dataset.categoria = novaCategoria;
-            linhaSelecionada.dataset.descricao = novaDescricao;
-            linhaSelecionada.dataset.statusCategoria = novoStatusCategoria;
-
-            // Atualiza visual da tabela
-            // FORMAS DE PAGAMENTO
-            
-            if (tipoDados === "formasPagamento") {
-                linhaSelecionada.cells[0].textContent = resultado.formaPagamento;
-                linhaSelecionada.cells[1].textContent = resultado.responsavel;
-                linhaSelecionada.cells[2].textContent = resultado.data_vencimento;
-                linhaSelecionada.cells[3].textContent = resultado.status;
-            }
-            // CATEGORIAS
-            if (tipoDados === "categorias") {
-                linhaSelecionada.cells[0].textContent = resultado.categoria;
-                linhaSelecionada.cells[1].textContent = resultado.descricao;
-                linhaSelecionada.cells[2].textContent = resultado.status_categoria;
-            }
-            // LANÇAMENTOS
-            if (tipoDados === "lancamentos") {
-                linhaSelecionada.cells[0].textContent = dataCompraFormatada;
-                linhaSelecionada.cells[1].textContent = resultado.item_comprado;
-                linhaSelecionada.cells[2].textContent = resultado.valor_lancamento;
-            }
-
-            fecharMenu();
-            alert("Lançamento atualizado com sucesso!");
         }
     });
 }

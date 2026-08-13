@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends, HTTPException, Request
 from models import Usuarios
 from dependencies import pegar_sessao, verificar_token
 from sqlalchemy.orm import Session
-from main import templates, ALGORITHM, ACCESS_TOKEN_EXPIRE_HOURS, SECRET_KEY
+from main import templates, ALGORITHM, ACCESS_TOKEN_EXPIRE_HOURS, SECRET_KEY, bcrypt_context
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from fastapi.responses import RedirectResponse
@@ -24,16 +24,19 @@ def criar_token(usuario_id,
     return jwt_codificado
 
 
-def autenticar_usuario(email, 
+def autenticar_usuario(nome_usuario, 
                        senha, 
                        session):
     
-
-    existe_usuario = session.query(Usuarios).filter(Usuarios.email == email).first()
+    nome_usuario = nome_usuario.upper()
+    existe_usuario = session.query(Usuarios).filter(Usuarios.email == nome_usuario).first()
     if not existe_usuario:
-        raise HTTPException(status_code= 400, detail = "Não tem usuário cadastrado para este e-mail!")
-    if senha != existe_usuario.senha:
+        existe_usuario = session.query(Usuarios).filter(Usuarios.usuario == nome_usuario).first()
+        if not existe_usuario:
+            raise HTTPException(status_code= 400, detail = "Não tem usuário cadastrado para este e-mail!")
+    if not bcrypt_context.verify(senha, existe_usuario.senha):
         raise HTTPException(status_code= 400, detail="Senha incorreta")
+
     return existe_usuario
 
 
@@ -55,7 +58,8 @@ async def criar_usuario(usuario: str = Form(...),
     existe_usuario = session.query(Usuarios).filter(Usuarios.email == email).first()
     if existe_usuario:
         raise HTTPException(status_code= 400, detail = "Este e-mail já foi cadastrado em sistema.")
-    novo_usuario = Usuarios(usuario = usuario, nome = nome, status_usuario = "ATIVO", email = email, senha = senha)
+    senha_criptografada = bcrypt_context.hash(senha)
+    novo_usuario = Usuarios(usuario = usuario, nome = nome, status_usuario = "ATIVO", email = email, senha = senha_criptografada)
     session.add(novo_usuario)
     session.commit()
 
@@ -75,12 +79,12 @@ async def login(request: Request):
 
 
 @rota_autenticacao.post("/login")
-async def login(email: str = Form(...), 
+async def login(nome_usuario: str = Form(...), 
                 senha: str = Form(...), 
                 session: Session = Depends(pegar_sessao)):
     
-
-    usuario = autenticar_usuario(email, senha, session)
+    
+    usuario = autenticar_usuario(nome_usuario, senha, session)
     access_token = criar_token(usuario.id)
     response = RedirectResponse(
         url="/home",
@@ -95,22 +99,9 @@ async def login(email: str = Form(...),
 
     return response
 
-# ======= LOGIN VIA FAST API =======
-@rota_autenticacao.post("/login-form")
-async def login_form(dados_formulario: OAuth2PasswordRequestForm = Depends(), 
-                     session: Session = Depends(pegar_sessao)):
-    
-    usuario = autenticar_usuario(dados_formulario.username, dados_formulario.password, session)
-    access_token = criar_token(usuario.id)
-    return {
-        "access_token": access_token,
-        "token_type": "Bearer"
-    }
-
 
 @rota_autenticacao.get("/refresh")
 async def use_refresh_token(usuario: Usuarios = Depends(verificar_token)):
-
 
     access_token = criar_token(usuario.id)
     return {

@@ -51,14 +51,7 @@ form .campo_data label.escondida {
     opacity: 0;
 }
  
-select, 
-summary::marker,
-details,
-input:not([type="checkbox"]) {
-    background-color: #000e32;
-    border: 2px solid #00ffb6;
-    box-shadow: 2px -2px 7px 1px #6a11a9;
-}
+
 form input::placeholder{
     color: white;
 }
@@ -75,8 +68,9 @@ input:not([type="checkbox"]){
     font-weight: bold;
 }
 
-form input, 
-#enviar_formulario, 
+#enviar_formulario,
+#btn_editar,
+#btn_excluir,
 select,
 input:not([type="checkbox"]) {
     background-color: #000e32;
@@ -91,6 +85,21 @@ input:not([type="checkbox"]) {
     text-overflow: ellipsis;
     overflow: hidden;
     font-size: .8em;
+    border: 2px solid #00ffb6;
+    box-shadow: 2px -2px 7px 1px #6a11a9;
+}
+details {
+    background-color: #000e32;
+    color: white;
+    padding: .6em;
+    width: 100%;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: .8em;
+    text-align: center;
+    margin-bottom: 1em;
+    border: 2px solid #00ffb6;
+    box-shadow: 2px -2px 7px 1px #6a11a9;
 }
 
 optgroup{

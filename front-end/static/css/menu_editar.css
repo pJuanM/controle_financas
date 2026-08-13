@@ -27,7 +27,8 @@
 .menu_editar.ativo button:last-child {
     right: 2%;
 }
-.menu_editar .grupo_campo_editar, .formulario .grupo_campo_editar{
+.menu_editar .grupo_campo_editar, 
+.formulario .grupo_campo_editar{
     display: flex;
     gap: .8em;
     width: 100%;
@@ -41,4 +42,10 @@
     right: 50%;
     transform: translate(50%, 0);
     width: 80vw;
+}
+
+:disabled {
+    background-color: #e0e0e0;
+    color: #777;
+    cursor: not-allowed;
 }

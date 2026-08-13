@@ -366,7 +366,7 @@ async def deletar_conta(id_lancamento: int = Form(...),
                         session: Session = Depends(pegar_sessao), 
                         usuario: Usuarios = Depends(verificar_token)):
     
-    
+    print("mandaram coisa pra cá")
     conta = session.query(Lancamentos).filter(Lancamentos.id == id_lancamento).first()
 
     if not conta:
