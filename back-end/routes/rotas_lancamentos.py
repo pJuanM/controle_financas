@@ -1,22 +1,25 @@
-from fastapi import APIRouter, Form, File, Depends, HTTPException, UploadFile, Request, Query
-from fastapi.responses import RedirectResponse
-from typing import Optional
-from urllib.parse import quote
-from sqlalchemy.orm import Session
-from sqlalchemy import func
-from dependencies import pegar_sessao, verificar_token
-from models import Lancamentos, Categorias, FormasPagamento, Usuarios, Parcelas
-from main import templates
-from decimal import Decimal
 from datetime import date, datetime
+from decimal import Decimal
+from urllib.parse import quote
+from typing import Optional
 import calendar
-from dateutil.relativedelta import relativedelta
-from ofxparse import OfxParser
-import pandas as pd
+import re
 
+import pandas as pd
+from dateutil.relativedelta import relativedelta
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile
+from fastapi.responses import RedirectResponse
+from ofxparse import OfxParser
+from sqlalchemy.orm import Session
+
+from dependencies import pegar_sessao, verificar_token
+from main import templates
+from models import Categorias, FormasPagamento, Lancamentos, Parcelas, Usuarios
 
 rota_lancamentos = APIRouter(prefix="/lancamentos", tags=["lancamentos"], dependencies=[Depends(verificar_token)])
 
+
+# === FUNÇÃO PARA CALCULAR VENCIMENTO DE PARCELAS ===
 def calcular_primeiro_vencimento(data_compra, forma_pagamento):
     dia_fechamento = forma_pagamento.data_fechamento
     dia_vencimento = forma_pagamento.data_vencimento
@@ -48,6 +51,49 @@ def calcular_primeiro_vencimento(data_compra, forma_pagamento):
     )   
 
 
+# === FUNÇÃO PARA IDENTIFICAR SE ALGUMA CATEGORIA CORRESPONDE AO LANÇAMENTO ===
+def encontrar_categoria(descricao_lancamento,
+                        usuario_id,
+                        session):
+    categorias = (
+        session.query(Categorias).filter(Categorias.id_usuario == usuario_id, 
+                                         Categorias.status_categoria == "ATIVO")
+    ).all()
+
+    for categoria in categorias:
+        if categoria.categoria.upper() == "AVULSO":
+            continue
+
+        palavras_chave = re.split(r"[,|]", categoria.descricao.upper())
+
+        for palavra in palavras_chave:
+            palavra = palavra.strip()
+
+            if palavra and palavra in descricao_lancamento.upper():
+                return categoria.id
+            
+    categoria_avulso = (
+        session.query(Categorias)
+        .filter(
+            Categorias.id_usuario == usuario_id,
+            Categorias.categoria == "AVULSO",
+            Categorias.status_categoria == "ATIVO"
+        )
+        .first()
+    )
+
+    if categoria_avulso:
+        return categoria_avulso.id
+    categoria_avulso = Categorias(id_usuario = usuario_id, 
+                                categoria = "AVULSO", 
+                                status_categoria = "ATIVO", 
+                                descricao = "LANÇAMENTOS QUE NÃO POSSUEM UMA CATEGORIA PRÉ ESTABELECIDA.")
+    session.add(categoria_avulso)
+    session.flush()
+    return categoria_avulso.id
+
+
+# === ROTA PRINCIPAL DE LANÇAMENTOS VISUAL ===
 @rota_lancamentos.get("/")
 async def listar_lancamentos(request: Request,
                          data_compra_inicio: str | None = Query(None),
@@ -140,6 +186,7 @@ async def listar_lancamentos(request: Request,
     )
 
 
+# === ROTA DE CRIAR LANÇAMENTOS VISUAL ===
 @rota_lancamentos.get("/criar")
 async def home(request: Request, 
                mensagem: Optional[str] = None,
@@ -165,6 +212,7 @@ async def home(request: Request,
     )
 
 
+# === ROTA DE CRIAR LANÇAMENTOS ===
 @rota_lancamentos.post("/criar")
 async def criar_lancamento(data_compra: date = Form(...), 
                       item_comprado: str = Form(...), 
@@ -240,6 +288,7 @@ async def criar_lancamento(data_compra: date = Form(...),
     )
     
 
+# === ROTA DE IMPORTAÇÃO OFX VISUAL ===
 @rota_lancamentos.get("/importacao")
 def tela_importacao(
     request: Request,
@@ -254,6 +303,8 @@ def tela_importacao(
                                         "request": request
                                         })
 
+
+# === ROTA DE IMPORTAÇÃO OFX ===
 @rota_lancamentos.post("/importacao/ofx")
 async def importar_ofx(request: Request, 
                         arquivo: UploadFile = File(...), 
@@ -262,11 +313,11 @@ async def importar_ofx(request: Request,
                         data_fechamento: int | None = Form(None),
                         usuario: Usuarios = Depends(verificar_token),
                         session: Session = Depends(pegar_sessao)):
-    # VERIFICAR SE ESTÁ LOGADO
+    # === VERIFICAR SE ESTÁ LOGADO ===
     if usuario is None:
-        return templates.TemplateResponse(request = request, name =     "sem_login.html")
+        return templates.TemplateResponse(request = request, name = "sem_login.html")
 
-    # INTERPRETAR ARQUIVO UPADO
+    # === INTERPRETAR ARQUIVO UPADO ===
     if not arquivo.filename:
         raise HTTPException(
             status_code = 400,
@@ -277,32 +328,34 @@ async def importar_ofx(request: Request,
             status_code = 400,
             detail = "Necessário ser arquivo .ofx"
         )
-    
+
     arquivo.file.seek(0)
     ofx = OfxParser.parse(arquivo.file)
 
-    # INTERAGIR COM O ARQUIVO PARA LEITURA DOS DADOS
+    # === INTERAGIR COM O ARQUIVO PARA LEITURA DOS DADOS ===
     id_conta = ofx.signon.fi_fid
     conta = ofx.account
     
-    # CASO SEJA NUBANK
+    # === CASO SEJA NUBANK ===
     if id_conta == "260":
         nome_forma_pagamento = "CARTÃO DE CRÉDITO - NUBANK"
-        cartao_nubank_existe = (
+        forma_pagamento_nubank = (
             session.query(FormasPagamento)
             .filter(
-                func.unaccent(FormasPagamento.forma_pagamento) == func.unaccent(nome_forma_pagamento),
+                FormasPagamento.forma_pagamento == nome_forma_pagamento,
                 FormasPagamento.responsavel == usuario.nome,
                 FormasPagamento.id_usuario == usuario.id
             ).first())
 
-        if not cartao_nubank_existe and not confirmar_nubank:
+        # === SE NÃO HOUVER FORMA DE PAGAMENTO NUBANK E AINDA NÃO FOI CONFIRMADO GERAR FORMA DE PAGAMENTO NUBANK ===
+        if not forma_pagamento_nubank and not confirmar_nubank:
             return {
                 "precisa_criar_forma_pagamento": True,
                 "forma_pagamento": nome_forma_pagamento
             }
         
-        if not cartao_nubank_existe and confirmar_nubank:
+        # === SE NÃO HOUVER FORMA DE PAGAMENTO NUBANK MAS FOI CONFIRMADO GERAR FORMA DE PAGAMENTO NUBANK ===
+        if not forma_pagamento_nubank and confirmar_nubank:
             if data_vencimento is None:
                 raise HTTPException(
                     status_code=400,
@@ -327,15 +380,17 @@ async def importar_ofx(request: Request,
                     detail = "Data de fechamento deve estar entre 01 e 31."
                 )
 
-            nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, 
+            # === CRIAR FORMA DE PAGAMENTO NUBANK - CARTÃO DE CRÉDITO - NUBANK ===
+            forma_pagamento_nubank = FormasPagamento(id_usuario = usuario.id, 
                                                   forma_pagamento = nome_forma_pagamento, 
                                                   responsavel = usuario.nome, 
                                                   status_forma_pagamento = "ATIVO", 
                                                   data_vencimento = data_vencimento, 
                                                   data_fechamento = data_fechamento)
-            session.add(nova_formaPagamento)
+            session.add(forma_pagamento_nubank)
             session.flush()
 
+        # === INTERAGIR COM CADA TRANSAÇÃO DO ARQUIVO .OFX ===
         transacoes = []
         for t in conta.statement.transactions:
             transacoes.append({
@@ -346,6 +401,7 @@ async def importar_ofx(request: Request,
                 "id_transacao": t.id,
             })
 
+        # === SEPARAR DO ARQUIVO - ITENS PARCELADOS / ALTERAR FORMATO DATA DA COMPRA / REMOVER CRÉDITOS / TORNAR DÉBITOS COMO POSITIVOS
         df = pd.DataFrame(transacoes)
         df = df[~df["item_comprado"].str.contains("Parcela", case=False, na=False)]
         df["data_compra"] = pd.to_datetime(df["data_compra"]).dt.date
@@ -353,13 +409,28 @@ async def importar_ofx(request: Request,
         df["valor_lancamento"] = df["valor_lancamento"].abs()
         novo_df = df[df_filtrado]
 
+        # === PARA CADA LINHA LIDA DO ARQUIVO .OFX ===
         for _, linha in novo_df.iterrows():
+            item_comprado = linha["item_comprado"].upper()
 
+            # === VERIFICAR SE EXISTE LANÇAMENTO COM AQUELE CODIGO ===
+            existeLancamento = session.query(Lancamentos).filter(Lancamentos.id_transacao_bancaria == linha["id_transacao"]).first()
+            # === SE SIM IGNORAR ===
+            if existeLancamento:
+                continue
+            
+            # === VERIFICAR CATEGORIA CORRESPONDENTE ===
+            id_categoria = encontrar_categoria(item_comprado,
+                                               usuario_id = usuario.id,
+                                               session = session
+                                               )
+            # === CRIAR NOVO LANCAMENTO ===
             novolancamento = Lancamentos(id_usuario = usuario.id, 
+                                         id_transacao_bancaria = linha["id_transacao"],
                                         data_compra = linha["data_compra"], 
-                                        item_comprado = linha["item_comprado"], 
-                                        id_categoria = '', 
-                                        id_forma_pagamento = nova_formaPagamento.id, 
+                                        item_comprado = item_comprado, 
+                                        id_categoria = id_categoria, 
+                                        id_forma_pagamento = forma_pagamento_nubank.id, 
                                         valor_lancamento = linha["valor_lancamento"], 
                                         parcelado = False, 
                                         qnt_parcelas = 1, 
@@ -367,6 +438,27 @@ async def importar_ofx(request: Request,
                                         tipo_lancamento = "DEBITO"
                                         )
             session.add(novolancamento)
+            session.flush()
+
+            # === GERAR NOVA PARCELA ===
+            qtd = novolancamento.qnt_parcelas
+            valor_total = Decimal(str(novolancamento.valor_lancamento))
+            qtd = novolancamento.qnt_parcelas
+            valor_base = (valor_total / qtd).quantize(Decimal("0.01"))
+            primeiro_vencimento = calcular_primeiro_vencimento(linha["data_compra"],
+                                                               novolancamento.formaPagamento)
+            for numero in range(1, qtd + 1):
+                if numero < qtd:
+                    valor = valor_base
+                else:
+                    valor = valor_total - (valor_base * (qtd - 1))
+                    vencimento = primeiro_vencimento + relativedelta(months = numero - 1)
+            parcela = Parcelas(numero_parcela = 1,
+                           valor_parcela = valor,
+                           id_lancamento = novolancamento.id,
+                           data_vencimento = vencimento,
+                           )
+            session.add(parcela)
         session.commit()
         return {
             "sucesso": True,

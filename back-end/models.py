@@ -12,7 +12,7 @@ Base = declarative_base()
 class Lancamentos(Base):
     __tablename__ = "lancamentos" 
     id = Column(Integer, primary_key=True, autoincrement=True) 
-    # id_transacao_bancaria = Column(String, nullable=True)
+    id_transacao_bancaria = Column(String, nullable=True)
     data_compra = Column(Date, nullable=False) 
     item_comprado = Column(String(150), nullable=False) 
     valor_lancamento = Column(Numeric(10, 2), nullable = False)

@@ -382,15 +382,10 @@ document.addEventListener("click", function(event) {
 // ======================================================
 
 document.querySelectorAll(".btn-liquidar").forEach(checkbox => {
-
     checkbox.addEventListener("click", function (e) {
-
-        // Impede que o clique no checkbox
-        // abra o menu de edição da linha
+        // Impede que o clique no checkbox abra o menu de edição da linha
         e.stopPropagation();
-
     });
-
 });
 
 
