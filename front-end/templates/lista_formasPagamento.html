@@ -8,7 +8,7 @@ Forma de Pagamento
     <form action="/formaPagamento" method="get" id="formulario_filtrar">
         <div class="grupo_campo">
             <select name="status_forma_pagamento" id="status_forma_pagamento">
-                <option value="" disabled {% if not status_forma_pagamento %} selected {% endif %}>Status Forma de Pagamento</option>
+                <option   style='text-align-last: center' value="" disabled {% if not status_forma_pagamento %} selected {% endif %}>Status Forma de Pagamento</option>
                 <option value="ATIVO" {% if status_forma_pagamento == "ATIVO" %}selected{% endif %}>ATIVO</option>
                 <option value="INATIVO" {% if status_forma_pagamento == "INATIVO" %}selected{% endif %}>INATIVO</option>
             </select>
@@ -37,7 +37,6 @@ Forma de Pagamento
                 <th class="tabela_cabecalho" onclick="ordenarTabela(this, 0, 'texto')">FORMA</th>
                 <th class="tabela_cabecalho" onclick="ordenarTabela(this, 1, 'texto')">RESPONSÁVEL</th>
                 <th class="tabela_cabecalho" onclick="ordenarTabela(this, 2, 'numero')">VENCIMENTO</th>
-                <th class="tabela_cabecalho" onclick="ordenarTabela(this, 3, 'texto')">STATUS</th>
             </tr>
         </thead>
         <tbody>
@@ -54,12 +53,11 @@ Forma de Pagamento
                     <td class="col-item">{{ formaDePagamento.forma_pagamento }}</td>
                     <td>{{ formaDePagamento.responsavel }}</td>
                     <td>{{ formaDePagamento.data_vencimento or 'À vista' }}</td>
-                    <td>{{ formaDePagamento.status_forma_pagamento }}</td>
                 </tr>
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td colspan="4">Nenhuma forma de pagamento encontrada.</td>
+                    <td colspan="3">Nenhuma forma de pagamento encontrada.</td>
                 </tr>
             {% endif %}
         </tbody>
@@ -95,7 +93,7 @@ Forma de Pagamento
             </select>
         </div>
 
-        <div class="grupo_campo">
+        <div class="grupo_campo botoes_formulario">
             <button type="submit" id="btn_excluir" formaction="/formaPagamento/excluir/">Excluir Forma de Pagamento</button>
             <button type="submit" id="btn_editar" formaction="/formaPagamento/editar">Editar Forma de Pagamento</button>
         </div>

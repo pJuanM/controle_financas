@@ -9,7 +9,7 @@ Débitos
 <!-------  ======= ABA DE FILTROS DE LANÇAMENTOS ======= ------->
 <h1 class="titulo-pagina">Lançamentos</h1>
 <section class="formulario">
-    <form action="/lancamentos" method="get" id="formulario_filtrar">
+    <form action="/lancamentos/" method="get" id="formulario_filtrar">
         
         <div class="grupo_campo campo_data">
             <input type="date" id="data_compra_inicio" name="data_compra_inicio" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()" value="{{ data_compra_inicio or '' }}">
@@ -65,14 +65,28 @@ Débitos
         </div>
 
         <div class="grupo_campo">
-            <select name="tipo_lancamento" id="tipo_lancamento" required>
-                <option value="" {% if not tipo_lancamento %} selected {% endif %} disabled>Tipo Lançamento: </option>
-                <option value="CREDITO" {% if tipo_lancamento == "CREDITO" %}selected {% endif %}>CRÉDITO</option>
-                <option value="DEBITO" {% if tipo_lancamento == "DEBITO" %}selected {% endif %}>DÉBITO</option>
-            </select>  
+            <details class="filtroDetails">
+                <summary>Tipo de Lançamento</summary>
+                    <div class="opcao_checkbox">
+                        <div class="linha_checkbox">
+                            <input {% if tipo_lancamento and "CREDITO" in tipo_lancamento %}checked {% endif %} type="checkbox" name="tipo_lancamento" id="credito" value="CREDITO">
+                            <label for="credito">CRÉDITO</label>
+                        </div>
+                    </div>
+                     
+                    <div class="opcao_checkbox">
+                        <div class="linha_checkbox">
+                            <input {% if tipo_lancamento and "DEBITO" in tipo_lancamento %}checked {% endif %}  type="checkbox" name="tipo_lancamento" id="debito" value="DEBITO">
+                            <label for="debito">DÉBITO</label>
+                        </div>
+                    </div>
+            </details>  
         </div>
 
         <button type="submit" id="enviar_formulario">Filtrar Lançamentos</button>
+        <button type="submit" class="botao_gerar_excel" name="acao" value="excel">
+            Gerar Excel
+        </button>
     </form>
 </section>
 
@@ -93,14 +107,15 @@ Débitos
                 <tr onclick="editarItem(this)"
                     data-id="{{ lancamento.id }}"
                     data-data-compra="{{ lancamento.data_compra }}"
-                    data-item-comprado="{{ lancamento.item_comprado }}"
+                    data-item-comprado="{{ lancamento.  item_comprado }}"
                     data-id-categoria="{{ lancamento.categoria.id }}"
                     data-valor-lancamento="{{ lancamento.valor_lancamento }}"
                     data-id-forma-pagamento="{{ lancamento.formaPagamento.id }}"
                     data-tipo-lancamento="{{ lancamento.parcela.tipo_lancamento }}"
                     data-qnt-parcelas="{{ lancamento.qnt_parcelas }}"
                     data-pagador-responsavel="{{ lancamento.pagador_responsavel }}"
-                    data-responsavel-forma_pagamento="{{ lancamento.formaPagamento.responsavel }}">
+                    data-responsavel-forma_pagamento="{{ lancamento.formaPagamento.responsavel }}"
+                    class="badge-tipo {{ lancamento.tipo_lancamento|lower }}">
                     <td class="col-data-compra">{{ lancamento.data_compra.strftime("%d/%m/%Y") }}</td>
                     <td class="col-item">{{ lancamento.item_comprado }}</td>
                     <td>R$ {{ "{:,.2f}".format(lancamento.valor_lancamento).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>                    
@@ -131,7 +146,7 @@ Débitos
                 <label for="item_comprado">Compra:</label>
                 <input type="text" id="editar_item_comprado" name="item_comprado" placeholder="Item Comprado" autocomplete="off">
             </div>
-            <div class="grupo_campo">
+            <div class="grupo_campo data_vencimento_menu_editar">
                 <label for="data_compra">Dt. Compra:</label>
                 <input type="date" id="editar_data_compra" name="data_compra" placeholder="" onfocus="this.showPicker()" required>
             </div>

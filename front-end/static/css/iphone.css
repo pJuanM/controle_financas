@@ -6,11 +6,20 @@
     font-size: 16px; /* evita zoom automático no iPhone */
     width: 20.375em;
   }
-
   
+  .data_vencimento_menu_editar input[type="date"] {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
   input[type="checkbox"] {
     display: inline-block;
     margin: auto;
     transform: translateY(-50%);
   }
+
+
 }

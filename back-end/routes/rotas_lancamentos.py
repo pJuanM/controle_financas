@@ -8,7 +8,8 @@ import re
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, StreamingResponse
+from io import BytesIO
 from ofxparse import OfxParser
 from sqlalchemy.orm import Session
 
@@ -93,6 +94,42 @@ def encontrar_categoria(descricao_lancamento,
     return categoria_avulso.id
 
 
+# === FUNÇÃO PARA GERAR O EXCEL DA ROTA ===
+def gerar_excel(lancamentos):
+    dados = []
+    for lancamento in lancamentos:
+        dados.append({
+            "ID": lancamento.id,
+            "Data da compra": lancamento.data_compra,
+            "Item": lancamento.item_comprado,
+            "Categoria": lancamento.categoria.categoria,
+            "Forma de pagamento": lancamento.formaPagamento.forma_pagamento,
+            "Valor": float(lancamento.valor_lancamento),
+            "Parcelado": "SIM" if lancamento.parcelado else "NÃO",
+            "Quantidade de parcelas": lancamento.qnt_parcelas,
+            "Pagador": lancamento.pagador_responsavel,
+            "Tipo": lancamento.tipo_lancamento,
+        })
+
+    df = pd.DataFrame(dados)
+    arquivo = BytesIO()
+
+    with pd.ExcelWriter(arquivo, engine="openpyxl") as writer:
+        df.to_excel(
+            writer,
+            index=False,
+            sheet_name="Lançamentos"
+        )
+    arquivo.seek(0)
+
+    return StreamingResponse(
+        arquivo,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": 'attachment; filename="lancamentos.xlsx"'
+            }
+    )
+
 # === ROTA PRINCIPAL DE LANÇAMENTOS VISUAL ===
 @rota_lancamentos.get("/")
 async def listar_lancamentos(request: Request,
@@ -102,8 +139,9 @@ async def listar_lancamentos(request: Request,
                          data_vencimento_final: str | None = Query(None),
                          id_categoria: list[int] | None = Query(None), 
                          id_forma_pagamento: list[int] | None = Query(None),
-                         tipo_lancamento: str | None = Query(None),
-                         session: Session = Depends(pegar_sessao), 
+                         tipo_lancamento: list[str] | None = Query(None),
+                         session: Session = Depends(pegar_sessao),
+                         acao: str | None = Query(None),
                          usuario: Usuarios = Depends(verificar_token)):
     """
     Essa é a rota padrão das contas.
@@ -111,7 +149,6 @@ async def listar_lancamentos(request: Request,
     
     if usuario is None:
         return templates.TemplateResponse(request= request, name="sem_login.html")
-    
     categorias = session.query(Categorias).filter(Categorias.id_usuario == usuario.id)
     formas_pagamento = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
     
@@ -160,11 +197,12 @@ async def listar_lancamentos(request: Request,
             query = query.filter(Lancamentos.id_forma_pagamento.in_(formasPagamento))
 
         if tipo_lancamento is not None:
-            query = query.filter(Lancamentos.tipo_lancamento == tipo_lancamento)
+            query = query.filter(Lancamentos.tipo_lancamento.in_(tipo_lancamento))
 
         resultadoLancamentos = query.all()
         valor_total = sum(lancamento.valor_lancamento for lancamento in resultadoLancamentos)
-
+    if acao == "excel":
+        return gerar_excel(resultadoLancamentos)
     return templates.TemplateResponse(
         name="lista_lancamentos.html", 
         request=request,    
@@ -346,7 +384,6 @@ async def importar_ofx(request: Request,
                 FormasPagamento.responsavel == usuario.nome,
                 FormasPagamento.id_usuario == usuario.id
             ).first())
-
         # === SE NÃO HOUVER FORMA DE PAGAMENTO NUBANK E AINDA NÃO FOI CONFIRMADO GERAR FORMA DE PAGAMENTO NUBANK ===
         if not forma_pagamento_nubank and not confirmar_nubank:
             return {
@@ -465,7 +502,6 @@ async def importar_ofx(request: Request,
             "mensagem": "Arquivo OFX importado com sucesso."
         }
         
-
 
 @rota_lancamentos.post("/editar")
 async def editar_lancamento(id_lancamento: int = Form(...),

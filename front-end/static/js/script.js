@@ -283,7 +283,6 @@ if (formEditar) {
                     linhaSelecionada.cells[0].textContent = resultado.formaPagamento;
                     linhaSelecionada.cells[1].textContent = resultado.responsavel;
                     linhaSelecionada.cells[2].textContent = resultado.data_vencimento;
-                    linhaSelecionada.cells[3].textContent = resultado.status;
                 }
                 // CATEGORIAS
                 if (tipoDados === "categorias") {
@@ -298,8 +297,8 @@ if (formEditar) {
                     linhaSelecionada.cells[2].textContent = resultado.valor_lancamento;
                 }
 
+                alert(resultado.mensagem);
                 fecharMenu();
-                alert("Lançamento atualizado com sucesso!");
             }
         }
     });
