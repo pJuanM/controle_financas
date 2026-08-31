@@ -59,7 +59,7 @@ Parcelas
             <div class="grupo_campo">
                 <details class="filtroDetails">
                     <summary>Categoria</summary>
-                    {% for categoria in categorias %}
+                    {% for categoria in categorias | sort(attribute='categoria') %}
                         <div class="opcao_checkbox">
                             <div class="linha_checkbox">
                                 <input type="checkbox" name="id_categoria" id="id_{{ categoria.categoria }}" value="{{ categoria.id }}" {% if id_categoria and categoria.id in id_categoria %}checked {% endif %}>
@@ -117,9 +117,12 @@ Parcelas
 <h1 class="titulo-pagina">Lista de Parcelas</h1>
 
 <section class="tabela">
-    <div class="acoes_liquidacao">
+    <div class="botoes_acoes_lancamentos">
         <button type="button" id="btn-liquidar">
             LIQUIDAR
+        </button>
+        <button form="formulario_filtrar" formaction="/parcelas/" type="submit" class="botao_gerar_excel" name="acao" value="excel">
+            GERAR EXCEL 
         </button>
     </div>
     <table>

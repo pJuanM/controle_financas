@@ -1,14 +1,57 @@
-from fastapi import APIRouter, Form, Depends, HTTPException, Request, Query
-from fastapi.responses import RedirectResponse
-from models import Usuarios, Parcelas, Lancamentos, FormasPagamento, Categorias
-from dependencies import pegar_sessao, verificar_token
-from urllib.parse import quote 
-from typing import Optional  
-from sqlalchemy.orm import Session
 from datetime import datetime
+from io import BytesIO
+from typing import Optional
+from urllib.parse import quote
+
+import pandas as pd
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request
+from fastapi.responses import RedirectResponse, StreamingResponse
+from sqlalchemy.orm import Session
+
+from dependencies import pegar_sessao, verificar_token
 from main import templates
+from models import Categorias, FormasPagamento, Lancamentos, Parcelas, Usuarios
+
+
 
 rota_parcelas = APIRouter(prefix="/parcelas", tags=["parcela"], dependencies=[Depends(verificar_token)])
+
+
+def gerar_excel(parcelas):
+    dados = []
+    for parcela in parcelas:
+        dados.append({
+            "ID": parcela.id,
+            "ITEM": parcela.lancamento.item_comprado,
+            "DATA DA COMPRA": parcela.lancamento.data_compra,
+            "DATA DE VENCIMENTO": parcela.data_vencimento,
+            "FORMA DE PAGAMENTO": parcela.lancamento.formaPagamento.forma_pagamento,
+            "CATEGORIA": parcela.lancamento.categoria.categoria,
+            "VALOR": parcela.valor_parcela,
+            "PAGADOR RESPONSAVEL": parcela.lancamento.pagador_responsavel,
+            "PARCELA": f"{parcela.numero_parcela}/{parcela.lancamento.qnt_parcelas}",
+            
+            "STATUS": parcela.status_parcela,
+        })
+    df = pd.DataFrame(dados)
+
+    arquivo = BytesIO()
+
+    with pd.ExcelWriter(arquivo, engine="openpyxl") as writer:
+        df.to_excel(
+            writer,
+            index=False,
+            sheet_name="Parcelas"
+        )
+    arquivo.seek(0)
+
+    return StreamingResponse(
+        arquivo,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": 'attachment; filename="parcelas.xlsx"'
+            }
+    )
 
 @rota_parcelas.get("/")
 async def listar_parcelas(request: Request,
@@ -21,6 +64,7 @@ async def listar_parcelas(request: Request,
                           status_parcela: list[str] | None = Query(None),
                           id_forma_pagamento: list[int] | None = Query(None),
                           id_categoria: list[int] | None = Query(None),
+                          acao: str | None = Query(None),
                           pagador_responsavel: list[str] | None = Query(None)):
     
     
@@ -78,6 +122,8 @@ async def listar_parcelas(request: Request,
 
         resultado_parcelas = query.all()
         valor_total = sum(parcela.valor_parcela for parcela in resultado_parcelas)
+    if acao == "excel":
+        return gerar_excel(resultado_parcelas)
 
     return templates.TemplateResponse(
         name="parcelas.html", 

@@ -1,20 +1,24 @@
-.acoes_liquidacao {
+.botoes_acoes_lancamentos {
     display: flex;
     justify-content: end;
     margin-bottom: 1em;
+    gap: 1em;
 }
-#btn-liquidar {
-    padding: 0.4em;
-    border-radius: 6px;
+.botoes_acoes_lancamentos button {
+    padding: .6em;
+    border-radius: 11px;
     border: 1px solid green;
-    color: white;
-    background: green;
-    align-items: center;
-    box-shadow: -1px 2px 9px 0px black;
+    background: linear-gradient(45deg, #35b117f0, #04b71af2, #12a34c);    
     font-weight: bold;
-    cursor: pointer;
-
+    color: white;
+    box-shadow: 2px -3px 9px #68ff2a;
 }
+.botoes_acoes_lancamentos button:hover {
+    transform: scale(1.1);
+    background: linear-gradient(45deg, #0a3400f0, #000000f2, #01180a);
+    box-shadow: 2px -3px 9px #2d830b;
+}
+
 
 table {
     width: 100%;
@@ -94,13 +98,4 @@ input.btn-liquidar {
     background: black;
     color: white;
 
-}
-.botao_gerar_excel {
-    padding: .6em;
-    border-radius: 15px;
-    border: 1px solid green;
-    background: linear-gradient(45deg, #65e147f0, #04b71af2, #41d17a);
-    font-weight: bold;
-    color: white;
-    box-shadow: 2px -3px 9px #68ff2a;
 }

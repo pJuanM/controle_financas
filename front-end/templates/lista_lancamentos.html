@@ -84,14 +84,16 @@ Débitos
         </div>
 
         <button type="submit" id="enviar_formulario">Filtrar Lançamentos</button>
-        <button type="submit" class="botao_gerar_excel" name="acao" value="excel">
-            Gerar Excel
-        </button>
     </form>
 </section>
 
 <!-------  ======= ABA DE TABELA DOS LANÇAMENTOS ======= ------->
 <h1 class="titulo-pagina">Lista de Lançamentos</h1>
+<div class="botoes_acoes_lancamentos">
+    <button form="formulario_filtrar" formaction="/lancamentos/" type="submit" class="botao_gerar_excel" name="acao" value="excel">
+        GERAR EXCEL
+    </button>
+</div>
 <section class="tabela">
     <table>
         <thead>

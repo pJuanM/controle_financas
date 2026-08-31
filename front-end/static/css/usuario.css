@@ -1,0 +1,41 @@
+.formulario_editar_usuario {
+    display: flex;
+    flex-direction: row;
+    gap: 2em;
+}
+
+.grupo_campo {
+    position: relative;
+}
+.label_campos_usuario {
+    color: #3b3b3be0;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+.usuario_menu_editar {
+    width: 100%;
+}
+
+.btn_menu_edicao_usuario.direita,
+.btn_menu_edicao_usuario.esquerda{
+    position: absolute;
+    bottom: 0;
+    max-width: 30%;
+
+}
+.btn_menu_edicao_usuario.esquerda {
+    left: 0;
+    transform: translate(-2em, 4em);
+}
+.btn_menu_edicao_usuario.esquerda:hover {
+    background-color: rgb(41 13 13) !important;
+    transform: translate(-2em, 4em) scale(1.07);
+    color: rgb(255, 0, 0) !important;
+}
+.btn_menu_edicao_usuario.direita:hover {
+    transform: translate(2em, 4em) scale(1.07);
+}
+.btn_menu_edicao_usuario.direita{
+    right: 0;
+    transform: translate(2em, 4em);
+}

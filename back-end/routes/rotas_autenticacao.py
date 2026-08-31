@@ -1,16 +1,17 @@
-from fastapi import APIRouter, Form, Depends, HTTPException, Request
-from models import Usuarios
-from dependencies import pegar_sessao, verificar_token
-from sqlalchemy.orm import Session
-from main import templates, ALGORITHM, ACCESS_TOKEN_EXPIRE_HOURS, SECRET_KEY, bcrypt_context
 from datetime import datetime, timedelta, timezone
-from jose import jwt, JWTError
+
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from sqlalchemy.orm import Session
+
+from dependencies import pegar_sessao, verificar_token
+from main import ACCESS_TOKEN_EXPIRE_HOURS, ALGORITHM, SECRET_KEY, bcrypt_context, templates
+from models import Usuarios
 
 
 # ======= LOGIN VIA FAST API =======
-from fastapi.security import OAuth2PasswordRequestForm
-
 rota_autenticacao = APIRouter(prefix="/usuario", tags=["usuario"])
 
 def criar_token(usuario_id, 
@@ -40,12 +41,30 @@ def autenticar_usuario(nome_usuario,
     return existe_usuario
 
 
-@rota_autenticacao.get("/cadastro")
-async def home(request: Request):
+@rota_autenticacao.get("/")
+async def home(request: Request,
+               usuario: Usuarios = Depends(verificar_token)):
     """
-    Essa é a rota padrão de usuários do sistema.
+    Essa é a rota padrão dos usuários.
+    """
+    if usuario is None:
+        return templates.TemplateResponse(request= request, name="sem_login.html")
+
+    return templates.TemplateResponse(name = "usuario.html",
+                                      request = request,
+                                      context = {
+                                            "usuario":usuario
+                                        }
+    )
+
+
+@rota_autenticacao.get("/cadastro")
+async def criar_usuario(request: Request):
+    """
+    Essa é a rota padrão de cadastro de usuário do sistema.
     """
     return templates.TemplateResponse(request = request, name="cadastro.html")
+
 
 @rota_autenticacao.post("/cadastro/criar")
 async def criar_usuario(usuario: str = Form(...), 

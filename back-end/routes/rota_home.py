@@ -1,14 +1,14 @@
-from fastapi import Form, Depends, APIRouter, Request
-from urllib.parse import quote
+import calendar
+from datetime import datetime
 from decimal import Decimal
+from urllib.parse import quote
+
+from dependencies import pegar_sessao, verificar_token
+from fastapi import APIRouter, Depends, Form, Request
+from main import templates
+from models import Categorias, FormasPagamento, Lancamentos, Parcelas, Usuarios
 from sqlalchemy import extract
 from sqlalchemy.orm import Session
-from dependencies import pegar_sessao, verificar_token
-from models import FormasPagamento, Usuarios, Lancamentos, Categorias, Parcelas
-from main import templates
-from datetime import datetime
-import calendar
-
 
 rota_home = APIRouter(prefix="/home", tags=["home"], dependencies=[Depends(verificar_token)])
 

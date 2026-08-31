@@ -14,10 +14,11 @@ Débitos
 <section class="formulario">
     <form action="/lancamentos/criar" method="post" id="formulario">
         <div class="grupo_campo campo_data">
-            <input type="date" id="data_compra" name="data_compra" placeholder="" onfocus="this.showPicker()" required>
+            <input type="date" id="data_compra" name="data_compra" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()" class="tem_valor">
             <label for="data_compra">Data de Compra</label>
         </div>
 
+    
         <div class="grupo_campo">
             <input type="text" id="item_comprado" name="item_comprado" placeholder="Item Comprado" autocomplete="off" required>
         </div>
@@ -86,4 +87,6 @@ Débitos
 
 {% block script %}
 <script src="/static/js/lancamentos.js"></script>
+<script src="/static/js/lista_lancamentos.js"></script>
+
 {% endblock %}

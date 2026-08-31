@@ -1,11 +1,12 @@
-from fastapi import Form, Depends, HTTPException, APIRouter, Request, Query
-from fastapi.responses import RedirectResponse
-from urllib.parse import quote
 from typing import Optional
-from sqlalchemy.orm import Session
+from urllib.parse import quote
+
 from dependencies import pegar_sessao, verificar_token
-from models import FormasPagamento, Usuarios
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request
+from fastapi.responses import RedirectResponse
 from main import templates
+from models import FormasPagamento, Usuarios
+from sqlalchemy.orm import Session
 
 
 rota_formasPagamento = APIRouter(prefix="/formaPagamento", tags=["formaPagamento"], dependencies=[Depends(verificar_token)])
