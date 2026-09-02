@@ -144,7 +144,6 @@ Parcelas
                     data-valor-parcela="{{ parcela.valor_parcela }}"
                     data-parcela="{{ parcela.numero_parcela }}"
                     data-data-vencimento="{{ parcela.data_vencimento }}"
-                    data-data-compra="{{ parcela.lancamento.data_compra }}"
                     data-pagador-responsavel="{{ parcela.lancamento.pagador_responsavel }}"
                     data-status-parcela="{{ parcela.status_parcela }}"
                     class="badge-tipo {{ parcela.lancamento.tipo_lancamento|lower }}">
@@ -177,7 +176,7 @@ Parcelas
 
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="/parcelas" method="post" id="formulario_editar" data-url="/parcelas/editar" data-tipo="parcelas">
+    <form action="/parcelas" method="post" id="formulario_editar" data-tipo="parcelas">
         <input type="hidden" id="id_parcela" name="id_parcela" data-id-principal>
 
         <div class="grupo_campo">
@@ -245,8 +244,8 @@ Parcelas
         </div>
 
         <div class="grupo_campo botoes_formulario">
-            <button type="submit" id="btn_excluir" formaction="/parcelas/excluir">Excluir Parcela</button>
-            <button type="submit" id="btn_editar" formaction="/parcelas/editar">Editar Parcela</button>
+            <button type="submit" id="btn_excluir" data-acao="excluir" data-url="/parcelas/excluir">Excluir Parcela</button>
+            <button type="submit" id="btn_editar" data-acao="editar" data-url="/parcelas/editar">Editar Parcela</button>
         </div>
     </form>
 </aside>
@@ -257,7 +256,6 @@ Parcelas
 {% endif %}
 {% endblock %}
 {% block script %}
-<script src="/static/js/lista_lancamentos.js"></script>
-<script src="/static/js/lancamentos.js"></script>
-
+    <script src="{{ url_for('static', path='/js/parcelas.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/menu_editar.js') }}"></script>
 {% endblock %}

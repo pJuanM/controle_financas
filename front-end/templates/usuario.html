@@ -5,49 +5,48 @@ Usuário
 {% endblock %}
 {% block conteudo %}
 <section class="formulario">
-    <form class="dados_usuario" action="/lancamentos/criar" method="post" id="formulario">
+    <form data-tipo="usuario" class="dados_usuario" action="/usuario/excluir" method="post" id="formulario_usuario">
+        
         <div class="grupo_campo">
             <label class="label_campos_usuario" for="usuario">Usuário:</label>
-            <input type="text" id="usuario" name="usuario" placeholder="Usuário" autocomplete="off" value="{{ usuario.usuario }}">
+            <input disabled type="text" id="usuario" name="usuario" placeholder="Usuário" autocomplete="off" value="{{ usuario.usuario }}">
         </div>
         <div class="grupo_campo">
             <label class="label_campos_usuario" for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome" placeholder="Nome" autocomplete="off" value="{{ usuario.nome }}">
+            <input disabled type="text" id="nome" name="nome" placeholder="Nome" autocomplete="off" value="{{ usuario.nome }}">
         </div>
         <div class="grupo_campo">
             <label class="label_campos_usuario" for="email">E-mail:</label>
-            <input type="email" id="email" name="email" placeholder="E-mail" autocomplete="off" value="{{ usuario.email }}">
+            <input disabled type="email" id="email" name="email" placeholder="E-mail" autocomplete="off" value="{{ usuario.email }}">
         </div>
         <div class="grupo_campo">
-            <button onclick="editarItem(this)" class="btn_menu_edicao_usuario direita" type="button" id="btn_editar">EDITAR USUÁRIO</button>
+            <button onclick="abrirEdicaoUsuario()" class="btn_menu_edicao_usuario direita" type="button" id="btn_editar">EDITAR USUÁRIO</button>
 
-            
-            <button class="btn_menu_edicao_usuario esquerda" type="submit" formaction="/usuario/excluir" id="btn_excluir">EXCLUIR USUÁRIO</button>
+            <button class="btn_menu_edicao_usuario esquerda" type="submit" data-acao="excluir" data-url="/usuario/excluir" id="btn_excluir">EXCLUIR USUÁRIO</button>
         </div>
     </form> 
 </section>      
 
 <div class="overlay" id="overlay"></div>
-
 <aside class="menu_editar">
-    <form class="formulario_editar_usuario" action="/usuario/editar" method="post" id="formulario_editar" data-url="/usuario/editar" data-tipo="usuario" data-id="{{ usuario.id }}" >
+    <form class="formulario_editar_usuario" action="/usuario/" method="post" id="formulario_editar" data-tipo="usuario" data-id="{{ usuario.id }}" >
         <input type="hidden" id="usuario_id" name="usuario_id" value="{{ usuario.id }}" data-id-principal >
         <div class="usuario_menu_editar">
             <h2>EDITAR USUÁRIO</h2>
 
             <div class="grupo_campo">
                 <label for="editar_usuario">Usuário</label>
-                <input type="text" id="editar_usuario" name="usuario" value="{{ usuario.usuario }}" autocomplete="off">
+                <input type="text" id="editar_usuario" name="novo_usuario" value="{{ usuario.usuario }}" autocomplete="off">
             </div>
 
             <div class="grupo_campo">
                 <label for="editar_nome">Nome</label>
-                <input type="text" id="editar_nome" name="nome" value="{{ usuario.nome }}" autocomplete="off">
+                <input type="text" id="editar_nome" name="novo_nome" value="{{ usuario.nome }}" autocomplete="off">
             </div>
 
             <div class="grupo_campo">
                 <label for="editar_email">E-mail</label>
-                <input type="email" id="editar_email" name="email" value="{{ usuario.email }}" autocomplete="off">
+                <input type="email" id="editar_email" name="novo_email" value="{{ usuario.email }}" autocomplete="off">
             </div>
         </div>
         <hr>
@@ -61,13 +60,13 @@ Usuário
 
             <div class="grupo_campo">
                 <label for="nova_senha">Nova senha</label>
-                <input type="password" id="nova_senha" name="nova_senha" autocomplete="new-password">
+                <input type="password" id="nova_senha" name="nova_senha" autocomplete="new-password" data-senha>
                 
     
             </div>
             <div class="grupo_campo">
                 <label for="confirme_nova_senha">Confirmar nova senha</label>
-                <input type="password" id="confirme_nova_senha" name="confirme_nova_senha" autocomplete="new-password">
+                <input type="password" id="confirme_nova_senha" name="confirme_nova_senha" autocomplete="new-password" data-confirme-senha>
             </div>
             <p id="erroSenha"></p>
 
@@ -76,7 +75,7 @@ Usuário
                     CANCELAR
                 </button>
 
-                <button formaction="/usuario/editar" id="btn_editar" type="submit">
+                <button data-acao="editar" data-url="/usuario/editar" id="btn_editar" type="submit">
                     EDITAR USUÁRIO
                 </button>
             </div>
@@ -87,5 +86,7 @@ Usuário
 
 {% endblock %}
 {% block script %}
-<script src="../static/js/editar_usuario.js"></script>
+<script src="{{ url_for('static', path='/js/autenticar.js') }}"></script>
+<script src="{{ url_for('static', path='/js/menu_editar.js') }}"></script>
+<script src="{{ url_for('static', path='/js/editarUsuario.js') }}"></script>
 {% endblock %}

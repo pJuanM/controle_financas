@@ -34,11 +34,13 @@ def autenticar_usuario(nome_usuario,
     if not existe_usuario:
         existe_usuario = session.query(Usuarios).filter(Usuarios.usuario == nome_usuario).first()
         if not existe_usuario:
-            raise HTTPException(status_code= 400, detail = "Não tem usuário cadastrado para este e-mail!")
+            raise HTTPException(status_code= 400, detail = "Não existe este usuário cadastrado.")
     if not bcrypt_context.verify(senha, existe_usuario.senha):
         raise HTTPException(status_code= 400, detail="Senha incorreta")
 
     return existe_usuario
+
+
 
 
 @rota_autenticacao.get("/")
@@ -57,6 +59,25 @@ async def home(request: Request,
                                         }
     )
 
+
+@rota_autenticacao.post("/excluir")
+async def excluir_usuario(request: Request,
+                          session: Session = Depends(pegar_sessao),
+                          usuario: Usuarios = Depends(verificar_token)):
+    if usuario is None:
+        return templates.TemplateResponse(
+            name="login.html",
+            request = request
+        )
+    id_usuario = session.query(Usuarios).filter(Usuarios.id == usuario.id, Usuarios.status_usuario == "ATIVO").first()
+    if not id_usuario:
+        return {
+            "sucesso": False,
+            "mensagem": "Usuário inexistente ou inativo, por gentileza verificar."
+        }
+    id_usuario.status_usuario == "INATIVO"
+    session.commit()
+    
 
 @rota_autenticacao.get("/cadastro")
 async def criar_usuario(request: Request):
@@ -102,30 +123,44 @@ async def login(request: Request):
 
 
 @rota_autenticacao.post("/login")
-async def login(nome_usuario: str = Form(...), 
+async def login(login: str = Form(...), 
                 senha: str = Form(...), 
                 session: Session = Depends(pegar_sessao)):
     
-    nome_usuario = nome_usuario.upper()
-    
-    usuario = autenticar_usuario(nome_usuario, senha, session)
+    login = login.upper()
+    usuario = autenticar_usuario(login, senha, session)
     access_token = criar_token(usuario.id)
     response = RedirectResponse(
         url="/home",
         status_code = 303
     )
-
     response.set_cookie(
         key = "access_token",
         value = access_token,
         httponly=True
     )
-
     return response
+
+@rota_autenticacao.post("/editar")
+async def editarUsuario(novo_usuario: str = Form(...), 
+                        senha: str = Form(...),
+                novo_email: str = Form(...),
+                novo_nome: str = Form(...),
+                nova_senha: str = Form(...), 
+                session: Session = Depends(pegar_sessao),
+                usuario: Usuarios = Depends(verificar_token)):
+    
+    usuario = autenticar_usuario(usuario.email, senha, session)
+    
+    return {
+        "mensagem" :"Usuário editado com sucesso!"
+    }
+    
 
 
 @rota_autenticacao.get("/refresh")
 async def use_refresh_token(usuario: Usuarios = Depends(verificar_token)):
+
 
     access_token = criar_token(usuario.id)
     return {

@@ -67,7 +67,7 @@ Forma de Pagamento
 
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="/formaPagamento" method="post" id="formulario_editar" data-url="/formaPagamento/editar" data-tipo="formasPagamento">
+    <form action="/formaPagamento" method="post" id="formulario_editar" data-tipo="formasPagamento">
         <input type="hidden" id="id_formaPagamento" name="id_formaPagamento" data-id-principal>
         <div class="grupo_campo">
             <input type="text" id="editar_forma_pagamento" name="forma_pagamento" placeholder="Forma de Pagamento" autocomplete="off" required>
@@ -94,9 +94,12 @@ Forma de Pagamento
         </div>
 
         <div class="grupo_campo botoes_formulario">
-            <button type="submit" id="btn_excluir" formaction="/formaPagamento/excluir/">Excluir Forma de Pagamento</button>
-            <button type="submit" id="btn_editar" formaction="/formaPagamento/editar">Editar Forma de Pagamento</button>
+            <button type="submit" id="btn_excluir" data-acao="excluir" data-url="/formaPagamento/excluir/">Excluir Forma de Pagamento</button>
+            <button type="submit" id="btn_editar" data-acao="editar" data-url="/formaPagamento/editar">Editar Forma de Pagamento</button>
         </div>
     </form>
 </aside>
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', path='/js/menu_editar.js') }}"></script>
 {% endblock %}

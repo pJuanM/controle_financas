@@ -50,7 +50,7 @@ Categoria
 </section>
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="/categorias/editar" method="post" id="formulario_editar" data-url="/categorias/editar" data-tipo="categorias">
+    <form action="/categorias/editar" method="post" id="formulario_editar" data-tipo="categorias">
         <input type="hidden" id="categoria_id" name="categoria_id" data-id-principal>
         <div class="grupo_campo">
             <select name="categoria_status" id="editar_status_categoria">
@@ -67,10 +67,13 @@ Categoria
             <input type="text" id="editar_descricao" name="categoria_descricao" placeholder="Descrição" autocomplete="off" required>
         </div>
         <div class="grupo_campo botoes_formulario">
-            <button type="submit" id="btn_excluir" formaction="/categorias/excluir">Excluir Categoria</button>
-            <button type="submit" id="btn_editar" formaction="/categorias/editar">Editar Categoria</button>
+            <button type="submit" id="btn_excluir" data-acao="excluir" data-url="/categorias/excluir">Excluir Categoria</button>
+            <button type="submit" id="btn_editar" data-acao="editar" data-url="/categorias/editar">Editar Categoria</button>
         </div>
 
     </form>
 </aside>
+{% endblock %}
+{% block script %}
+    <script src="{{ url_for('static', path='/js/menu_editar.js') }}"></script>
 {% endblock %}

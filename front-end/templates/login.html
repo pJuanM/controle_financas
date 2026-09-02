@@ -2,13 +2,12 @@
 {% block titulo %}
 Login
 {% endblock %}
-
 {% block conteudo %}
 <h1 class="titulo-pagina">Login</h1>
 <section class="formulario">
     <form action="/usuario/login" method="POST" id="formulario">
         <div class="grupo_campo">
-            <input type="text" id="email" name="nome_usuario" placeholder="E-mail" required>
+            <input type="text" id="login" name="login" placeholder="E-mail/Usuário" autocomplete="username" required>
         </div>
 
         <div class="grupo_campo">

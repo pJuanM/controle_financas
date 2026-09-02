@@ -141,7 +141,7 @@ Débitos
 <!-------  ======= ABA DE EDIÇÃO DOS LANÇAMENTOS ======= ------->
 <div class="overlay" id="overlay"></div>
 <aside class="menu_editar">
-    <form action="/lancamentos" method="post" id="formulario_editar" data-url="/lancamentos/editar" data-tipo="lancamentos">
+    <form action="/lancamentos" method="post" id="formulario_editar" data-tipo="lancamentos">
         <input type="hidden" id="id_lancamento" name="id_lancamento" data-id-principal>
         <div class="grupo_campo_editar">
             <div class="grupo_campo">
@@ -210,14 +210,12 @@ Débitos
         </div>
 
         <div class="grupo_campo botoes_formulario">
-            <button type="submit" id="btn_excluir" formaction="/lancamentos/excluir">Excluir Débito</button>
-            <button type="submit" id="btn_editar" formaction="/lancamentos/editar">Editar Débito</button>
+            <button type="submit" id="btn_excluir" data-acao="excluir" data-url="/lancamentos/excluir">Excluir Débito</button>
+            <button type="submit" id="btn_editar" data-acao="editar" data-url="/lancamentos/editar">Editar Débito</button>
         </div>
     </form>
 </aside>
 {% endblock %}
 {% block script %}
-<script src="/static/js/lista_lancamentos.js"></script>
-<script src="/static/js/lancamentos.js"></script>
-
+    <script src="{{ url_for('static', path='/js/menu_editar.js') }}"></script>
 {% endblock %}

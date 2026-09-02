@@ -1,5 +1,5 @@
-const dashboard = window.dashboard;
 // GRÁFICO DE LINHA - CUSTOS POR DIA - BASEADO NO MÊS (VENCIMENTO JULHO - COMPRAS QUE VENCE EM JULHO PORÉM COM DATA DE COMPRA DE OUTROS MESES)
+const dashboard = window.dashboard;
 const labelsGastosDia = dashboard.label_gastos_dia;
 const data_gastos_dia = dashboard.data_gastos_dia;
 

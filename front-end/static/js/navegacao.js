@@ -1,3 +1,4 @@
+// ABRIR MENU SUSPENSO DA NAVEGAÇÃO
 document.querySelectorAll(".navegar_rotas_menu").forEach(menu => {
     menu.addEventListener("click", () => {
         menu.querySelector(".navegar_rotas_secao").classList.toggle("ativo");
@@ -10,7 +11,7 @@ document.querySelectorAll(".navegar_rotas_menu").forEach(menu => {
     });
 });
 
-
+// ABRIR MENU LATERAL
 const menu_hamburguer = document.querySelector(".menu_hamburguer")
 const fechar_menu_lateral = document.querySelector("#fechar_menu_lateral")
 menu_hamburguer.addEventListener("click", () => {
