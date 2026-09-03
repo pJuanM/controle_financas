@@ -127,6 +127,7 @@ async def excluir_categoria(categoria_id: int = Form(...),
     return {
         "sucesso": True,
         "mensagem": "Categoria inativada com sucesso!"
+        
     }
 
 

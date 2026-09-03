@@ -29,11 +29,42 @@ addEventListener("keydown", function(e) {
 
 
 function atualizarLinhaEditar(resultado) {
+    // DADOS
+    const tipoDados = formEditar.dataset.tipo;
+
+    // USUARIO 
+    if (tipoDados === "usuario") {
+        const usuario = document.getElementById("usuario");
+        const nome = document.getElementById("nome");
+        const email = document.getElementById("email");
+
+        const novoUsuario =
+            document.getElementById("editar_usuario")?.value || "";
+        const novoNome =
+            document.getElementById("editar_nome")?.value || "";
+        const novoEmail =
+            document.getElementById("editar_email")?.value || "";
+        const senha = document.getElementById("senha")
+
+
+        if (usuario) {
+            usuario.value = novoUsuario;
+        }
+        if (nome) {
+            nome.value = novoNome;
+        }
+        if (email) {
+            email.value = novoEmail;
+        }
+        if (senha) {
+            senha.value = "";
+        }
+        return;
+    }
+
     if (!linhaSelecionada) {
         return;
     }
-    // DADOS
-    const tipoDados = formEditar.dataset.tipo;
     // Atualiza visual da tabela
     // FORMAS DE PAGAMENTO
     if (tipoDados === "formasPagamento") {
@@ -105,26 +136,6 @@ function atualizarLinhaEditar(resultado) {
     else if (tipoDados === "parcelas") {
         const novoStatusParcela = document.getElementById("editar_status_parcela")?.value || "";
         linhaSelecionada.dataset.statusParcela = novoStatusParcela;
-    }
-    // USUARIOS
-    else if (tipoDados === "usuario") {
-        const usuario = document.getElementById("usuario");
-        const nome = document.getElementById("nome");
-        const email = document.getElementById("email");
-        const novoUsuario = document.getElementById("editar_usuario")?.value || "";
-        const novoNome = document.getElementById("editar_nome")?.value || "";
-        const novoEmail = document.getElementById("editar_email")?.value || "";
-
-        if (usuario) {
-            usuario.value = novoUsuario;
-        }
-        if (nome) {
-            nome.value = novoNome;
-        }
-        if (email) {
-            email.value = novoEmail;
-        }
-        return;
     }
 }
 

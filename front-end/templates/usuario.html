@@ -41,7 +41,7 @@ Usuário
 
             <div class="grupo_campo">
                 <label for="editar_nome">Nome</label>
-                <input type="text" id="editar_nome" name="novo_nome" value="{{ usuario.nome }}" autocomplete="off">
+                <input disabled type="text" id="editar_nome" name="novo_nome" value="{{ usuario.nome }}" autocomplete="off">
             </div>
 
             <div class="grupo_campo">
@@ -55,7 +55,7 @@ Usuário
 
             <div class="grupo_campo">
                 <label for="senha">Senha atual</label>
-                <input type="password" id="senha" name="senha" autocomplete="current-password">
+                <input required type="password" id="senha" name="senha" autocomplete="current-password">
             </div>
 
             <div class="grupo_campo">

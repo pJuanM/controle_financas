@@ -75,7 +75,7 @@ async def excluir_usuario(request: Request,
             "sucesso": False,
             "mensagem": "Usuário inexistente ou inativo, por gentileza verificar."
         }
-    id_usuario.status_usuario == "INATIVO"
+    id_usuario.status_usuario = "INATIVO"
     session.commit()
     
 
@@ -144,16 +144,72 @@ async def login(login: str = Form(...),
 @rota_autenticacao.post("/editar")
 async def editarUsuario(novo_usuario: str = Form(...), 
                         senha: str = Form(...),
-                novo_email: str = Form(...),
-                novo_nome: str = Form(...),
-                nova_senha: str = Form(...), 
-                session: Session = Depends(pegar_sessao),
-                usuario: Usuarios = Depends(verificar_token)):
+                        novo_email: str = Form(...),
+                        nova_senha: str | None = Form(None), 
+                        confirme_nova_senha: str | None = Form(None),
+                        session: Session = Depends(pegar_sessao),
+                        usuario: Usuarios = Depends(verificar_token)):
     
-    usuario = autenticar_usuario(usuario.email, senha, session)
+    validar_usuario = autenticar_usuario(usuario.email, senha, session)
+
+    if not validar_usuario:
+        return {
+            "sucesso": False,
+            "mensagem":"Verifique as credenciais."
+        }
+    novo_usuario = novo_usuario.upper()
+    novo_email = novo_email.upper()
+
+    if nova_senha or confirme_nova_senha:
+        if not nova_senha or not confirme_nova_senha:
+            return {
+                "sucesso": False,
+                "mensagem": "Caso deseje alterar a senha, preencha todos os campos"
+            }
+        if nova_senha != confirme_nova_senha:
+            return {
+                "sucesso": False,
+                "mensagem": "As senhas não coincidem (nova senha + confirmar nova senha)"
+            }
+        if nova_senha == senha:
+            return {
+                "sucesso": False,
+                "mensagem": "Nova senha não pode ser igual a senha atual."
+            }
+
+    existe_usuario = session.query(Usuarios).filter(
+        Usuarios.usuario == novo_usuario,
+        Usuarios.id != usuario.id
+        ).first()
+    if existe_usuario:
+        return {
+            "sucesso": False, 
+            "mensagem": "Este nome de usuário já está em uso."
+        }
+
+    existe_email = session.query(Usuarios).filter(
+        Usuarios.email == novo_email, 
+        Usuarios.id != usuario.id
+    ).first()
+    if existe_email:
+        return {
+            "sucesso": False,
+            "mensagem": "Este e-mail já está em uso."
+        }
+        
+    usuario.usuario = novo_usuario
+    usuario.email = novo_email
+
+    if nova_senha:
+        usuario.senha = bcrypt_context.hash(nova_senha)
+    session.commit()
     
     return {
-        "mensagem" :"Usuário editado com sucesso!"
+        "sucesso": True,
+        "mensagem" :"Usuário editado com sucesso!",
+        "usuario": usuario.usuario,
+        "email": usuario.email
+
     }
     
 
