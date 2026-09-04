@@ -14,8 +14,15 @@ Login
             <input type="password" id="senha" name="senha" placeholder="Senha" required>
         </div>
 
+        {% if erro %}
+            <div class="mensagemErro">
+                {{ erro }}
+            </div>
+        {% endif %}
+        
         <button type="submit" id="enviar_formulario">Entrar</button>
     </form>
+
 </section>
 {% endblock %}
 

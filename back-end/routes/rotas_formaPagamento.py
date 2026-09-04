@@ -93,13 +93,15 @@ async def home(request: Request,
 
 @rota_formasPagamento.post("/criar")
 async def criar_formaPagamento(forma_pagamento: str = Form(...), 
-                               responsavel: str = Form(...), 
+                               responsavel: str | None = Form(None), 
                                data_vencimento: int | None = Form(None),
                                data_fechamento: int | None = Form(None), 
                                session: Session = Depends(pegar_sessao),
                                usuario: Usuarios = Depends(verificar_token)):
     
-
+    if not responsavel:
+        responsavel = usuario.usuario
+        
     existe_formaPagamento = session.query(FormasPagamento).filter(
         FormasPagamento.forma_pagamento == forma_pagamento, 
         FormasPagamento.responsavel == responsavel).first()

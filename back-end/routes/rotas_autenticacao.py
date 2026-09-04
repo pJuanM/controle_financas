@@ -5,6 +5,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
+from urllib.parse import quote
 
 from dependencies import pegar_sessao, verificar_token
 from main import ACCESS_TOKEN_EXPIRE_HOURS, ALGORITHM, SECRET_KEY, bcrypt_context, templates
@@ -30,17 +31,30 @@ def autenticar_usuario(nome_usuario,
                        session):
     
     nome_usuario = nome_usuario.upper()
-    existe_usuario = session.query(Usuarios).filter(Usuarios.email == nome_usuario).first()
+
+    existe_usuario = (
+        session.query(Usuarios)
+        .filter(Usuarios.email == nome_usuario)
+        .first())
     if not existe_usuario:
-        existe_usuario = session.query(Usuarios).filter(Usuarios.usuario == nome_usuario).first()
-        if not existe_usuario:
-            raise HTTPException(status_code= 400, detail = "Não existe este usuário cadastrado.")
+        existe_usuario = (
+            session.query(Usuarios)
+            .filter(Usuarios.usuario == nome_usuario)
+            .first())
+    
+    if not existe_usuario:
+        raise HTTPException(
+            status_code= 400, 
+            detail = "Não existe este usuário cadastrado."
+        )
+    
     if not bcrypt_context.verify(senha, existe_usuario.senha):
-        raise HTTPException(status_code= 400, detail="Senha incorreta")
+        raise HTTPException(
+            status_code= 400, 
+            detail="Senha incorreta"
+        )
 
     return existe_usuario
-
-
 
 
 @rota_autenticacao.get("/")
@@ -99,19 +113,39 @@ async def criar_usuario(usuario: str = Form(...),
     nome = nome.upper()
     email = email.upper()
     
-    existe_usuario = session.query(Usuarios).filter(Usuarios.email == email).first()
+    existe_email = (session.query(Usuarios)
+                      .filter(Usuarios.email == email)
+                      .first())
+    if existe_email:
+        return {
+            "sucesso": False,
+            "mensagem": "Já existe um cadastro com este e-mail em sistema."
+    }
+
+    existe_usuario = (session.query(Usuarios)
+                          .filter(Usuarios.usuario == usuario)
+                          .first())
+    
     if existe_usuario:
-        raise HTTPException(status_code= 400, detail = "Este e-mail já foi cadastrado em sistema.")
+        return {
+            "sucesso": False,
+            "mensagem": "Já existe um cadastro com este usuário em sistema."
+        }
+    
     senha_criptografada = bcrypt_context.hash(senha)
-    novo_usuario = Usuarios(usuario = usuario, nome = nome, status_usuario = "ATIVO", email = email, senha = senha_criptografada)
+    novo_usuario = Usuarios(usuario = usuario, 
+                            nome = nome, 
+                            status_usuario = "ATIVO", 
+                            email = email, 
+                            senha = senha_criptografada)
+    
     session.add(novo_usuario)
     session.commit()
 
-
-    return RedirectResponse(
-        url = "/usuario/login",
-        status_code = 303
-    )
+    return {
+        "sucesso": True,
+        "mensagem" : "Cadastro realizado com sucesso."
+    }
 
 
 @rota_autenticacao.get("/login")
@@ -119,16 +153,30 @@ async def login(request: Request):
     """
     Essa é a rota para carregar o html da página
     """
-    return templates.TemplateResponse(request = request, name = "login.html")
+    return templates.TemplateResponse(request = request, 
+                                      name = "login.html")
 
 
 @rota_autenticacao.post("/login")
-async def login(login: str = Form(...), 
+async def login(request: Request,
+                login: str = Form(...), 
                 senha: str = Form(...), 
                 session: Session = Depends(pegar_sessao)):
     
     login = login.upper()
-    usuario = autenticar_usuario(login, senha, session)
+
+    try:
+        usuario = autenticar_usuario(login, senha, session)
+    except HTTPException as erro:
+        return templates.TemplateResponse(
+            request = request,
+            name = "login.html",
+            context = {
+                "erro": erro.detail
+            },
+            status_code = erro.status_code
+        )
+    
     access_token = criar_token(usuario.id)
     response = RedirectResponse(
         url="/home",
@@ -212,7 +260,6 @@ async def editarUsuario(novo_usuario: str = Form(...),
 
     }
     
-
 
 @rota_autenticacao.get("/refresh")
 async def use_refresh_token(usuario: Usuarios = Depends(verificar_token)):

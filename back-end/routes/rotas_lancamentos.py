@@ -290,7 +290,7 @@ async def criar_lancamento(data_compra: date = Form(...),
         pagador_responsavel = usuario.nome
     else:
         if pagador_responsavel:
-            pagador_responsavel = pagador_responsavel
+            pagador_responsavel = pagador_responsavel.upper()
         else:
             raise HTTPException(status_code = 401, detail = "Precisa declarar responsável por pagamento quando se é um CRÉDITO.")
     
@@ -381,7 +381,7 @@ async def importar_ofx(request: Request,
             session.query(FormasPagamento)
             .filter(
                 FormasPagamento.forma_pagamento == nome_forma_pagamento,
-                FormasPagamento.responsavel == usuario.nome,
+                FormasPagamento.responsavel == usuario.usuario,
                 FormasPagamento.id_usuario == usuario.id
             ).first())
         # === SE NÃO HOUVER FORMA DE PAGAMENTO NUBANK E AINDA NÃO FOI CONFIRMADO GERAR FORMA DE PAGAMENTO NUBANK ===
@@ -547,7 +547,7 @@ async def editar_lancamento(id_lancamento: int = Form(...),
             )
 
     if pagador_responsavel is not None:
-        lancamento.pagador_responsavel = pagador_responsavel
+        lancamento.pagador_responsavel = pagador_responsavel.upper()
 
     if valor_lancamento is not None:
         valor_lancamento = (
