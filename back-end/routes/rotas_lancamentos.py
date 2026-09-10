@@ -568,6 +568,9 @@ async def editar_lancamento(id_lancamento: int = Form(...),
                     parcela.valor_parcela = valor_base
                 else:
                     parcela.valor_parcela = novo_valor - (valor_base * (qtd - 1))
+        else:
+            if lancamento.parcela:
+                lancamento.parcela[0].valor_parcela = novo_valor
 
 
     if qnt_parcelas is not None and qnt_parcelas != lancamento.qnt_parcelas:
