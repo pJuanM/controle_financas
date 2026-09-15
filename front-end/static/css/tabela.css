@@ -7,16 +7,16 @@
 .botoes_acoes_lancamentos button {
     padding: .6em;
     border-radius: 11px;
-    border: 1px solid green;
-    background: linear-gradient(45deg, #35b117f0, #04b71af2, #12a34c);    
+    border: 1px solid var(--cor-sucesso-verde);
+    background: linear-gradient(45deg, var(--cor-sucesso-verde-claro), var(--cor-sucesso-verde-claro), var(--cor-sucesso-verde));    
     font-weight: bold;
-    color: white;
-    box-shadow: 2px -3px 9px #68ff2a;
+    color: var(--cor-texto);
+    box-shadow: 2px -3px 9px var(--cor-brilho-verde);
 }
 .botoes_acoes_lancamentos button:hover {
     transform: scale(1.1);
-    background: linear-gradient(45deg, #0a3400f0, #000000f2, #01180a);
-    box-shadow: 2px -3px 9px #2d830b;
+    background: linear-gradient(45deg, var(--cor-sucesso-verde-escuro), var(--cor-fundo-preto)f2, var(--cor-fundo-preto));
+    box-shadow: 2px -3px 9px var(--cor-sucesso-verde-medio);
 }
 
 
@@ -24,39 +24,39 @@ table {
     width: 100%;
     border-collapse: separate;
     border-radius: 1em;
-    border: 1px solid black;
+    border: 1px solid var(--cor-texto-preto);
     overflow: hidden;
     border-spacing: 0;
 }
 
 th, td {
-    border: 1px dotted #808080;
+    border: 1px dotted var(--cor-borda-cinza);
     padding: 8px;
     text-align: center;
 }
 th {
-    background-color: black;
-    color: white;
+    background-color: var(--cor-texto-preto);
+    color: var(--cor-texto);
     text-align: center;
 }
 table .tabela_cabecalho {
     cursor: pointer;
 }
 .tabela_cabecalho.ordem-asc {
-    color: green;
+    color: var(--cor-sucesso-verde);
 }
 
 .tabela_cabecalho.ordem-desc {
-    color: red;
+    color: var(--cor-vermelho-claro);
 }
 
 table .badge-tipo.credito{
-    background:#d1fae5;
-    color:#065f46;
+    background:var(--cor-fundo-verde-claro);
+    color:var(--cor-sucesso-texto);
 }
 
 table .badge-tipo.debito{
-    color: #FF0000;
+    color: var(--cor-vermelho-claro);
 }
 table .col-item {
     max-width: 8em;
@@ -95,7 +95,7 @@ input.btn-liquidar {
 }
 
 .linha-total {
-    background: black;
-    color: white;
+    background: var(--cor-texto-preto);
+    color: var(--cor-texto);
 
 }

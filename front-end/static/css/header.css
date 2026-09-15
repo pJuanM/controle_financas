@@ -1,7 +1,7 @@
 header{
-    color: white;
+    color: var(--cor-texto);
     text-align: end;
-    background-image: linear-gradient(to right, #18E474,#19AEA2 , #2F85E8);
+    background-image: linear-gradient(to right, var(--cor-gradiente-1),var(--cor-gradiente-2) , var(--cor-gradiente-3));
 }
 .menu_navegacao {
     display: flex;
@@ -9,8 +9,9 @@ header{
 }
 nav a:hover {
     text-decoration: underline;
-    color: #000E32;
+    color: var(--cor-texto-hover);
     cursor: pointer;
+    
 }
 
 .homepage_navegacao {
@@ -21,9 +22,14 @@ nav a:hover {
     font-weight: bold;
 }
 .homepage_navegacao a {
-    background-image: linear-gradient(to right, #18E474,#19AEA2 , #2F85E8);
+    background-image: linear-gradient(to right, var(--cor-gradiente-1),var(--cor-gradiente-2) , var(--cor-gradiente-3));
     padding: 1.4em;
     border-radius: 15px;
-    border: 2px solid #8d1313;
-    box-shadow: 2px -2px 7px 0px #1fe1c1;
+    border: 2px solid var(--cor-vermelho-escuro);
+    box-shadow: 2px -2px 7px 0px var(--cor-turquesa);
+}
+.homepage_navegacao a:hover {
+    transform: scale(1.03);
+    box-shadow: 2px -2px 7px 3px var(--cor-turquesa);
+
 }

@@ -2,14 +2,15 @@
     padding: 2.5em;
     width: 80%;
     border-radius: 15px;
-    color: white;
+    color: var(--cor-texto);
     font-weight: bold;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-image: linear-gradient(#18E474,#19AEA2 , #2F85E8);
+    background-image: linear-gradient(var(--cor-gradiente-1) 3%,var(--cor-gradiente-2) 40% , var(--cor-gradiente-3));
     text-align: center;
+    box-shadow: 5px 6px 17px 3px black;
 }
 
 #falha_acesso a {
@@ -17,5 +18,5 @@
 }
 
 #falha_acesso a:hover {
-    color: #000E32;
+    color: var(--cor-texto-hover);
 }

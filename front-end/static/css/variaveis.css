@@ -1,0 +1,89 @@
+/* =========================================================
+   VARIÁVEIS GLOBAIS DE CORES
+   Altere as cores neste arquivo para mudar o tema do site.
+   ========================================================= */
+
+:root {
+    /* ===== CORES PRINCIPAIS ===== */
+    --cor-principal: #000E32;
+    --cor-principal-transparente: #000e32b0;
+
+    /* ===== GRADIENTE PRINCIPAL ===== */
+    --cor-gradiente-1: #06c1af ;
+    --cor-gradiente-2: #066259 ;
+    --cor-gradiente-3: #000000;
+
+    --gradiente-principal-direita: linear-gradient(
+        to right,
+        var(--cor-gradiente-1),
+        var(--cor-gradiente-2),
+        var(--cor-gradiente-3)
+    );
+
+    --gradiente-principal-esquerda: linear-gradient(
+        to left,
+        var(--cor-gradiente-1),
+        var(--cor-gradiente-2),
+        var(--cor-gradiente-3)
+    );
+
+    --gradiente-principal-45deg: linear-gradient(
+        45deg,
+        var(--cor-gradiente-1),
+        var(--cor-gradiente-2),
+        var(--cor-gradiente-3)
+    );
+
+    --gradiente-login: linear-gradient(
+        var(--cor-gradiente-1),
+        var(--cor-gradiente-2),
+        var(--cor-gradiente-3)
+    );
+
+    /* ===== TEXTO ===== */
+    --cor-texto: #ffffff;
+    --cor-texto-hover: #34e3f5;
+    --cor-texto-preto: #000000;
+    --cor-texto-cinza: #777777;
+    --cor-texto-cinza-claro: #cbd5e1;
+    --cor-texto-escuro: #3b3b3be0;
+
+    /* ===== FUNDOS ===== */
+    --cor-fundo: #ffffff;
+    --cor-fundo-preto: #000000;
+    --cor-fundo-overlay: #000000ad;
+    --cor-overlay: rgba(0, 0, 0, 0.75);
+    --cor-fundo-desabilitado: #0e193fba;
+    --cor-fundo-campo: #D9F0EE;
+    --cor-fundo-cinza: #e0e0e0;
+    --cor-fundo-verde-claro: #d1fae5;
+
+    /* ===== BORDAS / DETALHES ===== */
+    --cor-borda-azul: #0000ff;
+    --cor-borda-verde-clara: #00ffb6;
+    --cor-borda-vermelha: #8d1313;
+    --cor-borda-turquesa: #64c9c4;
+    --cor-borda-cinza: #808080;
+    --cor-borda-preta: #000000;
+    --cor-borda-verde: #027385;
+
+    /* ===== ESTADOS ===== */
+    --cor-sucesso: #28a745;
+    --cor-sucesso-texto: #065f46;
+    --cor-sucesso-verde: #12a34c;
+    --cor-sucesso-verde-escuro: #0a3400f0;
+    --cor-sucesso-verde-medio: #2d830b;
+    --cor-sucesso-verde-claro: #35b117f0;
+    --cor-brilho-verde: #68ff2a;
+    --cor-vermelho: #dc3545;
+    --cor-vermelho-claro: #FF0000;
+    --cor-vermelho-escuro: #8d1313;
+
+    /* ===== CORES ESPECÍFICAS ===== */
+    --cor-turquesa: #1fe1c1;
+    --cor-roxo: #6a11a9;
+    --cor-teal: #027385;
+    --cor-cinza-sombra: #717171;
+    --cor-cinza-sombra-transparente: #717171d1;
+    --cor-branca-transparente: #ffffffd6;
+}

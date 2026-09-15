@@ -27,3 +27,32 @@ function abrirEdicaoUsuario() {
     })
 }
 
+
+// EXCLUIR USUÁRIO
+const excluirUsuario = document.getElementById("btn_excluir");
+const formularioExcluirUsuario = document.getElementById("formulario_usuario");
+
+excluirUsuario.addEventListener("click", async function(event) {
+
+    event.preventDefault();
+    const dadosFormularioExcluirUsuario = new FormData(formularioExcluirUsuario);
+    try {
+        const resposta = await fetch(formularioExcluirUsuario.action, {
+            method: "POST",
+            body: dadosFormularioExcluirUsuario,
+        });
+
+        const dados = await resposta.json();
+
+        if (dados.sucesso) {
+            alert(dados.mensagem)
+        }
+        else {
+            alert(dados.mensagem)
+        }
+    } catch (erro){
+        console.error("Erro na requisição:", erro);
+        alert("Ocorreu um erro ao tentar excluir o usuário.");
+    }   
+});
+

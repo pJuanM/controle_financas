@@ -1,6 +1,6 @@
 /* CLASSE FORMULARIO SE REFERE A TAG SECTION NO HTML */
 .formulario{
-    background-color: #D9F0EE;
+    background-color: var(--cor-fundo-campo);
     padding: 1em;
     border-radius: 15px;
 }
@@ -22,14 +22,14 @@ form .campo_data {
     position: relative; 
 }
 form .campo_data input {
-    background: #000e32;
-    color: #000e32b0;
+    background: var(--cor-principal);
+    color: var(--cor-principal-transparente);
     outline: none;
     border-radius: 12px;
 }
 form .campo_data input:focus,
 form .campo_data input.tem_valor {
-    color: white;
+    color: var(--cor-texto);
 }
 form .campo_data label {
     position: absolute;
@@ -39,7 +39,7 @@ form .campo_data label {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--cor-texto);
     font-weight: bold;
     pointer-events: none;
     transition: .2s;
@@ -53,13 +53,13 @@ form .campo_data label.escondida {
  
 
 form input::placeholder{
-    color: white;
+    color: var(--cor-texto);
 }
 form input, 
 .botoes_formulario button,
 input:not([type="checkbox"]){
-    background-color: #000E32;
-    color: white;
+    background-color: var(--cor-principal);
+    color: var(--cor-texto);
     text-align: center;
     margin-bottom: 1em;
     padding: .6em;
@@ -68,13 +68,30 @@ input:not([type="checkbox"]){
     font-weight: bold;
 }
 
+.descricao_importacao {
+    font-size: 1.1em;
+    text-align: center;
+    font-style: italic;
+}
+#arquivoOFX {
+    display: none;
+}
+#labelArquivo {
+    display: inline-block;
+    width: 100%;
+    margin: 1em 0;
+    cursor: pointer;
+}
+
 #enviar_formulario,
 #btn_editar,
+#botaoImportarOfx,
 #btn_excluir,
+#labelArquivo,
 select,
 input:not([type="checkbox"]) {
-    background-color: #000e32;
-    color: white;
+    background-color: var(--cor-principal);
+    color: var(--cor-texto);
     text-align: center;
     margin-bottom: 1em;
     padding: .6em;
@@ -85,12 +102,26 @@ input:not([type="checkbox"]) {
     text-overflow: ellipsis;
     overflow: hidden;
     font-size: .8em;
-    border: 2px solid #00ffb6;
-    box-shadow: 2px -2px 7px 1px #6a11a9;
+    border: 2px solid var(--cor-borda-verde-clara);
+    box-shadow: 2px -2px 7px 1px var(--cor-roxo);
+}
+#btn_editar, 
+#btn_excluir,
+#btnCancelar {
+    background: var(--cor-gradiente-2);
+    transition: background .3s ease-in-out;
+}
+
+#btn_editar:hover, 
+#btn_excluir:hover,
+#btnCancelar:hover {
+    background: var(--cor-fundo-preto);
+    color: var(--cor-texto-hover);
+    
 }
 details {
-    background-color: #000e32;
-    color: white;
+    background-color: var(--cor-principal);
+    color: var(--cor-texto);
     padding: .6em;
     width: 100%;
     border-radius: 12px;
@@ -98,8 +129,8 @@ details {
     font-size: .8em;
     text-align: center;
     margin-bottom: 1em;
-    border: 2px solid #00ffb6;
-    box-shadow: 2px -2px 7px 1px #6a11a9;
+    border: 2px solid var(--cor-borda-verde-clara);
+    box-shadow: 2px -2px 7px 1px var(--cor-roxo);
 }
 
 optgroup{
@@ -112,8 +143,8 @@ optgroup option{
 }
 
 details {
-    background-color: #000e32;
-    color: white;
+    background-color: var(--cor-principal);
+    color: var(--cor-texto);
     padding: .6em;
     width: 100%;
     border-radius: 12px;
@@ -124,7 +155,7 @@ details {
 }
 
 details label {
-    color: white !important;
+    color: var(--cor-texto) !important;
     text-align: left !important;
     width: 100%;
     padding: .5em;
@@ -149,8 +180,8 @@ details .opcao_checkbox {
     gap: .5em;
     margin: .4em 0;
     align-items: center;
-    border: 1px solid white;
-    background-color: #000E32;
+    border: 1px solid var(--cor-texto);
+    background-color: var(--cor-principal);
     margin-top: .5em;
     padding-left: .5em;
     border-radius: 8px;
@@ -170,16 +201,23 @@ details .linha_checkbox {
 }
 
 .opcao_checkbox span {
-    color: white;
+    color: var(--cor-texto);
     text-align: left;
 }
 
 #enviar_formulario {
     margin-top: auto;
     cursor: pointer;
-    border: 1px solid #0000ff;
-    background-image: linear-gradient(to left, #18E474, #19AEA2, #2F85E8);
-    color: white;
+    border: 1px solid var(--cor-borda-azul);
+    background: var(--cor-gradiente-2);
+    color: var(--cor-texto);
     font-weight: bold;
     cursor: pointer;
+    transition: .2s ease-in;
+}
+
+
+#enviar_formulario:hover {
+    background: var(--cor-gradiente-3)
+
 }

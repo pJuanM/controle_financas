@@ -55,9 +55,10 @@ async def homepage(request: Request,
 @rota_home.post("/")
 async def homepage(request: Request,
                    session: Session = Depends(pegar_sessao),
-                   mes: list[int] | None = Form(None),
-                   ano: list[int] | None = Form(None),
+                   mes: int | None = Form(None),
+                   ano: int | None = Form(None),
                    usuario: Usuarios = Depends(verificar_token)):
+
 
     if usuario is None:
             return templates.TemplateResponse(request= request, name="sem_login.html")
@@ -78,11 +79,20 @@ async def homepage(request: Request,
     parcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(Parcelas.status_parcela != "CANCELADO", Lancamentos.id_usuario == usuario.id)
 
     if ano:
-        parcelas = parcelas.filter(extract('year', Parcelas.data_vencimento).in_(ano))
-        mesesParcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(Lancamentos.id_usuario == usuario.id, Parcelas.status_parcela != "CANCELADO", extract('year', Parcelas.data_vencimento).in_(ano))
+        parcelas = parcelas.filter(extract('year', Parcelas.data_vencimento) == ano)
+        mesesParcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(
+            Lancamentos.id_usuario == usuario.id, 
+            Parcelas.status_parcela != "CANCELADO", 
+            extract('year', Parcelas.data_vencimento) == ano)
+    else:
+        parcelas = parcelas.filter(extract('year', Parcelas.data_vencimento) == datetime.now().year)
+        mesesParcelas = session.query(Parcelas).join(Parcelas.lancamento).filter(
+            Lancamentos.id_usuario == usuario.id, 
+            Parcelas.status_parcela != "CANCELADO", 
+            extract('year', Parcelas.data_vencimento) == datetime.today().year)
 
     if mes:
-        parcelas = parcelas.filter(extract('month', Parcelas.data_vencimento).in_(mes))
+        parcelas = parcelas.filter(extract('month', Parcelas.data_vencimento) == mes)
 
 
 
@@ -94,6 +104,8 @@ async def homepage(request: Request,
         valorParcela = parcela.valor_parcela
 
         if parcela.lancamento.tipo_lancamento == "DEBITO":
+            if  parcela.lancamento.pagador_responsavel != usuario.nome:
+                continue
             # ======= DICIONÁRIO DE GASTOS POR CATEGORIA =======
             if categoria not in categorias:
                 categorias[categoria] = 0
@@ -125,15 +137,17 @@ async def homepage(request: Request,
     # ======= LOOPING SECUNDÁRIO ITERAR PARA TODOS OS MESES =======
     for mesParcelas in mesesParcelas:
         valorParcela = mesParcelas.valor_parcela
-        mes = mesParcelas.data_vencimento.month
+        numeroMes = mesParcelas.data_vencimento.month
         if mesParcelas.lancamento.tipo_lancamento == "DEBITO":
-            if mes not in gastosMes:
-                gastosMes[mes] = 0
-            gastosMes[mes] += float(valorParcela)
+            if mesParcelas.lancamento.pagador_responsavel != usuario.nome:
+                continue
+            if numeroMes not in gastosMes:
+                gastosMes[numeroMes] = 0
+            gastosMes[numeroMes] += float(valorParcela)
         else:
-            if mes not in creditosMes:
-                creditosMes[mes] = 0
-            creditosMes[mes] += float(valorParcela)
+            if numeroMes not in creditosMes:
+                creditosMes[numeroMes] = 0
+            creditosMes[numeroMes] += float(valorParcela)
 
 
     # ======= LISTA DE GASTOS POR CATEGORIA =======
@@ -150,10 +164,10 @@ async def homepage(request: Request,
 
     # ======= LISTA DE GASTOS POR MES =======
     labelsMes = list(range(1, 13))
-    dataGastosMes = [float(gastosMes.get(mes, 0)) for mes in labelsMes]
+    dataGastosMes = [float(gastosMes.get(numeroMes, 0)) for numeroMes in labelsMes]
 
     # ======= LISTA DE CREDITOS POR MES =======
-    dataCreditosMes = [float(creditosMes.get(mes, 0)) for mes in labelsMes]
+    dataCreditosMes = [float(creditosMes.get(numeroMes, 0)) for numeroMes in labelsMes]
 
     # ======= SALDO =======
     saldo = valor_credito - valor_debito
@@ -161,6 +175,8 @@ async def homepage(request: Request,
         request = request,
         name = "home.html",
         context = {
+            "mes": mes,
+            "ano": ano,
             "parcelas": parcelas,
 
             # CARDS

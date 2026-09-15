@@ -8,7 +8,7 @@
     position: relative;
 }
 .label_campos_usuario {
-    color: #3b3b3be0;
+    color: var(--cor-texto-escuro);
     text-transform: uppercase;
     cursor: pointer;
 }

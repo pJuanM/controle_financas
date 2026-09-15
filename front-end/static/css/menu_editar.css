@@ -1,5 +1,5 @@
 .menu_editar {
-    min-height: 70vh;
+    min-height: 75vh;
     width: 90vw;
     border: 1px solid;
     padding: 1.5em;
@@ -8,12 +8,13 @@
     top: 10vh;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #ffffffd6;
+    background-color: var(--cor-branca-transparente);
     z-index: 999;
     visibility: hidden;
 }
 .menu_editar.ativo {
     visibility: visible;
+    transition: .3s ease;
 }
 
 .menu_editar.ativo button{
@@ -45,7 +46,7 @@
 }
 
 :disabled {
-    background-color: #e0e0e0;
-    color: #777;
+    background-color: var(--cor-fundo-cinza);
+    color: var(--cor-texto-cinza);
     cursor: not-allowed;
 }

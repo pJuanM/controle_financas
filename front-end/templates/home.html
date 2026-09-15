@@ -17,18 +17,6 @@ HomePage
             <div class="grupo_campo_filtro_dashboard">
                 <select id="mes_dashboard" name="mes">
                     <option value="" selected disabled>MÊS</option>
-                    <option value="01">JAN.</option>
-                    <option value="02">FEV.</option>
-                    <option value="03">MAR.</option>
-                    <option value="04">ABR.</option>
-                    <option value="05">MAI.</option>
-                    <option value="06">JUN.</option>
-                    <option value="07">JUL.</option>
-                    <option value="08">AGO.</option>
-                    <option value="09">SET.</option>
-                    <option value="10">OUT.</option>
-                    <option value="11">NOV.</option>
-                    <option value="12">DEZ.</option>
                 </select>
                 <select id="ano_dashboard" name="ano">
                     <option value="" selected disabled>ANO</option>
@@ -93,7 +81,10 @@ HomePage
 
 {% block script %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <script>
+        const mesSelecionado = "{{ mes or '' }}";
+        const anoSelecionado = "{{ ano or '' }}";
+    </script>>
     <script>
         window.dashboard = {
             label_gastos_dia: {{ label_gastos_dia | tojson }},
@@ -111,5 +102,8 @@ HomePage
                 
         };
     </script>
-    <script src="/static/js/dashboard.js"></script>
+    <script src="{{ url_for('static', path='/js/dashboard.js') }}?v=2"></script>
+
+
+
 {% endblock %}

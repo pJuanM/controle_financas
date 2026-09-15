@@ -182,7 +182,7 @@ Débitos
                 <label for="id_categoria">Categoria:</label>
                 <select name="id_categoria" id="editar_id_categoria">
                     <option value="" disabled>Categoria:</option>
-                    {% for categoria in categorias %}
+                    {% for categoria in categorias|sort(attribute='categoria') %}
                         <option value="{{ categoria.id }}">
                             {{ categoria.categoria }}
                         </option>

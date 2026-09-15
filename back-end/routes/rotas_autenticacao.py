@@ -91,6 +91,10 @@ async def excluir_usuario(request: Request,
         }
     id_usuario.status_usuario = "INATIVO"
     session.commit()
+    return {
+        "sucesso": True,
+        "mensagem": "Usuário excluido com sucesso."
+    }
     
 
 @rota_autenticacao.get("/cadastro")

@@ -6,12 +6,23 @@
     cursor: pointer;
 
 }
+
+.grupo_campo_filtro_dashboard select:hover {
+    background: var(--cor-fundo-preto);
+    color: var(--cor-texto-hover);
+    transition: .3s ease-in-out;}
+
+.grupo_campo_filtro_dashboard select:hover option {
+    background: var(--cor-principal);
+    color: var(--cor-texto);
+    transition: .3s ease-in-out;
+}
 .btn-filtrar {
     padding: 0.4em;
     border-radius: 15px;
-    border: 1px solid #0000ff;
-    background-image: linear-gradient(to left, #18E474, #19AEA2, #2F85E8);
-    color: white;
+    border: 1px solid var(--cor-borda-azul);
+    background: var(--cor-gradiente-2);
+    color: var(--cor-texto);
     font-size: 1em;
     font-weight: bold;
     cursor: pointer;
@@ -29,21 +40,21 @@
 }
 .cards_dashboard .card_dashboard {
     padding: .9em;
-    color: white;
+    color: var(--cor-texto);
     border-radius: 30px;
-    background-image: linear-gradient(to right, #18E474, #19AEA2, #2F85E8);
+    background-image: linear-gradient(to right, var(--cor-gradiente-1), var(--cor-gradiente-2), var(--cor-gradiente-3));
     text-align: center;
     font-weight: bold;
     font-size: 1.1em;
     cursor: pointer;
     position: relative;
-    border: 2px solid #8d1313;
-    box-shadow: 2px -2px 7px 0px #1fe1c1;
+    border: 2px solid var(--cor-vermelho-escuro);
+    box-shadow: 2px -2px 7px 0px var(--cor-turquesa);
 }
 
 .cards_dashboard .card_dashboard h3 {
-    background: #000000;
-    color: white;
+    background: var(--cor-fundo-preto);
+    color: var(--cor-texto);
     border-radius: 2em;
     margin: 0 auto .5em;
     width: 45%;
@@ -51,13 +62,13 @@
     top: -30%;
     left: 50%;
     transform: translateX(-50%);
-    border: 2px solid #64c9c4;
-    box-shadow: 1px -1px 4px 1px black;
+    border: 2px solid var(--cor-turquesa);
+    box-shadow: 1px -1px 4px 1px var(--cor-texto-preto);
 }
 
 .cards_dashboard .card_dashboard span {
     font-size: 1.1em;
-    color: white;
+    color: var(--cor-texto);
     font-weight: bold;
 }
 
@@ -68,8 +79,8 @@
 
 .insights_dashboard h3 {
     text-align: center;
-    background: #000000ad;
-    color: white;
+    background: var(--cor-fundo-overlay);
+    color: var(--cor-texto);
     border-radius: 2em;
     width: 75%;
     padding: 0.2em;

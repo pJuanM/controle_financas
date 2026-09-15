@@ -13,9 +13,9 @@
     position: absolute;
     width: 2em;
     height: 2em;
-    background: #000E32;
+    background: var(--cor-principal);
     border-radius: 50%;
-    color: white;
+    color: var(--cor-texto);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -38,14 +38,14 @@
     width: 2.4em;
     height: 2.4em;
     border-radius: 50%;
-    color: white;
+    color: var(--cor-texto);
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     font-weight: bold;
     font-size: 1.3em;
-    background: #000E32;
+    background: var(--cor-principal);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -61,7 +61,7 @@
 .item svg {
     width: 28px;
     height: 28px;
-    fill: white;
+    fill: var(--cor-texto);
 }
 
 /* DASHBOARD */
@@ -103,7 +103,7 @@
 
 /* COR NO HOVER */
 .item:hover {
-    background: #2F85E8;
+    background: var(--cor-gradiente-3);
 
 }
 
@@ -113,5 +113,5 @@
     bottom: -25px;
     font-size: 12px;
     white-space: nowrap;
-    color: #cbd5e1;
+    color: var(--cor-texto-cinza-claro);
 }
