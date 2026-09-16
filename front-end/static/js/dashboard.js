@@ -17,7 +17,7 @@ const dashboard = window.dashboard;
 const labelsGastosDia = dashboard.label_gastos_dia;
 const data_gastos_dia = dashboard.data_gastos_dia;
 
-try{
+try {
 
     const canvas = document.getElementById("gastosDia");
     const ctx = canvas.getContext("2d");
@@ -209,8 +209,6 @@ const selectMes = document.querySelector("#mes_dashboard")
 const selectAno = document.querySelector("#ano_dashboard");
 const anoAtual = new Date().getFullYear();
 
-console.log("MÊS:", mesSelecionado);
-console.log("ANO:", anoSelecionado);
 
 const meses = [
     { valor: "01", nome: "JAN" },

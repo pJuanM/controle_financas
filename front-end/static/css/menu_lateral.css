@@ -1,7 +1,7 @@
 .menu_lateral_navegacao {
     left: -81vw;
     overflow: hidden;
-    width: 70vw;
+    width: 75vw;
     background: linear-gradient(45deg, var(--cor-gradiente-1),var(--cor-gradiente-2) , var(--cor-gradiente-3));
     padding: 1em 1em 1em 0.6em;
     box-shadow: 15px 6px 20px 0px var(--cor-cinza-sombra);
@@ -92,16 +92,28 @@
 .menu_lateral_navegacao .navegar_rotas .navegar_rotas_secoes .navegar_rotas_secao.ativo {
     transform: rotate(90deg);
 }
-.menu_lateral_navegacao .navegar_rotas,
-.menu_lateral_navegacao .perfil_usuario {
-    width: 95%;
-}
+
+
 .menu_lateral_navegacao .perfil_usuario {
     color: var(--cor-texto);
     padding: 1em .6em;
-    border: 1px solid var(--cor-texto);
     border-radius: 15px;
     margin: 1.5em 0;
+
+    text-align: left;
+    font-weight: bold;
+
+}
+.menu_lateral_navegacao .perfil_usuario legend {
+    padding: 0 .4em;
+    max-width: 100%;
+    white-space: normal;  /* Garante que o texto quebre linhas normalmente */
+}
+
+
+.menu_lateral_navegacao .navegar_rotas,
+.menu_lateral_navegacao .perfil_usuario {
+    width: 95%;
 }
 .menu_lateral_navegacao .perfil_usuario strong{
     font-weight: bold;

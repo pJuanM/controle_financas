@@ -36,23 +36,28 @@ excluirUsuario.addEventListener("click", async function(event) {
 
     event.preventDefault();
     const dadosFormularioExcluirUsuario = new FormData(formularioExcluirUsuario);
-    try {
-        const resposta = await fetch(formularioExcluirUsuario.action, {
-            method: "POST",
-            body: dadosFormularioExcluirUsuario,
-        });
+    const confirmarExcluirUsuario = confirm("Deseja realmente excluir o usuário: ")
+    if (confirmarExcluirUsuario == true) {
+        try {
+            const resposta = await fetch(formularioExcluirUsuario.action, {
+                method: "POST",
+                body: dadosFormularioExcluirUsuario,
+            });
 
-        const dados = await resposta.json();
+            const dados = await resposta.json();
 
-        if (dados.sucesso) {
-            alert(dados.mensagem)
-        }
-        else {
-            alert(dados.mensagem)
-        }
-    } catch (erro){
-        console.error("Erro na requisição:", erro);
-        alert("Ocorreu um erro ao tentar excluir o usuário.");
-    }   
+            if (dados.sucesso) {
+                alert(dados.mensagem)
+            } else {
+                alert(dados.mensagem)
+            }
+        } catch (erro){
+            console.error("Erro na requisição:", erro);
+            alert("Ocorreu um erro ao tentar excluir o usuário.");
+        }   
+    } else {
+        alert("Usuário permanece ATIVO!")
+    }
+    
 });
 
