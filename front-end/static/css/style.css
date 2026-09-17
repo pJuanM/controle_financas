@@ -46,6 +46,13 @@ label {
     font-size: 1em;
     margin-bottom: .2em;
 }
+.mensagemSucesso {
+    color: var(--cor-sucesso);
+}
+
+.mensagemErro {
+    color: var(--cor-vermelho);
+}
 .menu_editar input:disabled,
 .menu_editar select:disabled {
     background-color: var(--cor-fundo-desabilitado);

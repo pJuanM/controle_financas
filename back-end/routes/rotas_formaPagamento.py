@@ -101,33 +101,43 @@ async def criar_formaPagamento(forma_pagamento: str = Form(...),
     
     if not responsavel:
         responsavel = usuario.usuario
-        
+
+    
     existe_formaPagamento = session.query(FormasPagamento).filter(
-        FormasPagamento.forma_pagamento == forma_pagamento, 
-        FormasPagamento.responsavel == responsavel).first()
+        FormasPagamento.forma_pagamento == forma_pagamento.upper(), 
+        FormasPagamento.responsavel == responsavel.upper()).first()
     
     if existe_formaPagamento:
-        mensagem = quote("Já existe uma forma de pagamento idêntica.")
-        return RedirectResponse(
-            url = f"/formaPagamento/criar?mensagem={mensagem}",
-            status_code = 303
-        )
+        return {
+            "sucesso": False,
+            "mensagem": "Forma de Pagamento idêntica já cadastrada em sistema."
+        }
 
-    if data_vencimento == "":
-        return RedirectResponse(
-            url = f"/formaPagamento/criar?mensagem=Data de vencimento não informada.",
-            status_code = 303
-        )
+    if data_vencimento is not None and not (1 <= data_vencimento <= 31):
+        return {
+            "sucesso": False,
+            "mensagem": "Data de Vencimento precisa estar entre 1 e 31."
+        }
+    if data_fechamento is not None and not (1 <= data_fechamento <= 31):
+        return {
+            "sucesso": False,
+            "mensagem": "Data de Fechamento precisa estar entre 1 e 31."
+        }
+        
 
 
-    nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, forma_pagamento = forma_pagamento.upper(), responsavel = responsavel.upper(), status_forma_pagamento = "ATIVO", data_vencimento = data_vencimento, data_fechamento = data_fechamento)
+    nova_formaPagamento = FormasPagamento(id_usuario = usuario.id, 
+                                          forma_pagamento = forma_pagamento.upper(), 
+                                          responsavel = responsavel.upper(), 
+                                          status_forma_pagamento = "ATIVO", 
+                                          data_vencimento = data_vencimento, 
+                                          data_fechamento = data_fechamento)
     session.add(nova_formaPagamento)
     session.commit()
-    mensagem = quote("Forma de pagamento cadastrada com sucesso.")
-    return RedirectResponse(
-        url = f"/formaPagamento/criar?mensagem={mensagem}",
-        status_code = 303,
-    )
+    return {
+        "sucesso": True,
+        "mensagem": "Forma de Pagamento criada com sucesso."
+    }
 
 
 @rota_formasPagamento.post("/editar")
@@ -141,12 +151,47 @@ async def editar_formaPagamento(id_formaPagamento: int = Form(...),
                                 usuario: Usuarios = Depends(verificar_token)):
     
     
-    FormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == id_formaPagamento, FormasPagamento.id_usuario == usuario.id).first()
+    FormaPagamento = session.query(FormasPagamento).filter(
+        FormasPagamento.id == id_formaPagamento, 
+        FormasPagamento.id_usuario == usuario.id).first()
+    
     if not FormaPagamento:
-        raise HTTPException(status_code = 400, detail = "Forma de pagamento não cadastrada.")
+        return {
+            "sucesso": False,
+            "mensagem": "Forma de Pagamento não cadastrada ou INATIVA."
+        }
+        
+    if forma_pagamento:
+            forma_pagamento_existente = session.query(FormasPagamento).filter(
+                FormasPagamento.forma_pagamento == forma_pagamento.upper(),
+                FormasPagamento.id_usuario == usuario.id,
+                FormasPagamento.id != FormaPagamento.id
+            ).first()
+            if forma_pagamento_existente:
+                return {
+                    "sucesso": False,
+                    "mensagem": "Já existe uma Forma de Pagamento com este nome."
+                }
+
     
     if status_forma_pagamento not in ["ATIVO", "INATIVO"]:
-        raise HTTPException(status_code = 401, detail = "O status precisa ser ATIVO ou INATIVO.")
+        return {
+            "sucesso": False,
+            "mensagem": "Status da Forma de Pagamento deve ser ATIVO ou INATIVO."
+        }
+
+    if data_vencimento is not None and not (1 <= data_vencimento <= 31):
+        return {
+            "sucesso": False,
+            "mensagem": "Data de Vencimento precisa estar entre 1 e 31."
+        }
+    if data_fechamento is not None and not (1 <= data_fechamento <= 31):
+        return {
+            "sucesso": False,
+            "mensagem": "Data de Fechamento precisa estar entre 1 e 31."
+        }
+
+        
     
     FormaPagamento.forma_pagamento = forma_pagamento.upper()
     FormaPagamento.responsavel = responsavel.upper()
@@ -155,14 +200,14 @@ async def editar_formaPagamento(id_formaPagamento: int = Form(...),
     FormaPagamento.status_forma_pagamento = status_forma_pagamento.upper()
     session.commit()
 
-    if FormaPagamento.data_vencimento == None:
-        FormaPagamento.data_vencimento = "À vista"
+    vencimento = ("À VISTA" if FormaPagamento.data_vencimento is None else FormaPagamento.data_vencimento)
+
     return {
         "sucesso": True,
         "mensagem": "Forma de pagamento editada com sucesso!",
         "formaPagamento": FormaPagamento.forma_pagamento,
         "responsavel": FormaPagamento.responsavel,
-        "data_vencimento": FormaPagamento.data_vencimento,
+        "data_vencimento": vencimento,
         "status": FormaPagamento.status_forma_pagamento
     }
 
@@ -176,9 +221,12 @@ async def excluir_formaPagamento(id_formaPagamento: int = Form(...),
     existeFormaPagamento = session.query(FormasPagamento).filter(FormasPagamento.id == id_formaPagamento, FormasPagamento.id_usuario == usuario.id).first()
 
     if not existeFormaPagamento:
-        raise HTTPException(status_code = 401, detail = "Não existe essa forma de pagamento cadastrada para este usuário")
+        return {
+            "sucesso": False,
+            "mensagem": "Não existe esta Forma de Pagamento cadastrada para este usuário."
+        }
     
-    existeFormaPagamento.status_forma_pagamento = "INATIVO"
+    existeFormaPagamento.status_forma_pagamento = "ATIVO"
     session.commit()
 
     return {

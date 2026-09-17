@@ -267,24 +267,29 @@ async def criar_lancamento(data_compra: date = Form(...),
 
     valor_lancamento = (valor_lancamento.replace("R$", "").replace(".", "").replace(",", ".").strip())
     valor_lancamento = Decimal(valor_lancamento)
-    existelancamento = session.query(Lancamentos).join(Lancamentos.parcela).filter(Lancamentos.data_compra == data_compra, 
-                                                    Lancamentos.id_usuario == usuario.id,
-                                                    Lancamentos.item_comprado == item_comprado,
-                                                    Parcelas.status_parcela != "CANCELADO",
-                                                    Lancamentos.tipo_lancamento == tipo_lancamento,
-                                                    Lancamentos.valor_lancamento == valor_lancamento,
-                                                    Lancamentos.id_forma_pagamento == forma_pagamento).first()
+    existelancamento = session.query(Lancamentos).join(Lancamentos.parcela).filter(
+                                    Lancamentos.data_compra == data_compra, 
+                                    Lancamentos.id_usuario == usuario.id,
+                                    Lancamentos.item_comprado == item_comprado.upper(),
+                                    Parcelas.status_parcela != "CANCELADO",
+                                    Lancamentos.tipo_lancamento == tipo_lancamento,
+                                    Lancamentos.valor_lancamento == valor_lancamento,
+                                    Lancamentos.id_forma_pagamento == forma_pagamento).first()
     if parcelado == False:
         qnt_parcelas = 1
     else:
         if qnt_parcelas == None or qnt_parcelas <= 0 :
-            raise HTTPException(status_code = 400, detail = "A quantidade de parcelas precisa ser maior do que 0.")
+            return {
+                "sucesso": False,
+                "mensagem": "A quantidade de parcelas precisa ser maior do que 0."
+            }
+
         
     if existelancamento:
-        return RedirectResponse(
-            url = f"/lancamentos/criar?mensagem=Já existe uma compra idêntica.",
-            status_code = 303
-    )
+        return {
+            "sucesso": False,
+            "mensagem": "Já existe uma compra idêntica a esta em sistema."
+        }
 
     if tipo_lancamento == "DEBITO":
         pagador_responsavel = usuario.nome
@@ -292,11 +297,23 @@ async def criar_lancamento(data_compra: date = Form(...),
         if pagador_responsavel:
             pagador_responsavel = pagador_responsavel.upper()
         else:
-            raise HTTPException(status_code = 401, detail = "Precisa declarar responsável por pagamento quando se é um CRÉDITO.")
+            return {
+                "sucesso": False,
+                "mensagem": "Precisa declarar responsável por pagamento quando se é um CRÉDITO."
+            }
     
     item_comprado = item_comprado.upper()
     pagador_responsavel = pagador_responsavel.upper()
-    novolancamento = Lancamentos(id_usuario = usuario.id, data_compra = data_compra, item_comprado = item_comprado, id_categoria = categoria_id, id_forma_pagamento = forma_pagamento, valor_lancamento = valor_lancamento, parcelado = parcelado, qnt_parcelas = qnt_parcelas, pagador_responsavel = pagador_responsavel, tipo_lancamento = tipo_lancamento)
+    novolancamento = Lancamentos(id_usuario = usuario.id, 
+                                 data_compra = data_compra, 
+                                 item_comprado = item_comprado, 
+                                 id_categoria = categoria_id, 
+                                 id_forma_pagamento = forma_pagamento, 
+                                 valor_lancamento = valor_lancamento, 
+                                 parcelado = parcelado, 
+                                 qnt_parcelas = qnt_parcelas, 
+                                 pagador_responsavel = pagador_responsavel, 
+                                 tipo_lancamento = tipo_lancamento)
     session.add(novolancamento)
     session.flush()
 
@@ -319,11 +336,11 @@ async def criar_lancamento(data_compra: date = Form(...),
                            )
         session.add(parcela)
     session.commit()
-    mensagem = quote("Compra adicionada com sucesso!")
-    return RedirectResponse(
-        url = f"/lancamentos/criar?mensagem={mensagem}",
-        status_code = 303
-    )
+
+    return {
+        "sucesso": True,
+        "mensagem": "Lançamento adicionado com sucesso."
+    }
     
 
 # === ROTA DE IMPORTAÇÃO OFX VISUAL ===
@@ -517,10 +534,40 @@ async def editar_lancamento(id_lancamento: int = Form(...),
                         usuario: Usuarios= Depends(verificar_token)):
     
 
-    lancamento = session.query(Lancamentos).filter(Lancamentos.id == id_lancamento, Lancamentos.id_usuario == usuario.id).first()
+    lancamento = session.query(Lancamentos).filter(
+        Lancamentos.id == id_lancamento, 
+        Lancamentos.id_usuario == usuario.id).first()
 
     if not lancamento:
-        raise HTTPException(status_code = 400, detail = "Lançamento não cadastrado")
+        return {
+            "sucesso": False,
+            "mensagem": "Lançamento não encontrado em sistema ou CANCELADO."
+        }
+
+    
+    if isinstance(valor_lancamento, str):
+        valor_lancamento_normalizado = Decimal(valor_lancamento.replace("R$", "").replace(".","").replace(",",".").strip())
+    else:
+        valor_lancamento_normalizado = Decimal(str(valor_lancamento)) if valor_lancamento is not None else None
+    valor_parcelado = bool(parcelado) if parcelado is not None else False
+    lancamento_existente = session.query(Lancamentos).filter(
+        Lancamentos.id != lancamento.id,
+        Lancamentos.item_comprado == item_comprado.upper(),
+        Lancamentos.data_compra == data_compra,
+        Lancamentos.id_categoria == id_categoria,
+        Lancamentos.id_forma_pagamento == id_forma_pagamento,
+        Lancamentos.valor_lancamento == valor_lancamento_normalizado,
+        Lancamentos.parcelado == valor_parcelado,
+        Lancamentos.qnt_parcelas == qnt_parcelas,
+        Lancamentos.pagador_responsavel == pagador_responsavel.upper(),
+    ).first()
+
+
+    if lancamento_existente:
+        return {
+            "sucesso": False,
+            "mensagem": "Já existe um lancamento idêntico a este em sistema."
+        }
 
     if data_compra:
         lancamento.data_compra = data_compra
@@ -650,7 +697,7 @@ async def deletar_conta(id_lancamento: int = Form(...),
 
     return {
         "sucesso": True,
-        "mensagem": f"Conta excluída com sucesso! - ID da conta {conta.id}",
+        "mensagem": f"Lançamento excluído com sucesso! - ID da conta {conta.id}",
         "conta": conta
     }
 

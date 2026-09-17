@@ -144,10 +144,22 @@ function atualizarLinhaEditar(resultado) {
 const formEditar = document.getElementById("formulario_editar");
 let linhaSelecionada = null;
 if (formEditar) {
+    formEditar.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+
+            const btnEditar = document.getElementById("btn_editar");
+
+            btnEditar.click();
+        }
+    });
+    
     formEditar.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const botaoClicado = e.submitter;
+
+
 
         if (!botaoClicado) {
             console.error("Não foi possível identificar botão clicado!");

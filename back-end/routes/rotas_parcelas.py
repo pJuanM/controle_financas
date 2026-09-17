@@ -30,7 +30,6 @@ def gerar_excel(parcelas):
             "VALOR": parcela.valor_parcela,
             "PAGADOR RESPONSAVEL": parcela.lancamento.pagador_responsavel,
             "PARCELA": f"{parcela.numero_parcela}/{parcela.lancamento.qnt_parcelas}",
-            
             "STATUS": parcela.status_parcela,
         })
     df = pd.DataFrame(dados)
@@ -73,6 +72,7 @@ async def listar_parcelas(request: Request,
     
     categorias = session.query(Categorias).filter(Categorias.id_usuario == usuario.id)
     lancamentos = [responsavel.pagador_responsavel for responsavel in session.query(Lancamentos.pagador_responsavel).filter(Lancamentos.id_usuario == usuario.id).distinct().all()]
+    lancamentos.sort()
     formas_pagamento = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
 
     filtros_aplicados = any([
@@ -165,7 +165,6 @@ async def editar_parcela(id_parcela: int = Form(...),
         parcela.status_parcela = status_parcela
 
     session.commit()
-    print(f"VENCIMENTO: {parcela.data_vencimento}")
     return {
         "sucesso": True,
         "mensagem": "Parcela alterada com sucesso!",

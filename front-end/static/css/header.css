@@ -29,7 +29,7 @@ nav a:hover {
     box-shadow: 2px -2px 7px 0px var(--cor-turquesa);
 }
 .homepage_navegacao a:hover {
-    transform: scale(1.03);
+    transform: scale(.9);
     box-shadow: 2px -2px 7px 3px var(--cor-turquesa);
 
 }

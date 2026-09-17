@@ -7,9 +7,9 @@ Categorias
 
 {% block conteudo %}
 
-<h1 class="titulo-pagina">Categoria</h1>
+<h1 class="titulo-pagina">CATEGORIA</h1>
 <section class="formulario">
-    <form action="/categorias/criar" method="POST" id="formulario">
+    <form onsubmit="envioFormularioCadastro(event)" action="/categorias/criar" method="POST" id="formulario" data-tipo="categoria" data-url="/categorias/criar">
         <div class="grupo_campo">
             <input type="text" id="categoria" name="categoria" placeholder="Categoria" autocomplete="off" required>
         </div>
@@ -21,9 +21,7 @@ Categorias
         <button type="submit" id="enviar_formulario">Salvar Categoria</button>
     </form>
 </section>
-{% if mensagem %}
-<div class="mensagem_sucesso">
-    <p>{{ mensagem }}</p>
+<div class="mensagem">
+    <p id="status_mensagem"></p>
 </div>
-{% endif %}
 {% endblock %}

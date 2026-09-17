@@ -52,3 +52,52 @@ function formatarMoeda(input) {
         currency: "BRL"
     });
 }
+
+
+// CADASTRO CATEGORIA / FORMA PAGAMENTO / LANCAMENTO / USUARIO
+async function envioFormularioCadastro(event) {
+
+    event.preventDefault();
+
+    const formulario = document.getElementById("formulario")
+    const dados = new FormData(formulario)
+
+    const statusMensagem = document.querySelector("#status_mensagem");
+
+    const tipo = formulario.dataset.tipo;
+    const url = formulario.dataset.url;
+    
+    statusMensagem.classList.remove("mensagemSucesso", "mensagemErro")
+    statusMensagem.textContent = "";
+    
+    if (dados){
+        try {
+            const resposta = await fetch(url,{
+                method: 'POST',
+                body: dados
+            })
+            if (!resposta.ok) {
+                throw new Error('Erro na requisição: ' + resposta.status);
+            }
+            const resultado = await resposta.json();
+            if (resultado.sucesso) {
+                statusMensagem.classList.add("mensagemSucesso");
+                statusMensagem.textContent = resultado.mensagem;
+                setTimeout(() => {
+                    statusMensagem.textContent = "Recarregando a página....";
+                    setTimeout(() => {
+                        window.location.reload();                         
+                    }, 2000);
+                }, 2000);
+                  
+            } else {
+                statusMensagem.classList.add("mensagemErro");
+                statusMensagem.textContent = resultado.mensagem;
+            }
+        } catch (erro) {
+            console.error(erro);
+            statusMensagem.classList.add("mensagemErro");
+            statusMensagem.textContent = "Ocorreu um erro.";
+        }
+    }
+}

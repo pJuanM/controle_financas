@@ -61,23 +61,27 @@ async def criar_categoria(categoria: str = Form(...),
                           usuario: Usuarios = Depends(verificar_token)):
 
 
-    existe_categoria = session.query(Categorias).filter(Categorias.categoria == categoria, Categorias.id_usuario == usuario.id).first()
+    existe_categoria = session.query(Categorias).filter(
+        Categorias.categoria == categoria.upper(), 
+        Categorias.id_usuario == usuario.id).first()
+    
     if existe_categoria:
-        mensagem = quote("Já existe uma categoria idêntica.")
-        return RedirectResponse(
-            url = f"/categorias/criar?mensagem={mensagem}",
-            status_code = 303
-        )
-
-    nova_categoria = Categorias(id_usuario = usuario.id, categoria = categoria.upper(), status_categoria = "ATIVO", descricao = descricao.upper())
+        return {
+            "sucesso": False,
+            "mensagem": "Categoria já cadastrada em sistema."
+        }
+    
+    nova_categoria = Categorias(id_usuario = usuario.id, 
+                                categoria = categoria.upper(), 
+                                status_categoria = "ATIVO", 
+                                descricao = descricao.upper())
     session.add(nova_categoria)
     session.commit()
     
-    mensagem = quote("Categoria adicionada com sucesso!")
-    return RedirectResponse(
-        url = f"/categorias/criar?mensagem={mensagem}",
-        status_code = 303
-    )
+    return {
+        "sucesso": True,
+        "mensagem": "Categoria cadastrada com sucesso!" 
+    }
     
 
 @rota_categorias.post("/editar")
@@ -89,12 +93,33 @@ async def editar_categoria(categoria_id: int = Form(...),
                            usuario: Usuarios = Depends(verificar_token)):
     
 
-    categoria = session.query(Categorias).filter(Categorias.id == categoria_id, Categorias.id_usuario == usuario.id).first()
+    categoria = session.query(Categorias).filter(
+        Categorias.id == categoria_id, 
+        Categorias.id_usuario == usuario.id).first()
+    
     if not categoria:
-        raise HTTPException(status_code = 404, detail = "Não existe essa categoria cadastrada em sistema.")
+        return {
+            "sucesso": False,
+            "mensagem": "Categoria não existe ou INATIVA."
+        }
+
+    if categoria_titulo:
+        categoria_existente = session.query(Categorias).filter(
+            Categorias.categoria == categoria_titulo.upper(),
+            Categorias.id_usuario == usuario.id,
+            Categorias.id != categoria_id
+        ).first()
+        if categoria_existente:
+            return {
+                "sucesso": False,
+                "mensagem": "Já existe uma categoria com este nome."
+            }
     
     if categoria_status not in ["ATIVO", "INATIVO"]:
-        raise HTTPException(status_code = 401, detail = "A categoria só pode ser ATIVO ou INATIVO.")
+        return {
+            "sucesso": False,
+            "mensagem": "A categoria só pode ser ATIVO ou INATIVO."
+        }
     
     categoria.categoria = categoria_titulo.upper()
     categoria.descricao = categoria_descricao.upper()
@@ -119,7 +144,10 @@ async def excluir_categoria(categoria_id: int = Form(...),
     categoria = session.query(Categorias).filter(Categorias.id == categoria_id, Categorias.id_usuario == usuario.id).first()
 
     if not categoria:
-        raise HTTPException(status_code = 404, detail = "Não existe essa categoria cadastrada em sistema.")
+        return {
+            "sucesso": False,
+            "mensagem": "Categoria não existe ou INATIVA."
+        }
     
     categoria.status_categoria = "INATIVO"
     session.commit()
@@ -127,7 +155,6 @@ async def excluir_categoria(categoria_id: int = Form(...),
     return {
         "sucesso": True,
         "mensagem": "Categoria inativada com sucesso!"
-        
     }
 
 

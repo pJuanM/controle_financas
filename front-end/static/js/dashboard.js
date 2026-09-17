@@ -179,7 +179,7 @@ try {
             borderColor: "#FFFFFF",
             borderWidth: 2,
 
-            hoverOffset: 15
+            hoverOffset: 25
         }]
     };
 

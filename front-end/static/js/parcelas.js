@@ -103,3 +103,19 @@ if (btnLiquidar) {
     });
 
 }
+
+const selecionarTudo = document.querySelector(".selecionar_tudo");
+selecionarTudo.addEventListener("click", function (event) {
+
+    selecionarTudo.checked = true;
+    const botoesLiquidar = document.querySelectorAll(".btn-liquidar");
+
+    if (botoesLiquidar.length === 0){ 
+        return;
+    }
+
+    const deveDesmarcar = botoesLiquidar[0].checked;
+    for (let botao of botoesLiquidar) {
+        botao.checked = !deveDesmarcar;
+    }
+});

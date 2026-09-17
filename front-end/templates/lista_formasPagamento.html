@@ -3,12 +3,12 @@
 Forma de Pagamento
 {% endblock %}
 {% block conteudo %}
-<h1 class="titulo-pagina">Formas Pagamento</h1>
+<h1 class="titulo-pagina">FILTRO F. PAGAMENTO</h1>
 <section class="formulario">
     <form action="/formaPagamento" method="get" id="formulario_filtrar">
         <div class="grupo_campo">
             <select name="status_forma_pagamento" id="status_forma_pagamento">
-                <option   style='text-align-last: center' value="" disabled {% if not status_forma_pagamento %} selected {% endif %}>Status Forma de Pagamento</option>
+                <option   style='text-align-last: center' value="" disabled {% if not status_forma_pagamento %} selected {% endif %}>STATUS FORMA DE PAGAMENTO</option>
                 <option value="ATIVO" {% if status_forma_pagamento == "ATIVO" %}selected{% endif %}>ATIVO</option>
                 <option value="INATIVO" {% if status_forma_pagamento == "INATIVO" %}selected{% endif %}>INATIVO</option>
             </select>
@@ -29,7 +29,7 @@ Forma de Pagamento
     </form>
     
 </section>
-<h1 class="titulo-pagina">Lista de Formas</h1>
+<h1 class="titulo-pagina">LISTA F. PAGAMENTO</h1>
 <section class="tabela">
     <table>
         <thead>
@@ -52,7 +52,7 @@ Forma de Pagamento
                     data-status-forma-pagamento="{{ formaDePagamento.status_forma_pagamento }}">
                     <td class="col-item">{{ formaDePagamento.forma_pagamento }}</td>
                     <td>{{ formaDePagamento.responsavel }}</td>
-                    <td>{{ formaDePagamento.data_vencimento or 'À vista' }}</td>
+                    <td>{{ formaDePagamento.data_vencimento or 'À VISTA' }}</td>
                 </tr>
                 {% endfor %}
             {% else %}

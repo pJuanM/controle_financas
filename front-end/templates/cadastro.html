@@ -9,9 +9,9 @@ Cadastro
 {% endblock %}
 
 {% block conteudo %}
-<h1 class="titulo-pagina">Cadastro</h1>
+<h1 class="titulo-pagina">CADASTRO</h1>
 <section class="formulario">
-    <form action="/usuario/cadastro/criar" method="POST" id="formulario">
+    <form onsubmit="envioFormularioCadastro(event)" action="/usuario/cadastro/criar" method="POST" id="formulario" data-tipo="usuario" data-url="/usuario/cadastro/criar">
         <div class="grupo_campo">
             <input required type="text" id="usuario" name="usuario" placeholder="Usuário" autocomplete="off">
         </div>
@@ -22,16 +22,19 @@ Cadastro
             <input required type="email" id="email" name="email" placeholder="E-mail" autocomplete="off">
         </div>
         <div class="grupo_campo">
-            <input required type="password" id="senha" name="senha" placeholder="Senha" data-senha>
+            <input required type="password" id="senha" name="senha" placeholder="Senha" data-senha autocomplete="new-password">
         </div>
         <div class="grupo_campo">
-            <input required type="password" id="confirme_senha" name="confirme_senha" placeholder="Confirme sua senha" data-confirme-senha>
+            <input required type="password" id="confirme_senha" name="confirme_senha" placeholder="Confirme sua senha" data-confirme-senha autocomplete="new-password">
         </div>
         <p id="erroSenha"></p>
         <button onclick="cadastrarUsuario(event)" type="submit" id="enviar_formulario">Enviar Cadastro</button>
     </form>
     <p id="mensagemCadastro"></p>
 </section>
+<div class="mensagem">
+    <p id="status_mensagem"></p>
+</div>
 {% endblock %}
 
 {% block script %}

@@ -6,11 +6,11 @@ Forma de Pagamento
 
 
 {% block conteudo %}
-<h1 class="titulo-pagina">Forma de Pagamento</h1>
+<h1 class="titulo-pagina">FORMA DE PAGAMENTO</h1>
 <section class="formulario">
-    <form action="/formaPagamento/criar" method="POST" id="formulario">
+    <form onsubmit="envioFormularioCadastro(event)" action="/formaPagamento/criar" method="POST" id="formulario" data-tipo="formaPagamento" data-url="/formaPagamento/criar">
         <div class="grupo_campo">
-            <input type="text" id="forma_pagamento" name="forma_pagamento" placeholder="Forma de Pagamento" autocomplete="off" required>
+            <input type="text" id="forma_pagamento" name="forma_pagamento" placeholder="Forma de Pagamento" autocomplete="off">
         </div>
 
         <div class="grupo_campo">
@@ -28,11 +28,13 @@ Forma de Pagamento
         <button type="submit" id="enviar_formulario">Salvar Forma de Pagamento</button>
     </form>
 </section>
-{% if mensagem %}
-    <div class="mensagem_sucesso">
-        <p> {{ mensagem }} </p>
-    </div>
-{% endif %}
+<div class="mensagem">
+    <p id="status_mensagem"></p>
+</div>
+{% endblock %}
+{% block script %}
+<script src="{{ url_for('static', path='/js/formulario.js') }}"></script>
+
 {% endblock %}
 
   

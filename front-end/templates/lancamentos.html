@@ -10,9 +10,9 @@ Débitos
 {% endblock %}
 
 {% block conteudo %}
-<h1 class="titulo-pagina">Lançamento</h1>
+<h1 class="titulo-pagina">LANÇAMENTO</h1>
 <section class="formulario">
-    <form action="/lancamentos/criar" method="post" id="formulario">
+    <form onsubmit="envioFormularioCadastro(event)" action="/lancamentos/criar" method="post" id="formulario" data-tipo="lancamento" data-url="/lancamentos/criar">
         <div class="grupo_campo campo_data">
             <input type="date" id="data_compra" name="data_compra" placeholder="Data compra início" autocomplete="off" onclick="this.showPicker()" class="tem_valor">
             <label for="data_compra">Data de Compra</label>
@@ -77,11 +77,9 @@ Débitos
 
     </form>
 </section>
-{% if mensagem %}
-    <div class="mensagem_sucesso">
-        <p> {{ mensagem }} </p>
-    </div>
-{% endif %}
+<div class="mensagem">
+    <p id="status_mensagem"></p>
+</div>
 {% endblock %}
 
 

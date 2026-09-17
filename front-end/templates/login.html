@@ -11,18 +11,18 @@ Login
         </div>
 
         <div class="grupo_campo">
-            <input type="password" id="senha" name="senha" placeholder="Senha" required>
+            <input type="password" id="senha" name="senha" placeholder="Senha" required autocomplete="current-password">
         </div>
 
-        {% if erro %}
-            <div class="mensagemErro">
-                {{ erro }}
-            </div>
-        {% endif %}
+
         
         <button type="submit" id="enviar_formulario">Entrar</button>
     </form>
-
+{% if erro %}
+    <div class="mensagemErro">
+        {{ erro }}
+    </div>
+{% endif %}
 </section>
 {% endblock %}
 

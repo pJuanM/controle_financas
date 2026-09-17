@@ -6,7 +6,7 @@ Parcelas
 
 {% block conteudo %}
 <!-- ======= FILTRO DE PARCELAS ======= -->
-<h1 class="titulo-pagina">Parcelas</h1>
+<h1 class="titulo-pagina">PARCELAS</h1>
 <section class="formulario">
     <form action="/parcelas" method="get" id="formulario_filtrar">
 
@@ -114,16 +114,22 @@ Parcelas
 </section>
 
 <!-- ======= TABELA DE PARCELAS ======= -->
-<h1 class="titulo-pagina">Lista de Parcelas</h1>
+<h1 class="titulo-pagina">LISTA DE PARCELAS</h1>
 
 <section class="tabela">
-    <div class="botoes_acoes_lancamentos">
-        <button type="button" id="btn-liquidar">
-            LIQUIDAR
-        </button>
-        <button form="formulario_filtrar" formaction="/parcelas/" type="submit" class="botao_gerar_excel" name="acao" value="excel">
-            GERAR EXCEL 
-        </button>
+    <div>
+        <div class="selecionar_tudo">
+            <label for="selecionarTodasParcelas">Selecionar Tudo</label>
+            <input type="checkbox" name="selecionarTodasParcelas" id="selecionarTodasParcelas">
+        </div>
+        <div class="botoes_acoes_lancamentos">
+            <button type="button" id="btn-liquidar">
+                LIQUIDAR
+            </button>
+            <button form="formulario_filtrar" formaction="/parcelas/" type="submit" class="botao_gerar_excel" name="acao" value="excel">
+                GERAR EXCEL 
+            </button>
+        </div>
     </div>
     <table>
         <thead>
@@ -161,7 +167,7 @@ Parcelas
                 {% endfor %}
                 <tr class="linha-total">
                     <td colspan="2"><strong>Valor Total:</strong></td>
-                    <td><strong>R$ {{ "{:,.2f}".format(valor_total).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
+                    <td><strong id="valor_total_parcelas">R$ {{ "{:,.2f}".format(valor_total).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
                 </tr>
             {% else %}
                 <tr>
