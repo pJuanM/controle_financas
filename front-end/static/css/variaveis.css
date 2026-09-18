@@ -43,6 +43,7 @@
     /* ===== TEXTO ===== */
     --cor-texto: #ffffff;
     --cor-texto-hover: #34e3f5;
+    --cor-texto-erro: #fb0000;
     --cor-texto-preto: #000000;
     --cor-texto-cinza: #777777;
     --cor-texto-cinza-claro: #cbd5e1;
@@ -54,6 +55,8 @@
     --cor-fundo-overlay: #000000ad;
     --cor-overlay: rgba(0, 0, 0, 0.75);
     --cor-fundo-desabilitado: #0e193fba;
+    --cor-fundo-sucesso: #013b0ef0;
+    --cor-fundo-erro: #ffec00f0;
     --cor-fundo-campo: #D9F0EE;
     --cor-fundo-cinza: #e0e0e0;
     --cor-fundo-verde-claro: #d1fae5;

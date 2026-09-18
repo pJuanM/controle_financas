@@ -117,10 +117,9 @@ Parcelas
 <h1 class="titulo-pagina">LISTA DE PARCELAS</h1>
 
 <section class="tabela">
-    <div>
+    <div class="botoesAcoesTabela">
         <div class="selecionar_tudo">
-            <label for="selecionarTodasParcelas">Selecionar Tudo</label>
-            <input type="checkbox" name="selecionarTodasParcelas" id="selecionarTodasParcelas">
+            <div id="selecionarTodasParcelas"></div>
         </div>
         <div class="botoes_acoes_lancamentos">
             <button type="button" id="btn-liquidar">
@@ -155,7 +154,7 @@ Parcelas
                     class="badge-tipo {{ parcela.lancamento.tipo_lancamento|lower }}">
                     <td class="col-data-vencimento">{{ parcela.data_vencimento.strftime("%d/%m/%Y") }}</td>
                     <td class="col-item">{{ parcela.numero_parcela }}/{{ parcela.lancamento.qnt_parcelas }} - {{ parcela.lancamento.item_comprado }}</td>
-                    <td class="col-valor">
+                    <td class="col-valor">  
                         <span>
                             R$ {{ "{:,.2f}".format(parcela.valor_parcela).replace(",", "X").replace(".", ",").replace("X", ".") }}
                         </span>

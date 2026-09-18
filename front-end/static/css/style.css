@@ -47,11 +47,31 @@ label {
     margin-bottom: .2em;
 }
 .mensagemSucesso {
-    color: var(--cor-sucesso);
+    background-color: var(--cor-fundo-sucesso);
+    border-radius: 15px;
+    padding: .3em;
+    margin-top: .3em;
+    color: var(--cor-texto);
+    font-weight: bold;
+    width: 80%;
+    text-align: center;
+    margin: .5em auto;
+    font-size: 0.7EM;
+    font-style: italic;
 }
 
 .mensagemErro {
-    color: var(--cor-vermelho);
+    background-color: var(--cor-fundo-erro);
+    border-radius: 15px;
+    padding: .3em;
+    margin-top: .3em;
+    color: var(--cor-texto-erro);
+    font-weight: bold;
+    width: 80%;
+    text-align: center;
+    margin: .5em auto;
+    font-size: 0.7EM;
+    font-style: italic;
 }
 .menu_editar input:disabled,
 .menu_editar select:disabled {

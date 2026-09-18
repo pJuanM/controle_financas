@@ -1,9 +1,42 @@
+.botoesAcoesTabela {
+    margin-bottom: 1em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .botoes_acoes_lancamentos {
     display: flex;
     justify-content: end;
-    margin-bottom: 1em;
     gap: 1em;
+
 }
+
+.selecionar_tudo {
+    width: 4em;
+    height: 2em;
+    background-color: rgb(8, 8, 8);
+    border-radius: 50px;
+    position: relative;
+    cursor: pointer;
+}
+#selecionarTodasParcelas {
+    width: 2em;
+    height: 2em;
+    position: absolute;
+    background-color: rgb(185, 185, 182);
+    border-radius: 100%;
+    left: 0;
+    top: 0;
+    transition: transform .3s ease-in, background-color .3s ease-in;
+
+}
+#selecionarTodasParcelas.ativo {
+    transform: translateX(2em);
+    background-color: #00ff40;
+}
+
+
+
 .botoes_acoes_lancamentos button {
     padding: .6em;
     border-radius: 11px;
@@ -63,6 +96,7 @@ table .col-item {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: left;
 }
 table .col-data-vencimento,
 table .col-data-compra {
@@ -73,25 +107,24 @@ table .col-data-compra {
 }
 
 .col-valor {
-    text-align: center;
-    align-items: center;
-    display: flex;
-    gap: 1em;
-    justify-content: center;
+    text-align: left;
     vertical-align: middle;
+    position: relative;
+    
 }
 
 .col-valor span {
     display: inline-block;
-    width: 8em;
     text-align: right;
 }
 
 input.btn-liquidar {
     vertical-align: middle;
-    margin: 0;
-    margin: 0;
-    flex-shrink: 0;
+    right: 0.2em;
+    position: absolute;
+    top: 50%;
+    margin-left: .5em;
+    transform: translateY(-50%)
 }
 
 .linha-total {

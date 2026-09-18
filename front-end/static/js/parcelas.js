@@ -105,17 +105,21 @@ if (btnLiquidar) {
 }
 
 const selecionarTudo = document.querySelector(".selecionar_tudo");
-selecionarTudo.addEventListener("click", function (event) {
 
-    selecionarTudo.checked = true;
+selecionarTudo.addEventListener("click", function () {
     const botoesLiquidar = document.querySelectorAll(".btn-liquidar");
+    const bolinhaAlternavel = document.querySelector("#selecionarTodasParcelas");
 
     if (botoesLiquidar.length === 0){ 
         return;
     }
 
-    const deveDesmarcar = botoesLiquidar[0].checked;
-    for (let botao of botoesLiquidar) {
-        botao.checked = !deveDesmarcar;
+    bolinhaAlternavel.classList.toggle("ativo")
+    const selecionado = bolinhaAlternavel.classList.contains("ativo");
+    console.log(selecionado)
+    for (const botao of botoesLiquidar) {
+        botao.checked = selecionado;
     }
 });
+
+
