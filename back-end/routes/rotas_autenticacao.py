@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
@@ -172,14 +172,14 @@ async def login(request: Request,
     try:
         usuario = autenticar_usuario(login, senha, session)
     except HTTPException as erro:
-        return templates.TemplateResponse(
-            request = request,
-            name = "login.html",
-            context = {
-                "erro": erro.detail
-            },
-            status_code = erro.status_code
-        )
+        print("Deu este erro")
+        return JSONResponse(
+            status_code = erro.status_code,
+            content = {
+                "sucesso": False,
+                "mensagem": "Por gentileza verifique as credencias informadas."
+            }
+            )
     
     access_token = criar_token(usuario.id)
     response = RedirectResponse(

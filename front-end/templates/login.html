@@ -5,7 +5,7 @@ Login
 {% block conteudo %}
 <h1 class="titulo-pagina">Login</h1>
 <section class="formulario">
-    <form action="/usuario/login" method="POST" id="formulario">
+    <form onsubmit="envioFormularioCadastro(event)" data-tipo="login" data-url="/usuario/login" action="/usuario/login" method="POST" id="formulario">
         <div class="grupo_campo">
             <input type="text" id="login" name="login" placeholder="E-mail/Usuário" autocomplete="username" required>
         </div>
@@ -18,12 +18,12 @@ Login
         
         <button type="submit" id="enviar_formulario">Entrar</button>
     </form>
-{% if erro %}
-    <div class="mensagemErro">
-        {{ erro }}
-    </div>
-{% endif %}
+<div class="mensagem">
+    <p id="status_mensagem"></p>
+</div>
+
 </section>
 {% endblock %}
-
-
+{% block script %}
+    <script src="{{ url_for('static', path='/js/formulario.js') }}"></script>
+{% endblock %}

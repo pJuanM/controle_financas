@@ -61,6 +61,8 @@ def encontrar_categoria(descricao_lancamento,
                                          Categorias.status_categoria == "ATIVO")
     ).all()
 
+    descricao_upper = descricao_lancamento.upper()
+
     for categoria in categorias:
         if categoria.categoria.upper() == "AVULSO":
             continue
@@ -70,9 +72,14 @@ def encontrar_categoria(descricao_lancamento,
         for palavra in palavras_chave:
             palavra = palavra.strip()
 
-            if palavra and palavra in descricao_lancamento.upper():
+            if not palavra:
+                continue
+
+            padrao = r"\b" + re.escape(palavra) + r"\b"
+
+            if re.search(padrao, descricao_upper):
                 return categoria.id
-            
+
     categoria_avulso = (
         session.query(Categorias)
         .filter(
@@ -236,6 +243,7 @@ async def home(request: Request,
         return templates.TemplateResponse(request= request, name="sem_login.html")
     categorias = session.query(Categorias).filter(Categorias.id_usuario == usuario.id)
     formas_pagamento = session.query(FormasPagamento).filter(FormasPagamento.id_usuario == usuario.id)
+    formas_pagamento = formas_pagamento.order_by(FormasPagamento.responsavel)
 
 
     return templates.TemplateResponse(
@@ -274,6 +282,7 @@ async def criar_lancamento(data_compra: date = Form(...),
                                     Parcelas.status_parcela != "CANCELADO",
                                     Lancamentos.tipo_lancamento == tipo_lancamento,
                                     Lancamentos.valor_lancamento == valor_lancamento,
+                                    Lancamentos.pagador_responsavel == pagador_responsavel,
                                     Lancamentos.id_forma_pagamento == forma_pagamento).first()
     if parcelado == False:
         qnt_parcelas = 1
@@ -292,7 +301,10 @@ async def criar_lancamento(data_compra: date = Form(...),
         }
 
     if tipo_lancamento == "DEBITO":
-        pagador_responsavel = usuario.nome
+        if not pagador_responsavel:
+            pagador_responsavel = usuario.nome
+        else:
+            pagador_responsavel = pagador_responsavel.upper()
     else:
         if pagador_responsavel:
             pagador_responsavel = pagador_responsavel.upper()
