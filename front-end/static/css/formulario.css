@@ -82,6 +82,11 @@ input:not([type="checkbox"]){
     margin: 1em 0;
     cursor: pointer;
 }
+#labelArquivo:hover {
+    background: var(--cor-fundo-preto);
+    color: var(--cor-texto-hover);
+    transition: background-color .3s ease-in-out;
+}
 
 #enviar_formulario,
 #btn_editar,

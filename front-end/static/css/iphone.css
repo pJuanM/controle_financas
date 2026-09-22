@@ -23,3 +23,11 @@
 
 
 }
+
+@media (min-width: 800px) {
+
+  main {
+    margin: 0 auto;
+    max-width: 70vw;
+  }   
+}

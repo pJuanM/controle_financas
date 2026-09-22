@@ -172,19 +172,20 @@ async def login(request: Request,
     try:
         usuario = autenticar_usuario(login, senha, session)
     except HTTPException as erro:
-        print("Deu este erro")
         return JSONResponse(
-            status_code = erro.status_code,
+            status_code = 200,
             content = {
                 "sucesso": False,
-                "mensagem": "Por gentileza verifique as credencias informadas."
+                "mensagem": erro.detail
             }
-            )
+        )
     
     access_token = criar_token(usuario.id)
-    response = RedirectResponse(
-        url="/home",
-        status_code = 303
+    response = JSONResponse(
+        content = {
+            "sucesso": True,
+            "mensagem": "Login realizado com sucesso!"
+        }
     )
     response.set_cookie(
         key = "access_token",

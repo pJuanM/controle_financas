@@ -83,12 +83,22 @@ async function envioFormularioCadastro(event) {
             if (resultado.sucesso) {
                 statusMensagem.classList.add("mensagemSucesso");
                 statusMensagem.textContent = resultado.mensagem;
-                setTimeout(() => {
-                    statusMensagem.textContent = "Recarregando a página....";
+                if (tipo != "login") {
                     setTimeout(() => {
-                        window.location.reload();                         
+                        statusMensagem.textContent = "Recarregando a página....";
+                        setTimeout(() => {
+                            window.location.reload();                         
+                        }, 2000);
                     }, 2000);
-                }, 2000);
+
+                } else {
+                    setTimeout(() => {
+                        statusMensagem.textContent = "Redirecionando...";
+                        setTimeout(() => {
+                            window.location.href = "/home";                         
+                        }, 2000);
+                    }, 1000);
+                }
                   
             } else {
                 statusMensagem.classList.add("mensagemErro");

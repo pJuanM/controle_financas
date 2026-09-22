@@ -104,11 +104,16 @@
     font-weight: bold;
 
 }
+.menu_lateral_navegacao .perfil_usuario span:hover{
+    color: var(--cor-texto);
+
+}
 .menu_lateral_navegacao .perfil_usuario legend {
     padding: 0 .4em;
     max-width: 100%;
     white-space: normal;  /* Garante que o texto quebre linhas normalmente */
 }
+
 
 
 .menu_lateral_navegacao .navegar_rotas,

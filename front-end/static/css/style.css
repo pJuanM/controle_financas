@@ -30,9 +30,9 @@ button {
     cursor: pointer;
 }
 button:hover {
-    background: var(--cor-fundo-preto);
-    color: var(--cor-texto-hover);
-    transition: background color .3s ease-in-out;
+    background: var(--cor-fundo-preto) !important;
+    color: var(--cor-texto-hover) !important;
+    transition: background-color .3s ease-in-out !important;
 }
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
