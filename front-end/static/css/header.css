@@ -2,6 +2,9 @@ header{
     color: var(--cor-texto);
     text-align: end;
     background-image: linear-gradient(to right, var(--cor-gradiente-1),var(--cor-gradiente-2) , var(--cor-gradiente-3));
+    position: fixed;
+    width: 100%;
+    z-index: 98;
 }
 .menu_navegacao {
     display: flex;
@@ -11,7 +14,6 @@ nav a:hover {
     text-decoration: underline;
     color: var(--cor-texto-hover);
     cursor: pointer;
-    
 }
 
 .homepage_navegacao {

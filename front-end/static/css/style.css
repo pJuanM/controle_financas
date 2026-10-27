@@ -26,6 +26,10 @@ a {
     color: var(--cor-texto);
     font-weight: bold;
 }
+
+main {
+    padding-top: 80px !important;
+}
 button {
     cursor: pointer;
 }

@@ -13,18 +13,23 @@ Cadastro
 <section class="formulario">
     <form onsubmit="envioFormularioCadastro(event)" action="/usuario/cadastro/criar" method="POST" id="formulario" data-tipo="usuario" data-url="/usuario/cadastro/criar">
         <div class="grupo_campo">
+            <label class="label_campos_usuario" for="usuario">Usuário</label>
             <input required type="text" id="usuario" name="usuario" placeholder="Usuário" autocomplete="off">
         </div>
         <div class="grupo_campo">
+            <label class="label_campos_usuario" for="nome">Nome</label>
             <input required type="text" id="nome" name="nome" placeholder="Nome completo" autocomplete="off">
         </div>
         <div class="grupo_campo">
+            <label class="label_campos_usuario" for="email">E-mail</label>
             <input required type="email" id="email" name="email" placeholder="E-mail" autocomplete="off">
         </div>
         <div class="grupo_campo">
+            <label class="label_campos_usuario" for="senha">Senha</label>
             <input required type="password" id="senha" name="senha" placeholder="Senha" data-senha autocomplete="new-password">
         </div>
         <div class="grupo_campo">
+            <label class="label_campos_usuario" for="confirme_senha">Confirme Senha</label>
             <input required type="password" id="confirme_senha" name="confirme_senha" placeholder="Confirme sua senha" data-confirme-senha autocomplete="new-password">
         </div>
         <p id="erroSenha"></p>

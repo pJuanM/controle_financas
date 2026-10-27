@@ -7,10 +7,12 @@ Login
 <section class="formulario">
     <form onsubmit="envioFormularioCadastro(event)" data-tipo="login" data-url="/usuario/login" action="/usuario/login" method="POST" id="formulario">
         <div class="grupo_campo">
+            <label class="label_campos_usuario" for="login">E-mail / Usuário</label>
             <input type="text" id="login" name="login" placeholder="E-mail/Usuário" autocomplete="username" required>
         </div>
 
         <div class="grupo_campo">
+            <label class="label_campos_usuario" for="senha">SENHA</label>
             <input type="password" id="senha" name="senha" placeholder="Senha" required autocomplete="current-password">
         </div>
 
