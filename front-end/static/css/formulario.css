@@ -1,14 +1,14 @@
-/* CLASSE FORMULARIO SE REFERE A TAG SECTION NO HTML */
+/* CLASSE FORMULARIO SE REFERE A TAG SECTION NO HTML*/
 .formulario{
-    background-color: var(--cor-fundo-campo);
     padding: 1em;
     border-radius: 15px;
-}
+} 
 /* ID FORMULARIO SE REFERE A TAG FORM NO HTML */
 form {
     display: flex;
     flex-direction: column;
     min-height: 25vh;
+    gap: .7em;
 }
 form .grupo_campo {
     display: flex;
@@ -41,17 +41,18 @@ form .campo_data label {
     justify-content: center;
     color: var(--cor-texto);
     font-weight: bold;
-    pointer-events: none;
     transition: .2s;
     width: 100%;
     font-size: .9em;
 }
 form .campo_data:focus-within label,
 form .campo_data label.escondida {
-    opacity: 0;
+    top: -.3em;
+    color:black;
+    background-color: var(--cor-fundo-campo);
+    border-radius: 15px;
+    width: 75%;
 }
- 
-
 form input::placeholder{
     color: var(--cor-texto);
 }

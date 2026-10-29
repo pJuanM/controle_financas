@@ -17,21 +17,37 @@ nav a:hover {
 }
 
 .homepage_navegacao {
-    display: flex;
+    display: grid;
     flex-direction: column;
-    gap: 1em;
+    grid-column: 2;
     text-align: center;
     font-weight: bold;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2em;
 }
 .homepage_navegacao a {
-    background-image: linear-gradient(to right, var(--cor-gradiente-1),var(--cor-gradiente-2) , var(--cor-gradiente-3));
+    background-image: linear-gradient(to left, var(--cor-gradiente-1),var(--cor-gradiente-2) , var(--cor-gradiente-3));
+    background-size: 300% 300%;
     padding: 1.4em;
     border-radius: 15px;
     border: 2px solid var(--cor-vermelho-escuro);
     box-shadow: 2px -2px 7px 0px var(--cor-turquesa);
+    display: flex;
+    align-items: start;
+    gap: 1em;
+    flex-direction: column;
+
+}
+
+.homepage_navegacao a svg g {
+    fill: white;
 }
 .homepage_navegacao a:hover {
     transform: scale(.9);
     box-shadow: 2px -2px 7px 3px var(--cor-turquesa);
+
+}
+.homepage_navegacao a:hover g {
+    fill: var(--cor-texto-hover);
 
 }
